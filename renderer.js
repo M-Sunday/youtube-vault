@@ -264,7 +264,7 @@ document.getElementById('imageWrap').addEventListener('mousedown', (e) => {
 })
 
 // ─── Add video ────────────────────────────────────────
-document.getElementById('addBtn').addEventListener('click', () => {
+function addCurrentVideo() {
   if (!currentVideo) { document.getElementById('videoTitle').textContent = 'Load a video first'; return }
   const { id, title, channel, duration, url, thumbnail } = currentVideo
   const vs = getVideos()
@@ -278,7 +278,9 @@ document.getElementById('addBtn').addEventListener('click', () => {
   renderSidebar()
   const t = document.querySelector('#pane-history .settings-toggle:first-child')
   if (t?.classList.contains('on')) { const h = loadHistory().filter(x => x.id !== id); h.unshift({ id, title, channel }); saveHistory(h) }
-})
+}
+document.getElementById('addBtn').addEventListener('click', addCurrentVideo)
+document.getElementById('cardAddBtn').addEventListener('click', addCurrentVideo)
 
 // ─── Video fetch ──────────────────────────────────────
 function hashUrl(url) {
