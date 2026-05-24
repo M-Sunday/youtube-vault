@@ -214,7 +214,7 @@ function loadVideoById(id) {
   document.getElementById('durationBadge').textContent = v.duration || '–'
   document.getElementById('videoTitle').textContent = v.title
   document.getElementById('channelName').textContent = v.channel
-  renderSidebar()
+  renderSidebar(); updateCardAddBtn()
 }
 
 function clearCard() {
@@ -222,6 +222,7 @@ function clearCard() {
   document.getElementById('durationBadge').textContent = '–'
   document.getElementById('videoTitle').textContent = 'Paste a video link above'
   document.getElementById('channelName').textContent = ''
+  document.getElementById('cardAddRow').style.display = 'none'
 }
 
 // ─── Thumbnail drag ────────────────────────────────────
@@ -264,6 +265,24 @@ document.getElementById('imageWrap').addEventListener('mousedown', (e) => {
 })
 
 // ─── Add video ────────────────────────────────────────
+function updateCardAddBtn() {
+  const row = document.getElementById('cardAddRow')
+  const btn = document.getElementById('cardAddBtn')
+  if (!currentVideo) { row.style.display = 'none'; return }
+  const vs = getVideos()
+  if (vs[currentVideo.id]) {
+    row.style.display = 'flex'
+    btn.classList.add('saved')
+    btn.innerHTML = '<i data-lucide="check" class="card-add-icon"></i> Saved'
+    lucide.createIcons()
+  } else {
+    row.style.display = 'flex'
+    btn.classList.remove('saved')
+    btn.innerHTML = '<i data-lucide="plus" class="card-add-icon"></i> Add video'
+    lucide.createIcons()
+  }
+}
+
 function addCurrentVideo() {
   if (!currentVideo) { document.getElementById('videoTitle').textContent = 'Load a video first'; return }
   const { id, title, channel, duration, url, thumbnail } = currentVideo
@@ -275,7 +294,7 @@ function addCurrentVideo() {
   if (!fs['Videos']) fs['Videos'] = []
   if (!fs['Videos'].includes(id)) fs['Videos'].push(id)
   saveFolders(fs)
-  renderSidebar()
+  renderSidebar(); updateCardAddBtn()
   const t = document.querySelector('#pane-history .settings-toggle:first-child')
   if (t?.classList.contains('on')) { const h = loadHistory().filter(x => x.id !== id); h.unshift({ id, title, channel }); saveHistory(h) }
 }
@@ -314,7 +333,7 @@ async function loadVideo(url) {
     if (thumbnail) document.getElementById('thumbnail').src = thumbnail
     document.getElementById('durationBadge').textContent = duration || '–'
     document.getElementById('videoTitle').textContent = title; document.getElementById('channelName').textContent = channel
-    renderSidebar()
+    renderSidebar(); updateCardAddBtn()
   } catch (e) { document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
 }
 document.getElementById('ytBtn').addEventListener('click', () => {
