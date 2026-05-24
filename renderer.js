@@ -307,31 +307,43 @@ function hashUrl(url) {
   return Math.abs(h).toString(36)
 }
 
+async function fetchPageMeta(urlStr) {
+  const html = await (await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(urlStr)}`)).text()
+  const title = (html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/) || html.match(/<title>([^<]+)<\/title>/))?.[1]?.replace(/&amp;/g, '&')?.trim() || ''
+  const thumbnail = (html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/) || [])[1] || ''
+  const site = (html.match(/<meta\s+property="og:site_name"\s+content="([^"]+)"/) || [])[1] || ''
+  return { title, thumbnail, site }
+}
+
 async function loadVideo(url) {
   const urlStr = typeof url === 'string' ? url : url.trim()
   document.getElementById('thumbnail').src = ''
   document.getElementById('durationBadge').textContent = '...'
   document.getElementById('videoTitle').textContent = 'Loading...'; document.getElementById('channelName').textContent = ''
   try {
-    const data = await (await fetch(`https://noembed.com/embed?url=${encodeURIComponent(urlStr)}`)).json()
-    if (data.error) throw new Error(data.error)
     const id = hashUrl(urlStr)
-    let title = data.title || 'Unknown'
-    const channel = data.author_name || new URL(urlStr).hostname.replace('www.', '')
-    let thumbnail = data.thumbnail_url || ''
-    let sec = 0
-    if (!thumbnail) {
+    let title = '', channel = '', thumbnail = ''
+    try {
+      const data = await (await fetch(`https://noembed.com/embed?url=${encodeURIComponent(urlStr)}`)).json()
+      if (!data.error) {
+        title = data.title || ''
+        channel = data.author_name || ''
+        thumbnail = data.thumbnail_url || ''
+      }
+    } catch (_) {}
+    if (!title || !thumbnail) {
       try {
-        const html = await (await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(urlStr)}`)).text()
-        thumbnail = (html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/) || [])[1] || ''
-        sec = parseInt((html.match(/"lengthSeconds":"?(\d+)"?/) || [])[1] || '0')
+        const meta = await fetchPageMeta(urlStr)
+        if (!title) title = meta.title
+        if (!thumbnail) thumbnail = meta.thumbnail
+        if (!channel) channel = meta.site
       } catch (_) {}
     }
-    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60
-    const duration = sec ? (h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`) : ''
-    currentVideo = { id, title, channel, duration, url: urlStr, thumbnail }
+    if (!channel) { try { channel = new URL(urlStr).hostname.replace('www.', '') } catch (_) {} }
+    if (!title) title = 'Unknown'
+    currentVideo = { id, title, channel, duration: '', url: urlStr, thumbnail }
     if (thumbnail) document.getElementById('thumbnail').src = thumbnail
-    document.getElementById('durationBadge').textContent = duration || '–'
+    document.getElementById('durationBadge').textContent = '–'
     document.getElementById('videoTitle').textContent = title; document.getElementById('channelName').textContent = channel
     renderSidebar(); updateCardAddBtn()
   } catch (e) { document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
