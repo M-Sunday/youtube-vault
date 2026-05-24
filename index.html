@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1d1d1f">
+    <title>YouTube Vault</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-left">
+                <i data-lucide="library" class="sidebar-header-icon"></i>
+                <span class="sidebar-title">Vault</span>
+            </div>
+            <div class="sidebar-header-right">
+                <button class="sidebar-icon-btn" id="pinBtn">
+                    <i data-lucide="pin" class="sidebar-icon"></i>
+                </button>
+                <button class="sidebar-icon-btn" id="settingsBtn">
+                    <i data-lucide="settings" class="sidebar-icon"></i>
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-search">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search files..." spellcheck="false" />
+        </div>
+        <div class="sidebar-add">
+            <button id="addBtn">
+                <i data-lucide="plus" class="add-icon"></i>
+                <span>Add video</span>
+            </button>
+        </div>
+        <div class="sidebar-tree" id="sidebarTree"></div>
+        <div class="sidebar-footer">
+            <button class="sidebar-footer-btn" id="newFolderBtn">
+                <i data-lucide="folder-plus" class="footer-icon"></i>
+                New folder
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-area" id="mainArea">
+        <div class="top-bar">
+            <button class="menu-btn" id="menuBtn">
+                <i data-lucide="panel-left" class="menu-btn-icon"></i>
+            </button>
+            <div class="top-bar-center">YouTube</div>
+            <div class="top-bar-input">
+                <input type="text" id="ytInput" placeholder="Paste link" spellcheck="false" />
+                <button id="ytBtn">
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="container">
+                <div class="card" id="videoCard">
+                    <div class="image-wrap" id="imageWrap">
+                        <div class="badge" id="durationBadge">–</div>
+                        <img id="thumbnail" src="" alt="Video thumbnail">
+                    </div>
+                    <div class="card-body">
+                        <h1 id="videoTitle">Paste a YouTube link above</h1>
+                        <p class="subtitle" id="channelName"></p>
+                    </div>
+                    <div class="calendar" id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini thumbnail -->
+    <div class="mini-thumb" id="miniThumb">
+        <div class="mini-thumb-img-wrap">
+            <img id="miniImg" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Folder dialog -->
+    <div class="folder-dialog-overlay" id="folderDialog">
+        <div class="folder-dialog">
+            <h3>New folder</h3>
+            <input type="text" id="folderNameInput" placeholder="Folder name" spellcheck="false" />
+            <div class="folder-colors">
+                <div class="folder-color active" data-color="#ff453a" style="background:#ff453a"></div>
+                <div class="folder-color" data-color="#ff9f0a" style="background:#ff9f0a"></div>
+                <div class="folder-color" data-color="#ffd60a" style="background:#ffd60a"></div>
+                <div class="folder-color" data-color="#30d158" style="background:#30d158"></div>
+                <div class="folder-color" data-color="#0a84ff" style="background:#0a84ff"></div>
+            </div>
+            <div class="folder-dialog-actions">
+                <button class="dialog-btn cancel" id="folderDialogCancel">Cancel</button>
+                <button class="dialog-btn confirm" id="folderDialogConfirm">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context menu -->
+    <div class="ctx-menu" id="ctxMenu">
+        <div class="ctx-item" data-action="rename-folder"><i data-lucide="edit-3" class="ctx-icon"></i> Rename folder</div>
+        <div class="ctx-item ctx-danger" data-action="delete-folder"><i data-lucide="trash-2" class="ctx-icon"></i> Delete folder</div>
+        <div class="ctx-divider" id="ctxDiv1"></div>
+        <div class="ctx-item" data-action="archive"><i data-lucide="archive" class="ctx-icon"></i> Archive</div>
+        <div class="ctx-item" data-action="pin"><i data-lucide="pin" class="ctx-icon"></i> Pin</div>
+        <div class="ctx-divider" id="ctxDiv2"></div>
+        <div class="ctx-item ctx-danger" data-action="delete"><i data-lucide="trash-2" class="ctx-icon"></i> Delete</div>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <div class="settings-sidebar">
+                <div class="settings-sidebar-header">Settings</div>
+                <div class="settings-categories">
+                    <div class="settings-cat active" data-cat="theme">Theme</div>
+                    <div class="settings-cat" data-cat="basic">Basic info</div>
+                    <div class="settings-cat" data-cat="toolbar">Toolbar</div>
+                    <div class="settings-cat" data-cat="files">Files and links</div>
+                    <div class="settings-cat" data-cat="history">Link history</div>
+                </div>
+                <div class="settings-sidebar-footer" id="settingsClose">
+                    <i data-lucide="x" class="settings-close-icon"></i> Close
+                </div>
+            </div>
+            <div class="settings-content" id="settingsContent">
+                <div class="settings-pane" id="pane-theme">
+                    <div class="settings-pane-header"><h2>Theme</h2><p class="settings-pane-desc">Choose your preferred appearance.</p></div>
+                    <div class="theme-options">
+                        <div class="theme-option active" data-theme="white"><div class="theme-preview theme-white"></div><span>White</span></div>
+                        <div class="theme-option" data-theme="black"><div class="theme-preview theme-black"></div><span>Black</span></div>
+                        <div class="theme-option" data-theme="obsidian"><div class="theme-preview theme-obsidian"></div><span>Obsidian Black</span></div>
+                    </div>
+                    <label class="settings-checkbox"><input type="checkbox" id="systemTheme" /><span class="settings-checkbox-mark"></span><span>Have system theme</span></label>
+                </div>
+                <div class="settings-pane" id="pane-basic" style="display:none">
+                    <div class="settings-pane-header"><h2>Basic info</h2><p class="settings-pane-desc">About this app.</p></div>
+                    <div class="settings-footer-row" style="flex-direction:column;gap:6px;margin-top:20px">
+                        <span>Version 1.0.0</span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
+                    </div>
+                </div>
+                <div class="settings-pane" id="pane-toolbar" style="display:none">
+                    <div class="settings-pane-header"><h2>Toolbar</h2><p class="settings-pane-desc">Customize your toolbar.</p></div>
+                    <div class="settings-plugin-list" style="margin-top:20px">
+                        <div class="settings-plugin"><span class="settings-plugin-name">Show sidebar button</span><div class="settings-toggle on"></div></div>
+                        <div class="settings-plugin"><span class="settings-plugin-name">Show YouTube input</span><div class="settings-toggle on"></div></div>
+                        <div class="settings-plugin"><span class="settings-plugin-name">Compact mode</span><div class="settings-toggle"></div></div>
+                    </div>
+                </div>
+                <div class="settings-pane" id="pane-files" style="display:none">
+                    <div class="settings-pane-header"><h2>Files and links</h2><p class="settings-pane-desc">How files and links are handled.</p></div>
+                    <div class="settings-plugin-list" style="margin-top:20px">
+                        <div class="settings-plugin"><span class="settings-plugin-name">Automatically update links</span><div class="settings-toggle on"></div></div>
+                        <div class="settings-plugin"><span class="settings-plugin-name">Confirm file deletion</span><div class="settings-toggle on"></div></div>
+                        <div class="settings-plugin"><span class="settings-plugin-name">Detect all file extensions</span><div class="settings-toggle"></div></div>
+                    </div>
+                </div>
+                <div class="settings-pane" id="pane-history" style="display:none">
+                    <div class="settings-pane-header"><h2>Link history</h2><p class="settings-pane-desc">Recently opened YouTube links.</p></div>
+                    <div class="settings-plugin-list" style="margin-top:20px">
+                        <div class="settings-plugin"><span class="settings-plugin-name">Save link history</span><div class="settings-toggle on"></div></div>
+                        <div class="settings-plugin"><span class="settings-plugin-name">Clear on exit</span><div class="settings-toggle"></div></div>
+                    </div>
+                    <div class="settings-footer-info"><button class="settings-clear-btn">Clear history</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./node_modules/lucide/dist/umd/lucide.min.js"></script>
+    <script src="renderer.js"></script>
+</body>
+</html>
