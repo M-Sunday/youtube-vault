@@ -354,6 +354,57 @@ bookmarkUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') boo
 bookmarkTitleInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addBookmark(); if (e.key === 'Escape') bookmarkDialog.classList.remove('open') })
 bookmarkDialog.addEventListener('mousedown', (e) => { if (e.target === bookmarkDialog) bookmarkDialog.classList.remove('open') })
 
+// ─── Grid view ─────────────────────────────────────────
+function renderGridView() {
+  const el = document.getElementById('gridView')
+  let html = ''
+  const folders = getFolders()
+  const meta = getFolderMeta()
+  const videos = getVideos()
+  for (const [name, ids] of Object.entries(folders)) {
+    if (!ids.length) continue
+    const color = meta[name]?.color || ''
+    html += `<div class="grid-section"><div class="grid-section-header"${color ? ` style="color:${color}"` : ''}><i data-lucide="folder" style="width:16px;height:16px;flex-shrink:0"></i> ${name}</div><div class="grid-items">`
+    for (const id of ids) {
+      const v = videos[id]
+      if (!v) continue
+      const thumb = v.thumbnail || `https://img.youtube.com/vi/${id}/maxresdefault.jpg`
+      html += `<div class="grid-item" data-video-id="${id}"><img class="grid-item-img" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${id}/hqdefault.jpg'" /><div class="grid-item-info"><div class="grid-item-title">${v.title}</div><div class="grid-item-sublabel">${v.channel}</div></div></div>`
+    }
+    html += '</div></div>'
+  }
+  const bms = getBookmarks()
+  if (bms.length) {
+    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="bookmark" style="width:16px;height:16px;flex-shrink:0"></i> Bookmarks</div><div class="grid-items">`
+    for (const bm of bms) {
+      html += `<div class="grid-item bm" data-bookmark-id="${bm.id}">${bm.image ? `<img class="grid-item-img" src="${bm.image}" loading="lazy" />` : '<div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed"><i data-lucide="external-link" style="width:24px;height:24px;color:#8e8e93"></i></div>'}<div class="grid-item-info"><div class="grid-item-title">${bm.title || bm.url}</div><div class="grid-item-sublabel">${bm.url}</div></div></div>`
+    }
+    html += '</div></div>'
+  }
+  el.innerHTML = html || '<div style="padding:30px;text-align:center;font-size:13px;color:#8e8e93">Nothing to show yet.</div>'
+  lucide.createIcons()
+  // Click handlers
+  el.querySelectorAll('[data-video-id]').forEach(item => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.videoId
+      const v = videos[id]
+      if (v) { loadVideoById(id); document.getElementById('gridBtn').click() }
+    })
+  })
+  el.querySelectorAll('[data-bookmark-id]').forEach(item => {
+    item.addEventListener('click', () => {
+      const bm = bms.filter(b => b.id === item.dataset.bookmarkId)[0]
+      if (bm?.url) window.open(bm.url)
+    })
+  })
+}
+document.getElementById('gridBtn').addEventListener('click', function () {
+  const open = this.classList.toggle('active')
+  document.getElementById('gridView').classList.toggle('open', open)
+  document.querySelector('.content').style.display = open ? 'none' : ''
+  if (open) renderGridView()
+})
+
 // ─── Sidebar toolbar ──────────────────────────────────
 document.getElementById('pinBtn').addEventListener('click', function () { this.classList.toggle('pinned') })
 document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('closed'))
