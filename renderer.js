@@ -11,6 +11,7 @@ function getBookmarks() { try { return JSON.parse(localStorage.getItem('ytBookma
 function saveBookmarks(b) { localStorage.setItem('ytBookmarks', JSON.stringify(b)) }
 function getNotes() { try { return JSON.parse(localStorage.getItem('ytNotes') || '[]') } catch { return [] } }
 function saveNotes(n) { localStorage.setItem('ytNotes', JSON.stringify(n)) }
+function stripHtml(str) { return str.replace(/<[^>]*>/g, '') }
 
 let currentVideo = null
 let dragVideoId = null
@@ -49,8 +50,8 @@ function renderSidebar() {
     for (const n of getNotes()) {
       if (n.folder !== name) continue
       if (query && !n.title.toLowerCase().includes(query)) continue
-      const preview = (n.content || '').replace(/\n/g, ' ').substring(0, 50)
-      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${n.content?.length > 50 ? '…' : ''}</span></div></div></div>`
+      const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 50)
+      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
     }
     html += '</div></div>'
   }
@@ -70,8 +71,8 @@ function renderSidebar() {
     html += `<div class="tree-item expanded" data-notes="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="file-text" class="tree-folder-icon"></i><span class="tree-label">Notes</span></div><div class="tree-children">`
     for (const n of notes) {
       if (query && !n.title.toLowerCase().includes(query)) continue
-      const preview = (n.content || '').replace(/\n/g, ' ').substring(0, 50)
-      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${n.content?.length > 50 ? '…' : ''}</span></div></div></div>`
+      const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 50)
+      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
     }
     html += '</div></div>'
   }
@@ -455,14 +456,21 @@ const noteContentInput = document.getElementById('noteContentInput')
 
 function openNote(id) {
   currentNoteId = id
+  noteUndoStack = []
+  noteRedoStack = []
+  lastSavedContent = ''
   const notes = getNotes()
   const n = notes.filter(x => x.id === id)[0]
   if (!n) return
+  // Close grid view if open
+  const gridBtn = document.getElementById('gridBtn')
+  if (gridBtn.classList.contains('active')) gridBtn.click()
   document.querySelector('.container').style.display = 'none'
   document.getElementById('noteView').style.display = 'flex'
   document.getElementById('noteViewTitle').value = n.title || ''
   document.getElementById('noteViewContent').value = n.content || ''
   document.getElementById('noteViewFooter').textContent = `Last edited ${new Date(n.updated || n.added).toLocaleString()}`
+  renderNotePreview()
   renderSidebar()
 }
 
@@ -475,10 +483,23 @@ function closeNoteView() {
 
 // Auto-save note on input
 let noteSaveTimer = null
+let noteUndoStack = []
+let noteRedoStack = []
+let lastSavedContent = ''
+function pushNoteUndo() {
+  const current = document.getElementById('noteViewContent').value
+  if (lastSavedContent !== '' && lastSavedContent !== current) {
+    noteUndoStack.push(lastSavedContent)
+    if (noteUndoStack.length > 100) noteUndoStack.shift()
+    noteRedoStack = []
+  }
+  lastSavedContent = current
+}
 document.getElementById('noteViewTitle').addEventListener('input', () => {
   clearTimeout(noteSaveTimer)
   noteSaveTimer = setTimeout(() => {
     if (!currentNoteId) return
+    pushNoteUndo()
     const notes = getNotes()
     const n = notes.filter(x => x.id === currentNoteId)[0]
     if (!n) return
@@ -487,6 +508,7 @@ document.getElementById('noteViewTitle').addEventListener('input', () => {
     n.updated = Date.now()
     saveNotes(notes)
     document.getElementById('noteViewFooter').textContent = `Last edited ${new Date().toLocaleString()}`
+    renderNotePreview()
     renderSidebar()
   }, 500)
 })
@@ -494,6 +516,7 @@ document.getElementById('noteViewContent').addEventListener('input', () => {
   clearTimeout(noteSaveTimer)
   noteSaveTimer = setTimeout(() => {
     if (!currentNoteId) return
+    pushNoteUndo()
     const notes = getNotes()
     const n = notes.filter(x => x.id === currentNoteId)[0]
     if (!n) return
@@ -502,6 +525,7 @@ document.getElementById('noteViewContent').addEventListener('input', () => {
     n.updated = Date.now()
     saveNotes(notes)
     document.getElementById('noteViewFooter').textContent = `Last edited ${new Date().toLocaleString()}`
+    renderNotePreview()
     renderSidebar()
   }, 500)
 })
@@ -536,6 +560,66 @@ document.getElementById('noteDialogConfirm').addEventListener('click', () => {
 noteTitleInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); noteContentInput.focus() } })
 noteDialog.addEventListener('mousedown', (e) => { if (e.target === noteDialog) noteDialog.classList.remove('open') })
 
+// Paste images into notes
+document.getElementById('noteViewContent').addEventListener('paste', function (e) {
+  const items = e.clipboardData.items
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault()
+      const file = item.getAsFile()
+      if (!file) continue
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (!currentNoteId) return
+        const notes = getNotes()
+        const n = notes.filter(x => x.id === currentNoteId)[0]
+        if (!n) return
+        n.images = n.images || []
+        n.images.push({ dataUrl: reader.result })
+        n.updated = Date.now()
+        saveNotes(notes)
+        renderNotePreview()
+        this.dispatchEvent(new Event('input'))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+})
+function renderNotePreview() {
+  const el = document.getElementById('noteViewRendered')
+  if (!currentNoteId) { el.innerHTML = ''; return }
+  const n = getNotes().filter(x => x.id === currentNoteId)[0]
+  if (!n) { el.innerHTML = ''; return }
+  let html = (n.content || '').replace(/\n/g, '<br>')
+  if (n.images && n.images.length) {
+    for (const img of n.images) {
+      html += `<img src="${img.dataUrl}" style="max-width:100%;border-radius:8px;margin:8px 0">`
+    }
+  }
+  el.innerHTML = html
+}
+
+// Undo / Redo for notes
+document.getElementById('noteViewContent').addEventListener('keydown', function (e) {
+  const isZ = e.key === 'z' || e.key === 'Z'
+  if (!isZ || !(e.metaKey || e.ctrlKey)) return
+  if (e.shiftKey) {
+    e.preventDefault()
+    if (!noteRedoStack.length) return
+    const cur = this.value
+    this.value = noteRedoStack.pop()
+    noteUndoStack.push(cur)
+    this.dispatchEvent(new Event('input'))
+  } else {
+    e.preventDefault()
+    if (!noteUndoStack.length) return
+    const cur = this.value
+    this.value = noteUndoStack.pop()
+    noteRedoStack.push(cur)
+    this.dispatchEvent(new Event('input'))
+  }
+})
+
 // ─── Grid view ─────────────────────────────────────────
 function renderGridView() {
   const el = document.getElementById('gridView')
@@ -561,8 +645,8 @@ function renderGridView() {
     }
     // Folder notes in grid
     for (const n of getNotes().filter(x => x.folder === name)) {
-      const preview = (n.content || '').replace(/\n/g, ' ').substring(0, 80)
-      html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
+      const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 80)
+      html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${stripHtml(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
     }
     html += '</div></div>'
   }
@@ -579,8 +663,8 @@ function renderGridView() {
   if (notes.length) {
     html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="file-text" style="width:16px;height:16px;flex-shrink:0"></i> Notes</div><div class="grid-items">`
     for (const n of notes) {
-      const preview = (n.content || '').replace(/\n/g, ' ').substring(0, 80)
-      html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
+      const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 80)
+      html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${stripHtml(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
     }
     html += '</div></div>'
   }
@@ -603,7 +687,7 @@ function renderGridView() {
   el.querySelectorAll('[data-note-id]').forEach(item => {
     item.addEventListener('click', () => {
       const nid = item.dataset.noteId
-      if (nid) { openNote(nid); document.getElementById('gridBtn').click() }
+      if (nid) { openNote(nid) }
     })
   })
 }

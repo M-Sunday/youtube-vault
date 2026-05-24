@@ -335,6 +335,10 @@ body.theme-obsidian .note-view-btn:hover { background: #2a2a30; }
 .note-view-content { flex: 1; border: none; background: transparent; outline: none; font-size: 14px; line-height: 1.6; color: #3a3a3c; font-family: inherit; resize: none; min-height: 150px; padding: 0; }
 body.theme-black .note-view-content { color: #a1a1a6; }
 body.theme-obsidian .note-view-content { color: #a1a1a6; }
+.note-view-rendered { padding: 8px 0; font-size: 14px; line-height: 1.6; color: #3a3a3c; white-space: pre-wrap; word-break: break-word; min-height: 40px; border-top: 1px solid #e8e8ed; margin-top: 8px; }
+.note-view-rendered img { max-width: 100%; border-radius: 8px; margin: 8px 0; display: block; }
+body.theme-black .note-view-rendered { color: #a1a1a6; border-color: #3a3a3c; }
+body.theme-obsidian .note-view-rendered { color: #a1a1a6; border-color: #2a2a30; }
 .note-view-footer { font-size: 11px; color: #8e8e93; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8e8ed; }
 body.theme-black .note-view-footer { border-color: #3a3a3c; }
 body.theme-obsidian .note-view-footer { border-color: #2a2a30; }
