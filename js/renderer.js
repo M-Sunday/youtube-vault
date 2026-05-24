@@ -498,13 +498,25 @@ function noteSaveContent() {
   }, 300)
 }
 
-// Paste images: browser handles it natively in contenteditable, we just make sure images have styling
+// Undo / Redo buttons for contenteditable
+document.getElementById('noteUndoBtn').addEventListener('click', () => {
+  document.getElementById('noteViewContent').focus()
+  document.execCommand('undo')
+})
+document.getElementById('noteRedoBtn').addEventListener('click', () => {
+  document.getElementById('noteViewContent').focus()
+  document.execCommand('redo')
+})
+
+// Paste images: browser handles it natively in contenteditable
 document.getElementById('noteViewContent').addEventListener('paste', function () {
   setTimeout(() => {
     this.querySelectorAll('img').forEach(img => {
-      if (!img.style.maxWidth) img.style.maxWidth = '100%'
-      if (!img.style.borderRadius) img.style.borderRadius = '8px'
-      if (img.style.margin === '') img.style.margin = '8px 0'
+      img.style.maxWidth = ''
+      img.style.borderRadius = ''
+      img.style.margin = ''
+      img.removeAttribute('width')
+      img.removeAttribute('height')
     })
   }, 0)
 })
