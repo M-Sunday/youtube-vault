@@ -396,44 +396,9 @@ function hideWelcome() {
   document.querySelector('.calendar').style.display = 'block'
 }
 
-// ─── Thumbnail drag ────────────────────────────────────
-const miniThumb = document.getElementById('miniThumb')
-document.getElementById('imageWrap').addEventListener('mousedown', (e) => {
-  if ('ontouchstart' in window) return
-  if (!currentVideo || e.button !== 0 || !document.getElementById('thumbnail').src) return
-  e.preventDefault()
-  document.getElementById('miniImg').src = document.getElementById('thumbnail').src
-  miniThumb.style.display = 'flex'
-  miniThumb.style.left = (e.clientX - 60) + 'px'
-  miniThumb.style.top = (e.clientY - 30) + 'px'
-  dragVideoId = currentVideo.id
-
-  const move = (ev) => {
-    miniThumb.style.left = (ev.clientX - 60) + 'px'
-    miniThumb.style.top = (ev.clientY - 30) + 'px'
-    document.querySelectorAll('.tree-folder').forEach(f => {
-      const r = f.getBoundingClientRect()
-      f.classList.toggle('drop-zone', ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom)
-    })
-  }
-  const up = (ev) => {
-    miniThumb.style.display = 'none'
-    document.querySelectorAll('.tree-folder').forEach(f => f.classList.remove('drop-zone'))
-    document.removeEventListener('mousemove', move)
-    document.removeEventListener('mouseup', up)
-    const target = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('[data-folder]')
-    if (!target || !dragVideoId) return
-    const folderName = target.dataset.folder
-    if (!folderName) return
-    const fs = getFolders()
-    for (const ids of Object.values(fs)) { const idx = ids.indexOf(dragVideoId); if (idx > -1) ids.splice(idx, 1) }
-    if (!fs[folderName]) fs[folderName] = []
-    if (!fs[folderName].includes(dragVideoId)) fs[folderName].push(dragVideoId)
-    saveFolders(fs)
-    renderSidebar()
-  }
-  document.addEventListener('mousemove', move)
-  document.addEventListener('mouseup', up)
+// ─── Thumbnail click to open link ─────────────────────
+document.getElementById('imageWrap').addEventListener('click', () => {
+  if (currentVideo?.url) window.open(currentVideo.url)
 })
 
 // ─── Add video ────────────────────────────────────────
@@ -489,12 +454,23 @@ async function loadVideo(videoId) {
     const title = data.title || 'Unknown'
     const channel = data.author_name || ''
     let sec = 0, dateStr = '', privacy = 'PUBLIC'
-    try {
-      const html = await (await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`)).text()
-      sec = parseInt((html.match(/"lengthSeconds":"?(\d+)"?/) || [])[1] || '0')
-      dateStr = (html.match(/"uploadDate":"([^"]+)"/) || html.match(/<meta\s+itemprop="datePublished"\s+content="([^"]+)"/) || [])[1]
-      privacy = (html.match(/"privacyStatus":"([^"]+)"/) || [])[1] || 'PUBLIC'
-    } catch (_) {}
+    // Try proxies for duration/date/privacy
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://corsproxy.io/?url=${encodeURIComponent(url)}`
+    ]
+    for (const proxyUrl of proxies) {
+      try {
+        const html = await (await fetch(proxyUrl)).text()
+        const s = parseInt((html.match(/"lengthSeconds":"?(\d+)"?/) || [])[1] || '0')
+        if (s) { sec = s }
+        const ds = (html.match(/"uploadDate":"([^"]+)"/) || html.match(/<meta\s+itemprop="datePublished"\s+content="([^"]+)"/) || [])[1]
+        if (ds) { dateStr = ds }
+        const pv = (html.match(/"privacyStatus":"([^"]+)"/) || [])[1]
+        if (pv) { privacy = pv }
+        if (s || ds || pv) break
+      } catch (_) {}
+    }
     const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60
     const duration = sec ? (h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`) : ''
     const pubDate = dateStr ? new Date(dateStr) : null
