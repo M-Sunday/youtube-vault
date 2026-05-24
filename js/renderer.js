@@ -665,7 +665,7 @@ function loadVideoById(id) {
   if (v.pubDate) setPublishedDate(new Date(v.pubDate))
   updatePrivacy(v.privacy || 'PUBLIC')
   if (currentNoteId) closeNoteView()
-  hideWelcome(); renderSidebar(); updateCardAddBtn()
+  renderSidebar(); updateCardAddBtn()
 }
 
 function clearCard() {
@@ -674,23 +674,6 @@ function clearCard() {
   document.getElementById('videoTitle').textContent = 'Paste a YouTube link above'
   document.getElementById('channelName').textContent = ''
   document.getElementById('cardAddRow').style.display = 'none'
-  showWelcome()
-}
-
-// ─── Welcome screen ────────────────────────────────────
-function showWelcome() {
-  document.getElementById('welcome').style.display = 'flex'
-  document.getElementById('videoCard').classList.add('welcome-only')
-}
-function hideWelcome() {
-  document.getElementById('welcome').style.display = 'none'
-  document.getElementById('videoCard').classList.remove('welcome-only')
-}
-function hideWelcome() {
-  document.getElementById('welcome').style.display = 'none'
-  document.getElementById('imageWrap').style.display = 'block'
-  document.querySelector('.card-body').style.display = 'block'
-  document.querySelector('.calendar').style.display = 'block'
 }
 
 // ─── Thumbnail click to open link ─────────────────────
@@ -741,7 +724,6 @@ function getVideoId(url) {
   return null
 }
 async function loadVideo(videoId) {
-  hideWelcome()
   const url = `https://www.youtube.com/watch?v=${videoId}`
   document.getElementById('thumbnail').src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
   document.getElementById('durationBadge').textContent = '...'
@@ -780,7 +762,7 @@ async function loadVideo(videoId) {
     document.getElementById('videoTitle').textContent = title; document.getElementById('channelName').textContent = channel
     if (pubDate) setPublishedDate(pubDate)
     updatePrivacy(privacy)
-    hideWelcome(); renderSidebar(); updateCardAddBtn()
+    renderSidebar(); updateCardAddBtn()
   } catch (e) { document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
 }
 document.getElementById('ytBtn').addEventListener('click', () => {
@@ -799,9 +781,12 @@ document.querySelectorAll('.settings-cat').forEach(cat => {
     document.querySelectorAll('.settings-cat').forEach(c => c.classList.remove('active'))
     this.classList.add('active')
     document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none')
-    document.getElementById({ theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history' }[this.dataset.cat]).style.display = 'block'
+    document.getElementById({ theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
+    if (this.dataset.cat === 'patchnotes') loadPatchNotes()
   })
 })
+function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; localStorage.setItem('ytSettings', JSON.stringify(s)) }
+function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
 document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { this.classList.toggle('on') }))
 document.querySelectorAll('.theme-option').forEach(opt => {
   opt.addEventListener('click', function () {
@@ -819,21 +804,43 @@ const savedTheme = localStorage.getItem('theme') || 'white'
 if (savedTheme === 'system') { document.getElementById('systemTheme').checked = true; document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : '' }
 else if (savedTheme !== 'white') { document.body.className = 'theme-' + savedTheme; document.querySelector(`.theme-option[data-theme="${savedTheme}"]`)?.classList.add('active') }
 
+const SETTINGS_KEYS = {
+  toolbar: ['showSidebarBtn', 'showYtInput', 'compactMode'],
+  files: ['autoUpdateLinks', 'confirmDeletion', 'detectAllExt'],
+  history: ['saveLinkHistory', 'clearOnExit']
+}
+function applyToolbarSettings() {
+  document.getElementById('menuBtn').style.display = loadSetting('showSidebarBtn', true) ? '' : 'none'
+  document.querySelector('.top-bar-input').style.display = loadSetting('showYtInput', true) ? '' : 'none'
+  document.body.classList.toggle('compact', loadSetting('compactMode', false))
+}
 document.querySelectorAll('#pane-toolbar .settings-toggle').forEach((t, i) => {
+  const on = loadSetting(SETTINGS_KEYS.toolbar[i], true)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
   t.addEventListener('click', function () {
-    const on = this.classList.contains('on')
-    if (i === 0) document.getElementById('menuBtn').style.display = on ? '' : 'none'
-    else if (i === 1) document.querySelector('.top-bar-input').style.display = on ? '' : 'none'
-    else if (i === 2) document.body.classList.toggle('compact', on)
+    saveSetting(SETTINGS_KEYS.toolbar[i], this.classList.contains('on'))
+    applyToolbarSettings()
   })
 })
+document.querySelectorAll('#pane-files .settings-toggle').forEach((t, i) => {
+  const on = loadSetting(SETTINGS_KEYS.files[i], true)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
+  t.addEventListener('click', function () { saveSetting(SETTINGS_KEYS.files[i], this.classList.contains('on')) })
+})
 document.querySelectorAll('#pane-history .settings-toggle').forEach((t, i) => {
-  t.addEventListener('click', function () { if (i === 0 && !this.classList.contains('on')) saveHistory([]) })
+  const on = loadSetting(SETTINGS_KEYS.history[i], i === 0)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
+  t.addEventListener('click', function () {
+    saveSetting(SETTINGS_KEYS.history[i], this.classList.contains('on'))
+    if (i === 0 && !this.classList.contains('on')) saveHistory([])
+  })
 })
 document.querySelector('.settings-clear-btn')?.addEventListener('click', () => {
   if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
 })
 window.addEventListener('beforeunload', () => { const t = document.querySelector('#pane-history .settings-toggle:last-child'); if (t?.classList.contains('on')) localStorage.removeItem('linkHistory') })
+
+applyToolbarSettings()
 
 function loadHistory() { try { return JSON.parse(localStorage.getItem('linkHistory') || '[]') } catch { return [] } }
 function saveHistory(h) { localStorage.setItem('linkHistory', JSON.stringify(h)) }
@@ -861,6 +868,19 @@ function updatePrivacy(s) {
   b.className = 'cal-privacy ' + i.c; b.innerHTML = `<span class="dot"></span> ${i.t}`
 }
 
+// ─── Patch notes ──────────────────────────────────────
+function loadPatchNotes() {
+  fetch('changelog.json').then(r => r.json()).then(log => {
+    document.getElementById('patchNotesList').innerHTML = log.map(u => `
+      <div style="margin-bottom:18px">
+        <div style="font-weight:600;margin-bottom:2px">${u.version} — ${u.date}</div>
+        <div style="opacity:.8;margin-bottom:6px">${u.title}</div>
+        <ul style="margin:0;padding-left:18px">${u.changes.map(c => `<li style="margin-bottom:2px">${c}</li>`).join('')}</ul>
+      </div>
+    `).join('')
+  }).catch(() => { document.getElementById('patchNotesList').innerHTML = '<p>Could not load patch notes.</p>' })
+}
+
 // ─── Keyboard shortcuts ────────────────────────────────
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'L') { e.preventDefault(); document.getElementById('ytInput').focus() }
@@ -868,8 +888,12 @@ document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === ',') { e.preventDefault(); settingsOverlay.classList.add('open') }
 })
 
+// ─── Updcheck / version ──────────────────────────────
+const APP_VERSION = '1.2.0'
+
 // ─── Init ──────────────────────────────────────────────
-loadIcons(); renderCalendar(); renderSidebar(); showWelcome()
+document.getElementById('appVersionLabel').textContent = APP_VERSION
+loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridMenuBtn').classList.add('active')
 
 // Service worker update
 if ('serviceWorker' in navigator) {
@@ -892,7 +916,6 @@ if (history.length) {
 }
 
 // ─── Update check ──────────────────────────────────────
-const APP_VERSION = '1.1.0'
 const lastSeen = localStorage.getItem('ytLastVersion')
 if (lastSeen !== APP_VERSION) {
   fetch('changelog.json').then(r => r.json()).then(log => {

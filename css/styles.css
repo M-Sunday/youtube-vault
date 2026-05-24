@@ -88,7 +88,6 @@ body.theme-obsidian .menu-btn.active { background: #2a2a30; border-color: #3a3a4
 
 /* Card */
 .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 20px rgba(0,0,0,0.04); }
-.card.welcome-only { background: transparent; border-radius: 0; box-shadow: none; }
 
 .image-wrap { position: relative; overflow: hidden; cursor: pointer; }
 .image-wrap img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #e8e8ed; transition: transform 0.3s ease; }
@@ -104,15 +103,6 @@ body.theme-obsidian .menu-btn.active { background: #2a2a30; border-color: #3a3a4
 .card-add-btn:hover { background: #f5f5f7; border-color: #8e8e93; color: #3a3a3c; }
 .card-add-btn.saved { border-color: #30d158; color: #30d158; cursor: default; opacity: 0.7; }
 .card-add-icon { width: 14px; height: 14px; }
-
-/* Welcome */
-.welcome { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 32px 32px; }
-.welcome-icon { margin-bottom: 12px; }
-.welcome-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
-.welcome-desc { font-size: 14px; color: #86868b; margin-bottom: 28px; }
-.welcome-steps { display: flex; flex-direction: column; gap: 14px; text-align: left; }
-.welcome-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #3a3a3c; }
-.welcome-step-icon { width: 18px; height: 18px; color: #8e8e93; flex-shrink: 0; }
 
 /* Update toast */
 .update-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 500; background: #1d1d1f; color: #fff; font-size: 13px; padding: 8px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
@@ -207,7 +197,7 @@ body.theme-black { background: #1c1c1e; color: #f5f5f7; }
 body.theme-black .sidebar, body.theme-black .main-area, body.theme-black .card, body.theme-black .settings-cat.active, body.theme-black .theme-option.active, body.theme-black .ctx-menu { background: #2c2c2e; border-color: #3a3a3c; }
 body.theme-black .top-bar { color: #f5f5f7; background: #2c2c2e; border-color: #3a3a3c; }
 body.theme-black .card-body h1, body.theme-black .settings-plugin-name, body.theme-black .cal-date, body.theme-black .tree-label, body.theme-black .top-bar-input input, body.theme-black .sidebar-header-left, body.theme-black .settings-pane-header h2, body.theme-black .notes-area { color: #f5f5f7; }
-body.theme-black .menu-btn-icon, body.theme-black .sidebar-header-icon, body.theme-black .search-icon, body.theme-black .tree-folder-icon, body.theme-black .tree-file-icon, body.theme-black .welcome-step-icon, body.theme-black .cal-nav button { color: #a1a1a6; }
+body.theme-black .menu-btn-icon, body.theme-black .sidebar-header-icon, body.theme-black .search-icon, body.theme-black .tree-folder-icon, body.theme-black .tree-file-icon, body.theme-black .cal-nav button { color: #a1a1a6; }
 body.theme-black .sidebar-icon-btn { color: #a1a1a6; }
 body.theme-black .subtitle, body.theme-black .cal-day-name, body.theme-black .cal-header h2, body.theme-black .top-bar-input input::placeholder, body.theme-black .settings-pane-desc, body.theme-black .sidebar-add button, body.theme-black .tree-sublabel { color: #a1a1a6; }
 body.theme-black .top-bar-input, body.theme-black .sidebar-search input { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
@@ -223,9 +213,6 @@ body.theme-black .sidebar-add button:hover, body.theme-black .tree-folder:hover,
 body.theme-black .card-add-btn { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .card-add-btn:hover { background: #3a3a3c; color: #f5f5f7; border-color: #8e8e93; }
 body.theme-black .card-add-btn.saved { border-color: #30d158; color: #30d158; }
-body.theme-black .welcome-title { color: #f5f5f7; }
-body.theme-black .welcome-desc { color: #a1a1a6; }
-body.theme-black .welcome-step { color: #a1a1a6; }
 body.theme-black .update-toast { background: #f5f5f7; color: #1c1c1e; }
 body.theme-black .tree-file.active { background: #3a3a3c; }
 body.theme-black .tree-file.pinned { border-color: #f5f5f7; background: #3a3a3c; }
@@ -241,7 +228,7 @@ body.theme-obsidian { background: #19191e; color: #e8e8ec; }
 body.theme-obsidian .sidebar, body.theme-obsidian .main-area, body.theme-obsidian .card, body.theme-obsidian .settings-cat.active, body.theme-obsidian .theme-option.active, body.theme-obsidian .ctx-menu { background: #1e1e24; border-color: #2a2a30; }
 body.theme-obsidian .top-bar { color: #e8e8ec; background: #1e1e24; border-color: #2a2a30; }
 body.theme-obsidian .card-body h1, body.theme-obsidian .settings-plugin-name, body.theme-obsidian .cal-date, body.theme-obsidian .tree-label, body.theme-obsidian .top-bar-input input, body.theme-obsidian .sidebar-header-left, body.theme-obsidian .settings-pane-header h2, body.theme-obsidian .notes-area { color: #e8e8ec; }
-body.theme-obsidian .menu-btn-icon, body.theme-obsidian .sidebar-header-icon, body.theme-obsidian .search-icon, body.theme-obsidian .tree-folder-icon, body.theme-obsidian .tree-file-icon, body.theme-obsidian .welcome-step-icon, body.theme-obsidian .cal-nav button { color: #8e8e9a; }
+body.theme-obsidian .menu-btn-icon, body.theme-obsidian .sidebar-header-icon, body.theme-obsidian .search-icon, body.theme-obsidian .tree-folder-icon, body.theme-obsidian .tree-file-icon, body.theme-obsidian .cal-nav button { color: #8e8e9a; }
 body.theme-obsidian .sidebar-icon-btn { color: #8e8e9a; }
 body.theme-obsidian .subtitle, body.theme-obsidian .cal-day-name, body.theme-obsidian .cal-header h2, body.theme-obsidian .top-bar-input input::placeholder, body.theme-obsidian .settings-pane-desc, body.theme-obsidian .sidebar-add button, body.theme-obsidian .tree-sublabel { color: #7e7e8c; }
 body.theme-obsidian .top-bar-input, body.theme-obsidian .sidebar-search input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
@@ -257,9 +244,6 @@ body.theme-obsidian .sidebar-add button:hover, body.theme-obsidian .tree-folder:
 body.theme-obsidian .card-add-btn { border-color: #2a2a30; color: #8e8e9a; }
 body.theme-obsidian .card-add-btn:hover { background: #2a2a30; color: #e8e8ec; border-color: #7e7e8c; }
 body.theme-obsidian .card-add-btn.saved { border-color: #30d158; color: #30d158; }
-body.theme-obsidian .welcome-title { color: #e8e8ec; }
-body.theme-obsidian .welcome-desc { color: #7e7e8c; }
-body.theme-obsidian .welcome-step { color: #7e7e8c; }
 body.theme-obsidian .update-toast { background: #e8e8ec; color: #19191e; }
 body.theme-obsidian .tree-file.active { background: #2a2a30; }
 body.theme-obsidian .tree-file.pinned { border-color: #e8e8ec; background: #2a2a30; }

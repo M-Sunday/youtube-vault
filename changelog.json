@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.2.0",
+    "date": "2026-05-24",
+    "title": "Settings Overhaul, Default Grid, Patch Notes",
+    "changes": [
+      "Welcome screen removed — app now opens in grid view by default",
+      "Settings toggles are now persistent (saved to localStorage)",
+      "Added Patch Notes section in Settings showing changelog history",
+      "Settings toolbar (sidebar btn, YouTube input, compact mode) fully wired",
+      "Settings files pane toggles (auto-update, confirm delete, detect extensions) saved",
+      "Settings history pane toggles (save/clear link history) saved",
+      "App version label shown in Basic info settings pane"
+    ]
+  },
+  {
     "version": "1.1.0",
     "date": "2026-05-24",
     "title": "Notes, Icons, and Polish",

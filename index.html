@@ -80,16 +80,6 @@
         <div class="content">
             <div class="container">
                 <div class="card" id="videoCard">
-                    <div class="welcome" id="welcome">
-                        <div class="welcome-icon"><i data-lucide="youtube" style="width:48px;height:48px;color:#ff0000"></i></div>
-                        <h2 class="welcome-title">YouTube Vault</h2>
-                        <p class="welcome-desc">Save and organize your favorite YouTube videos.</p>
-                        <div class="welcome-steps">
-                            <div class="welcome-step"><i data-lucide="link" class="welcome-step-icon"></i><span>Paste a YouTube link above</span></div>
-                            <div class="welcome-step"><i data-lucide="download" class="welcome-step-icon"></i><span>Load video info with the arrow button</span></div>
-                            <div class="welcome-step"><i data-lucide="folder-plus" class="welcome-step-icon"></i><span>Add to your vault and organize with folders</span></div>
-                        </div>
-                    </div>
                     <div class="image-wrap" id="imageWrap">
                         <div class="badge" id="durationBadge">–</div>
                         <img id="thumbnail" src="" alt="Video thumbnail">
@@ -204,6 +194,7 @@
                     <div class="settings-cat" data-cat="toolbar">Toolbar</div>
                     <div class="settings-cat" data-cat="files">Files and links</div>
                     <div class="settings-cat" data-cat="history">Link history</div>
+                    <div class="settings-cat" data-cat="patchnotes">Patch notes</div>
                 </div>
                 <div class="settings-sidebar-footer" id="settingsClose">
                     <i data-lucide="x" class="settings-close-icon"></i> Close
@@ -222,7 +213,7 @@
                 <div class="settings-pane" id="pane-basic" style="display:none">
                     <div class="settings-pane-header"><h2>Basic info</h2><p class="settings-pane-desc">About this app.</p></div>
                     <div class="settings-footer-row" style="flex-direction:column;gap:6px;margin-top:20px">
-                        <span>Version 1.0.0</span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
+                        <span>Version <span id="appVersionLabel">1.0.0</span></span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
                     </div>
                 </div>
                 <div class="settings-pane" id="pane-toolbar" style="display:none">
@@ -248,6 +239,10 @@
                         <div class="settings-plugin"><span class="settings-plugin-name">Clear on exit</span><div class="settings-toggle"></div></div>
                     </div>
                     <div class="settings-footer-info"><button class="settings-clear-btn">Clear history</button></div>
+                </div>
+                <div class="settings-pane" id="pane-patchnotes" style="display:none">
+                    <div class="settings-pane-header"><h2>Patch notes</h2><p class="settings-pane-desc">Changelog history for this app.</p></div>
+                    <div id="patchNotesList" style="margin-top:20px"></div>
                 </div>
             </div>
         </div>
