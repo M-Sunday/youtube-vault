@@ -67,11 +67,13 @@ body {
 .main-area { flex: 1; display: flex; flex-direction: column; height: calc(100vh - 24px); background: #fff; border-radius: 16px; border: 1px solid #e8e8ed; box-shadow: 0 2px 20px rgba(0,0,0,0.03); overflow: hidden; }
 
 .top-bar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; margin: 10px 10px 0; border-radius: 14px; background: #f5f5f7; border: 1px solid #e8e8ed; }
-.menu-btn { background: none; border: 1px solid #e8e8ed; border-radius: 8px; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+.menu-btn { background: none; border: 1px solid #e8e8ed; border-radius: 8px; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; color: #1d1d1f; }
 .menu-btn:hover { background: #f5f5f7; }
 .menu-btn.active { background: #e8e8ed; border-color: #d1d1d6; }
 body.theme-black .menu-btn.active { background: #3a3a3c; border-color: #48484a; }
+body.theme-black .menu-btn { color: #a1a1a6; }
 body.theme-obsidian .menu-btn.active { background: #2a2a30; border-color: #3a3a44; }
+body.theme-obsidian .menu-btn { color: #8e8e9a; }
 
 .menu-btn-icon { width: 16px; height: 16px; color: #1d1d1f; }
 .top-bar-center { font-size: 13px; font-weight: 600; color: #86868b; flex-shrink: 0; }
