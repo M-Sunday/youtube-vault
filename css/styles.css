@@ -317,11 +317,11 @@ body.theme-obsidian .note-toolbar-title { color: #8e8e9a; }
 body.theme-black .note-view-title { color: #f5f5f7; }
 body.theme-obsidian .note-view-title { color: #e8e8ec; }
 .note-view-actions { display: flex; gap: 4px; }
-.note-view-btn { background: none; border: 1px solid #e8e8ed; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.12s; }
+.note-view-btn { background: none; border: 1px solid #e8e8ed; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.12s; color: #8e8e93; }
 .note-view-btn:hover { background: #f5f5f7; }
-body.theme-black .note-view-btn { border-color: #3a3a3c; }
+body.theme-black .note-view-btn { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .note-view-btn:hover { background: #3a3a3c; }
-body.theme-obsidian .note-view-btn { border-color: #2a2a30; }
+body.theme-obsidian .note-view-btn { border-color: #2a2a30; color: #8e8e9a; }
 body.theme-obsidian .note-view-btn:hover { background: #2a2a30; }
 .note-view-content { flex: 1; border: none; background: transparent; outline: none; font-size: 14px; line-height: 1.6; color: #3a3a3c; font-family: inherit; min-height: 150px; padding: 0; white-space: pre-wrap; word-break: break-word; overflow: hidden; }
 .note-view-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0; display: block; }
