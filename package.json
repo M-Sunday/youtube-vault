@@ -1,0 +1,15 @@
+{
+  "name": "my-mac-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^42.2.0",
+    "electron-reload": "^2.0.0-alpha.1"
+  },
+  "dependencies": {
+    "lucide": "^1.16.0"
+  }
+}
