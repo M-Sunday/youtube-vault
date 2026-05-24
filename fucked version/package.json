@@ -1,9 +1,10 @@
 {
-  "name": "my-mac-app",
-  "version": "1.0.0",
+  "name": "youtube-vault",
+  "version": "1.3.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "serve": "node serve.js"
   },
   "devDependencies": {
     "electron": "^42.2.0",

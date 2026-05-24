@@ -567,12 +567,6 @@ function renderGridView() {
   const folders = getFolders()
   const meta = getFolderMeta()
   const videos = getVideos()
-  html = `<div class="grid-toolbar">
-    <button class="menu-btn" id="gridMenuBtn"><i data-lucide="panel-left" class="menu-btn-icon"></i></button>
-    <span class="grid-toolbar-title">Vault</span>
-    <button class="menu-btn" id="gridBookmarkBtn"><i data-lucide="bookmark" style="width:18px;height:18px"></i></button>
-    <button class="menu-btn active" id="gridCloseBtn"><i data-lucide="layout-grid" style="width:18px;height:18px"></i></button>
-  </div>`
   for (const [name, ids] of Object.entries(folders)) {
     if (!ids.length) continue
     const color = meta[name]?.color || ''
@@ -889,7 +883,7 @@ document.addEventListener('keydown', (e) => {
 })
 
 // ─── Updcheck / version ──────────────────────────────
-const APP_VERSION = '1.2.0'
+const APP_VERSION = '1.3.0'
 
 // ─── Init ──────────────────────────────────────────────
 document.getElementById('appVersionLabel').textContent = APP_VERSION
@@ -915,27 +909,3 @@ if (history.length) {
   saveFolders(fs); renderSidebar()
 }
 
-// ─── Update check ──────────────────────────────────────
-const lastSeen = localStorage.getItem('ytLastVersion')
-if (lastSeen !== APP_VERSION) {
-  fetch('changelog.json').then(r => r.json()).then(log => {
-    const updates = log.filter(e => {
-      if (!lastSeen) return e.version === APP_VERSION
-      const v = e.version.split('.').map(Number)
-      const last = lastSeen.split('.').map(Number)
-      return v[0] > last[0] || v[1] > last[1]
-    })
-    if (!updates.length) return
-    const el = document.getElementById('updateBody')
-    el.innerHTML = updates.map(u => `
-      <div class="update-version">${u.version} — ${u.date}</div>
-      <div class="update-title">${u.title}</div>
-      <ul class="update-changes">${u.changes.map(c => `<li>${c}</li>`).join('')}</ul>
-    `).join('')
-    document.getElementById('updateOverlay').classList.add('open')
-  }).catch(() => {})
-  localStorage.setItem('ytLastVersion', APP_VERSION)
-}
-document.getElementById('updateCloseBtn').addEventListener('click', () => {
-  document.getElementById('updateOverlay').classList.remove('open')
-})
