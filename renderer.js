@@ -102,6 +102,29 @@ function bindSidebarEvents() {
         showContextMenu(e.clientX, e.clientY, null, item.dataset.folder)
     })
   })
+  // Mobile long-press for sidebar items
+  document.querySelectorAll('.tree-folder, .tree-file').forEach(el => {
+    let longTimer = null, longPressed = false
+    el.addEventListener('touchstart', (e) => {
+      if (el.closest('.folder-rename')) return
+      longPressed = false
+      longTimer = setTimeout(() => {
+        longPressed = true
+        const touch = e.touches[0]
+        const item = el.closest('[data-folder]')
+        const video = el.closest('[data-video-id]')
+        if (video) {
+          showContextMenu(touch.clientX, touch.clientY, video.dataset.videoId, item?.dataset.folder || null)
+        } else if (item && item.dataset.folder !== 'Videos' && item.dataset.folder !== 'Archived') {
+          showContextMenu(touch.clientX, touch.clientY, null, item.dataset.folder)
+        }
+      }, 500)
+    }, { passive: true })
+    el.addEventListener('touchmove', () => { clearTimeout(longTimer) }, { passive: true })
+    el.addEventListener('touchend', () => { clearTimeout(longTimer) })
+    el.addEventListener('touchcancel', () => { clearTimeout(longTimer) })
+    el.addEventListener('click', (e) => { if (longPressed) { e.preventDefault(); e.stopPropagation(); longPressed = false } })
+  })
 }
 
 // ─── Context menu ─────────────────────────────────────
@@ -109,44 +132,75 @@ let ctxTarget = null, ctxFolder = null
 function showContextMenu(x, y, videoId, folderName) {
   const menu = document.getElementById('ctxMenu')
   ctxTarget = videoId; ctxFolder = folderName
-  menu.style.left = x + 'px'; menu.style.top = y + 'px'
+  const isTouch = 'ontouchstart' in window
+  menu.style.left = (isTouch ? x - 40 : x) + 'px'
+  menu.style.top = (isTouch ? y - 40 : y) + 'px'
   menu.classList.add('open')
   menu.querySelector('[data-action="rename-folder"]').style.display = videoId ? 'none' : ''
   menu.querySelector('[data-action="delete-folder"]').style.display = videoId ? 'none' : ''
-  menu.querySelector('[data-action="open-link"]').style.display = videoId ? '' : 'none'
-  menu.querySelector('[data-action="archive"]').style.display = videoId ? '' : 'none'
-  menu.querySelector('[data-action="pin"]').style.display = videoId ? '' : 'none'
-  menu.querySelector('[data-action="delete"]').style.display = videoId ? '' : 'none'
-  const showFolder = videoId === null || videoId === undefined
-  document.getElementById('ctxDiv1').style.display = showFolder ? 'none' : videoId ? '' : 'none'
+  const showVideo = videoId !== null && videoId !== undefined
+  menu.querySelector('[data-action="open-link"]').style.display = showVideo ? '' : 'none'
+  menu.querySelector('[data-action="archive"]').style.display = showVideo ? '' : 'none'
+  menu.querySelector('[data-action="pin"]').style.display = showVideo ? '' : 'none'
+  menu.querySelector('[data-action="move-up"]').style.display = showVideo ? '' : 'none'
+  menu.querySelector('[data-action="move-down"]').style.display = showVideo ? '' : 'none'
+  menu.querySelector('[data-action="delete"]').style.display = showVideo ? '' : 'none'
+  document.getElementById('ctxDiv1').style.display = videoId ? '' : 'none'
+  document.getElementById('ctxDiv2').style.display = videoId ? '' : 'none'
+  document.getElementById('ctxDiv3').style.display = showVideo ? '' : 'none'
   if (videoId) {
     const pinItem = menu.querySelector('[data-action="pin"]')
     const isPinned = getPins().includes(videoId)
     pinItem.innerHTML = `<i data-lucide="pin" class="ctx-icon"></i> ${isPinned ? 'Unpin' : 'Pin'}`
+    // Populate "Move to" section
+    const moveToEl = document.getElementById('ctxMoveTo')
+    const folders = getFolders()
+    const currentFolder = folderName
+    const folderEntries = Object.keys(folders).filter(n => n !== currentFolder && n !== 'Archived')
+    const moveDiv4 = document.getElementById('ctxDiv4')
+    if (folderEntries.length) {
+      let mHtml = ''
+      for (const name of folderEntries) {
+        const color = (getFolderMeta()[name]?.color || '')
+        mHtml += `<div class="ctx-item" data-action="move-to" data-folder="${name}"><i data-lucide="folder" class="ctx-icon"${color ? ` style="color:${color}"` : ''}></i> Move to ${name}</div>`
+      }
+      moveToEl.innerHTML = mHtml
+      moveToEl.classList.add('show')
+      moveDiv4.style.display = ''
+    } else {
+      moveToEl.classList.remove('show')
+      moveDiv4.style.display = 'none'
+    }
     lucide.createIcons()
+  } else {
+    document.getElementById('ctxDiv3').style.display = 'none'
+    document.getElementById('ctxMoveTo').classList.remove('show')
+    document.getElementById('ctxDiv4').style.display = 'none'
   }
 }
 
 document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'))
 
-document.querySelectorAll('.ctx-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const a = item.dataset.action
-    if (a === 'delete' && ctxTarget) {
-      const fs = getFolders(); for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
-      saveFolders(fs); const vs = getVideos(); delete vs[ctxTarget]; saveVideos(vs)
-      renderSidebar(); if (currentVideo?.id === ctxTarget) { currentVideo = null; clearCard() }
-    }
-    if (a === 'archive' && ctxTarget) {
-      const fs = getFolders(); for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
-      if (!fs['Archived']) fs['Archived'] = []; fs['Archived'].push(ctxTarget); saveFolders(fs); renderSidebar()
-    }
-    if (a === 'pin') {
-      const pins = getPins(); const idx = pins.indexOf(ctxTarget)
-      if (idx > -1) pins.splice(idx, 1); else pins.push(ctxTarget)
-      savePins(pins); renderSidebar()
-    }
-    if (a === 'rename-folder' && ctxFolder) {
+// Delegated context menu actions (handles both static and dynamic items)
+document.getElementById('ctxMenu').addEventListener('click', (e) => {
+  const item = e.target.closest('.ctx-item')
+  if (!item) return
+  const a = item.dataset.action
+  if (a === 'delete' && ctxTarget) {
+    const fs = getFolders(); for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
+    saveFolders(fs); const vs = getVideos(); delete vs[ctxTarget]; saveVideos(vs)
+    renderSidebar(); if (currentVideo?.id === ctxTarget) { currentVideo = null; clearCard() }
+  }
+  if (a === 'archive' && ctxTarget) {
+    const fs = getFolders(); for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
+    if (!fs['Archived']) fs['Archived'] = []; fs['Archived'].push(ctxTarget); saveFolders(fs); renderSidebar()
+  }
+  if (a === 'pin') {
+    const pins = getPins(); const idx = pins.indexOf(ctxTarget)
+    if (idx > -1) pins.splice(idx, 1); else pins.push(ctxTarget)
+    savePins(pins); renderSidebar()
+  }
+  if (a === 'rename-folder' && ctxFolder) {
       const label = document.querySelector(`[data-folder="${ctxFolder}"] .tree-label`)
       if (!label) return
       const old = label.textContent
@@ -172,9 +226,31 @@ document.querySelectorAll('.ctx-item').forEach(item => {
       const v = vs[ctxTarget]
       if (v?.url) window.open(v.url)
     }
+    if ((a === 'move-up' || a === 'move-down') && ctxTarget) {
+      const fs = getFolders()
+      for (const [name, ids] of Object.entries(fs)) {
+        const idx = ids.indexOf(ctxTarget)
+        if (idx > -1) {
+          const swap = a === 'move-up' ? idx - 1 : idx + 1
+          if (swap >= 0 && swap < ids.length) {
+            [ids[idx], ids[swap]] = [ids[swap], ids[idx]]
+            saveFolders(fs); renderSidebar()
+          }
+          break
+        }
+      }
+    }
+    if (a === 'move-to' && ctxTarget) {
+      const target = item.dataset.folder
+      if (!target) return
+      const fs = getFolders()
+      for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
+      if (!fs[target]) fs[target] = []
+      if (!fs[target].includes(ctxTarget)) fs[target].push(ctxTarget)
+      saveFolders(fs); renderSidebar()
+    }
     document.getElementById('ctxMenu').classList.remove('open')
   })
-})
 
 // ─── Folder dialog ────────────────────────────────────
 const folderDialog = document.getElementById('folderDialog')
