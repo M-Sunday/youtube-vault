@@ -458,10 +458,10 @@ function openNote(id) {
   currentNoteId = id
   noteUndoStack = []
   noteRedoStack = []
-  lastSavedContent = ''
   const notes = getNotes()
   const n = notes.filter(x => x.id === id)[0]
   if (!n) return
+  lastSavedContent = n.content || ''
   // Close grid view if open
   const gridBtn = document.getElementById('gridBtn')
   if (gridBtn.classList.contains('active')) gridBtn.click()
@@ -486,6 +486,7 @@ let noteSaveTimer = null
 let noteUndoStack = []
 let noteRedoStack = []
 let lastSavedContent = ''
+let noteUndoing = false
 function pushNoteUndo() {
   const current = document.getElementById('noteViewContent').value
   if (lastSavedContent !== '' && lastSavedContent !== current) {
@@ -496,27 +497,18 @@ function pushNoteUndo() {
   lastSavedContent = current
 }
 document.getElementById('noteViewTitle').addEventListener('input', () => {
-  clearTimeout(noteSaveTimer)
-  noteSaveTimer = setTimeout(() => {
-    if (!currentNoteId) return
-    pushNoteUndo()
-    const notes = getNotes()
-    const n = notes.filter(x => x.id === currentNoteId)[0]
-    if (!n) return
-    n.title = document.getElementById('noteViewTitle').value
-    n.content = document.getElementById('noteViewContent').value
-    n.updated = Date.now()
-    saveNotes(notes)
-    document.getElementById('noteViewFooter').textContent = `Last edited ${new Date().toLocaleString()}`
-    renderNotePreview()
-    renderSidebar()
-  }, 500)
+  noteSaveContent()
 })
 document.getElementById('noteViewContent').addEventListener('input', () => {
+  if (!noteUndoing) pushNoteUndo()
+  noteUndoing = false
+  noteSaveContent()
+})
+
+function noteSaveContent() {
   clearTimeout(noteSaveTimer)
   noteSaveTimer = setTimeout(() => {
     if (!currentNoteId) return
-    pushNoteUndo()
     const notes = getNotes()
     const n = notes.filter(x => x.id === currentNoteId)[0]
     if (!n) return
@@ -527,8 +519,8 @@ document.getElementById('noteViewContent').addEventListener('input', () => {
     document.getElementById('noteViewFooter').textContent = `Last edited ${new Date().toLocaleString()}`
     renderNotePreview()
     renderSidebar()
-  }, 500)
-})
+  }, 300)
+}
 document.getElementById('noteDeleteBtn').addEventListener('click', () => {
   if (!currentNoteId) return
   let notes = getNotes().filter(x => x.id !== currentNoteId)
@@ -600,24 +592,32 @@ function renderNotePreview() {
 }
 
 // Undo / Redo for notes
+function noteUndo() {
+  const ta = document.getElementById('noteViewContent')
+  if (!noteUndoStack.length) return
+  noteUndoing = true
+  const cur = ta.value
+  ta.value = noteUndoStack.pop()
+  noteRedoStack.push(cur)
+  ta.dispatchEvent(new Event('input'))
+}
+function noteRedo() {
+  const ta = document.getElementById('noteViewContent')
+  if (!noteRedoStack.length) return
+  noteUndoing = true
+  const cur = ta.value
+  ta.value = noteRedoStack.pop()
+  noteUndoStack.push(cur)
+  ta.dispatchEvent(new Event('input'))
+}
+document.getElementById('noteUndoBtn').addEventListener('click', noteUndo)
+document.getElementById('noteRedoBtn').addEventListener('click', noteRedo)
 document.getElementById('noteViewContent').addEventListener('keydown', function (e) {
   const isZ = e.key === 'z' || e.key === 'Z'
   if (!isZ || !(e.metaKey || e.ctrlKey)) return
-  if (e.shiftKey) {
-    e.preventDefault()
-    if (!noteRedoStack.length) return
-    const cur = this.value
-    this.value = noteRedoStack.pop()
-    noteUndoStack.push(cur)
-    this.dispatchEvent(new Event('input'))
-  } else {
-    e.preventDefault()
-    if (!noteUndoStack.length) return
-    const cur = this.value
-    this.value = noteUndoStack.pop()
-    noteRedoStack.push(cur)
-    this.dispatchEvent(new Event('input'))
-  }
+  e.preventDefault()
+  if (e.shiftKey) noteRedo()
+  else noteUndo()
 })
 
 // ─── Grid view ─────────────────────────────────────────

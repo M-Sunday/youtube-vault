@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.svg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
@@ -110,6 +110,8 @@
             <div class="note-view-header">
                 <input class="note-view-title" id="noteViewTitle" placeholder="Note title" spellcheck="false" />
                 <div class="note-view-actions">
+                    <button class="note-view-btn" id="noteUndoBtn"><i data-lucide="undo-2" style="width:16px;height:16px"></i></button>
+                    <button class="note-view-btn" id="noteRedoBtn"><i data-lucide="redo-2" style="width:16px;height:16px"></i></button>
                     <button class="note-view-btn" id="noteDeleteBtn"><i data-lucide="trash-2" style="width:16px;height:16px;color:#ff453a"></i></button>
                     <button class="note-view-btn" id="noteCloseBtn"><i data-lucide="x" style="width:16px;height:16px"></i></button>
                 </div>
@@ -247,6 +249,6 @@
     </div>
 
     <script src="https://unpkg.com/lucide@1.16.0/dist/umd/lucide.min.js"></script>
-    <script src="renderer.js"></script>
+    <script src="js/renderer.js"></script>
 </body>
 </html>
