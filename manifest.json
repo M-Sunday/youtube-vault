@@ -2,20 +2,14 @@
   "name": "YouTube Vault",
   "short_name": "Vault",
   "description": "Save and organize YouTube videos",
-  "start_url": "index.html",
+  "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
   "theme_color": "#1d1d1f",
+  "categories": ["productivity", "utilities"],
   "icons": [
-    {
-      "src": "icon-192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "icon-512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    }
+    { "src": "icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
   ]
 }

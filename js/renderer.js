@@ -567,12 +567,6 @@ function renderGridView() {
   const folders = getFolders()
   const meta = getFolderMeta()
   const videos = getVideos()
-  html = `<div class="grid-toolbar">
-    <button class="menu-btn" id="gridMenuBtn"><i data-lucide="panel-left" class="menu-btn-icon"></i></button>
-    <span class="grid-toolbar-title">Vault</span>
-    <button class="menu-btn" id="gridBookmarkBtn"><i data-lucide="bookmark" style="width:18px;height:18px"></i></button>
-    <button class="menu-btn active" id="gridCloseBtn"><i data-lucide="layout-grid" style="width:18px;height:18px"></i></button>
-  </div>`
   for (const [name, ids] of Object.entries(folders)) {
     if (!ids.length) continue
     const color = meta[name]?.color || ''
@@ -889,7 +883,7 @@ document.addEventListener('keydown', (e) => {
 })
 
 // ─── Updcheck / version ──────────────────────────────
-const APP_VERSION = '1.2.0'
+const APP_VERSION = '1.3.0'
 
 // ─── Init ──────────────────────────────────────────────
 document.getElementById('appVersionLabel').textContent = APP_VERSION
