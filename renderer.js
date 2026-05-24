@@ -50,7 +50,7 @@ function renderSidebar() {
     html += `<div class="tree-item expanded" data-bookmarks="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="bookmark" class="tree-folder-icon"></i><span class="tree-label">Bookmarks</span></div><div class="tree-children">`
     for (const bm of bookmarks) {
       if (query && !bm.title.toLowerCase().includes(query) && !bm.url.toLowerCase().includes(query)) continue
-      html += `<div class="tree-item" data-bookmark-id="${bm.id}"><div class="tree-file"><i data-lucide="external-link" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${bm.title || bm.url}</span><span class="tree-sublabel">${bm.url}</span></div></div></div>`
+      html += `<div class="tree-item" data-bookmark-id="${bm.id}"><div class="tree-file"><div class="bm-thumb-wrap">${bm.image ? `<img class="bm-thumb" src="${bm.image}" onerror="this.style.display='none'" />` : `<i data-lucide="external-link" class="tree-file-icon" style="margin:4px"></i>`}</div><div class="tree-file-meta"><span class="tree-label">${bm.title || bm.url}</span><span class="tree-sublabel">${bm.url}</span></div></div></div>`
     }
     html += '</div></div>'
   }
@@ -320,12 +320,19 @@ const bookmarkDialog = document.getElementById('bookmarkDialog')
 const bookmarkUrlInput = document.getElementById('bookmarkUrlInput')
 const bookmarkTitleInput = document.getElementById('bookmarkTitleInput')
 
-function addBookmark() {
+async function addBookmark() {
   const url = bookmarkUrlInput.value.trim()
   if (!url) return
   const bms = getBookmarks()
   const id = '_bm_' + Date.now()
-  bms.push({ id, url, title: bookmarkTitleInput.value.trim() || url, added: Date.now() })
+  const bm = { id, url, title: bookmarkTitleInput.value.trim() || url, added: Date.now() }
+  // Try to fetch og:image
+  try {
+    const html = await (await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`)).text()
+    const m = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i) || html.match(/<link\s+rel="image_src"\s+href="([^"]+)"/i)
+    if (m) bm.image = m[1]
+  } catch (_) {}
+  bms.push(bm)
   saveBookmarks(bms)
   bookmarkUrlInput.value = ''; bookmarkTitleInput.value = ''
   bookmarkDialog.classList.remove('open')

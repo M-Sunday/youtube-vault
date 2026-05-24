@@ -45,6 +45,8 @@ body {
 .tree-file.active { background: #e8e8ed; color: #1d1d1f; font-weight: 500; }
 .tree-folder-icon, .tree-file-icon { width: 16px; height: 16px; flex-shrink: 0; color: #8e8e93; }
 .tree-file-icon { margin-top: 3px; }
+.bm-thumb-wrap { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+.bm-thumb { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; }
 .tree-chevron { width: 14px; height: 14px; flex-shrink: 0; color: #8e8e93; transition: transform 0.15s; }
 .tree-item:not(.expanded) .tree-chevron { transform: rotate(-90deg); }
 .tree-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: inherit; }
