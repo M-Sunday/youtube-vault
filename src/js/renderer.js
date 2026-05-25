@@ -1,32 +1,54 @@
 // ─── Data ──────────────────────────────────────────────
 function getVideos() { try { return JSON.parse(localStorage.getItem('ytVideos') || '{}') } catch { return {} } }
-function saveVideos(v) { localStorage.setItem('ytVideos', JSON.stringify(v)) }
+function saveVideos(v) { safeSetItem('ytVideos', JSON.stringify(v)) }
 function getFolders() { try { return JSON.parse(localStorage.getItem('ytFolders') || '{"Videos":[],"Archived":[]}') } catch { return { Videos: [], Archived: [] } } }
-function saveFolders(f) { localStorage.setItem('ytFolders', JSON.stringify(f)) }
+function saveFolders(f) { safeSetItem('ytFolders', JSON.stringify(f)) }
 function getFolderMeta() { try { return JSON.parse(localStorage.getItem('ytFolderMeta') || '{}') } catch { return {} } }
-function saveFolderMeta(m) { localStorage.setItem('ytFolderMeta', JSON.stringify(m)) }
+function saveFolderMeta(m) { safeSetItem('ytFolderMeta', JSON.stringify(m)) }
 function getPins() { try { return JSON.parse(localStorage.getItem('ytPins') || '[]') } catch { return [] } }
-function savePins(p) { localStorage.setItem('ytPins', JSON.stringify(p)) }
+function savePins(p) { safeSetItem('ytPins', JSON.stringify(p)) }
 function getBookmarks() { try { return JSON.parse(localStorage.getItem('ytBookmarks') || '[]') } catch { return [] } }
-function saveBookmarks(b) { localStorage.setItem('ytBookmarks', JSON.stringify(b)) }
+function saveBookmarks(b) { safeSetItem('ytBookmarks', JSON.stringify(b)) }
 function getDirectAccess() { try { return JSON.parse(localStorage.getItem('ytDirectAccess') || '[]') } catch { return [] } }
-function saveDirectAccess(d) { localStorage.setItem('ytDirectAccess', JSON.stringify(d)) }
+function saveDirectAccess(d) { safeSetItem('ytDirectAccess', JSON.stringify(d)) }
 function getNSFW() { try { return JSON.parse(localStorage.getItem('ytNSFW') || '[]') } catch { return [] } }
-function saveNSFW(n) { localStorage.setItem('ytNSFW', JSON.stringify(n)) }
+function saveNSFW(n) { safeSetItem('ytNSFW', JSON.stringify(n)) }
 function getBlurAllNSFW() { return localStorage.getItem('ytBlurAllNSFW') === 'true' }
-function saveBlurAllNSFW(v) { localStorage.setItem('ytBlurAllNSFW', v ? 'true' : 'false') }
+function saveBlurAllNSFW(v) { safeSetItem('ytBlurAllNSFW', v ? 'true' : 'false') }
 function isNSFW(url) {
   try {
     if (!getBlurAllNSFW()) return false
-    const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase()
+    let fullUrl = url
+    if (!/^https?:\/\//i.test(url)) {
+      fullUrl = 'https://' + url.replace(/^\/+/, '')
+    }
+    const domain = new URL(fullUrl).hostname.replace(/^www\./, '').toLowerCase()
     return getNSFW().some(n => domain === n || domain.endsWith('.' + n))
   } catch { return false }
 }
 function getNotes() { try { return JSON.parse(localStorage.getItem('ytNotes') || '[]') } catch { return [] } }
-function saveNotes(n) { localStorage.setItem('ytNotes', JSON.stringify(n)) }
+function saveNotes(n) { safeSetItem('ytNotes', JSON.stringify(n)) }
 function stripHtml(str) { return str.replace(/<[^>]*>/g, '') }
 function getCollapsed() { try { return JSON.parse(localStorage.getItem('ytCollapsed') || '{}') } catch { return {} } }
-function saveCollapsed(c) { localStorage.setItem('ytCollapsed', JSON.stringify(c)) }
+function saveCollapsed(c) { safeSetItem('ytCollapsed', JSON.stringify(c)) }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val) } catch (e) { if (e.name === 'QuotaExceededError') { const t = document.getElementById('updateToast'); t.textContent = 'Storage full — clear some data'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000) } } }
+function sanitizeHtml(str) {
+  const allowed = /^(b|i|u|em|strong|a|br|p|ul|ol|li|span|div|h[1-6]|pre|code|blockquote)$/i
+  str = str.replace(/<script[\s\S]*?<\/script>/gi, '')
+  str = str.replace(/\son\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+  str = str.replace(/\shref\s*=\s*["']javascript:[^"']*["']/gi, '')
+  str = str.replace(/<[^>]*>/g, function(m) {
+    const inner = m.slice(1, -1).trim()
+    if (inner.startsWith('/')) {
+      const tag = inner.slice(1).split(/\s/)[0]
+      return allowed.test(tag) ? m : ''
+    }
+    const tag = inner.split(/\s/)[0]
+    if (!allowed.test(tag)) return ''
+    return m
+  })
+  return str
+}
 
 let currentVideo = null
 let dragVideoId = null
@@ -121,7 +143,6 @@ function bindSidebarEvents() {
       const folderName = item.dataset.folder
       if (!folderName) return
       const folders = getFolders()
-      for (const ids of Object.values(folders)) { const idx = ids.indexOf(id); if (idx > -1) ids.splice(idx, 1) }
       if (!folders[folderName]) folders[folderName] = []
       if (!folders[folderName].includes(id)) folders[folderName].push(id)
       saveFolders(folders)
@@ -349,6 +370,7 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
       label.replaceWith(input); input.focus(); input.select()
       const done = () => {
         const name = input.value.trim() || old; const fs = getFolders(); const meta = getFolderMeta()
+        if (name === old) { saveFolders(fs); saveFolderMeta(meta); renderSidebar(); return }
         fs[name] = fs[old]; meta[name] = meta[old] || {}; delete fs[old]; delete meta[old]
         saveFolders(fs); saveFolderMeta(meta); renderSidebar()
       }
@@ -393,7 +415,6 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
       const target = item.dataset.folder
       if (!target) return
       const fs = getFolders()
-      for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
       if (!fs[target]) fs[target] = []
       if (!fs[target].includes(ctxTarget)) fs[target].push(ctxTarget)
       saveFolders(fs); renderSidebar()
@@ -538,7 +559,7 @@ function openNote(id) {
   document.querySelector('.container').style.display = 'none'
   document.getElementById('noteView').style.display = 'flex'
   document.getElementById('noteViewTitle').value = n.title || ''
-  document.getElementById('noteViewContent').innerHTML = n.content || ''
+  document.getElementById('noteViewContent').innerHTML = sanitizeHtml(n.content || '')
   document.getElementById('noteViewFooter').textContent = `Last edited ${new Date(n.updated || n.added).toLocaleString()}`
   renderSidebar()
 }
@@ -551,18 +572,20 @@ function closeNoteView() {
 }
 
 let noteSaveTimer = null
+let pendingNoteId = null
 document.getElementById('noteViewTitle').addEventListener('input', noteSaveContent)
 document.getElementById('noteViewContent').addEventListener('input', noteSaveContent)
 
 function noteSaveContent() {
   clearTimeout(noteSaveTimer)
+  pendingNoteId = currentNoteId
   noteSaveTimer = setTimeout(() => {
-    if (!currentNoteId) return
+    if (!pendingNoteId || pendingNoteId !== currentNoteId) return
     const notes = getNotes()
-    const n = notes.filter(x => x.id === currentNoteId)[0]
+    const n = notes.filter(x => x.id === pendingNoteId)[0]
     if (!n) return
     n.title = document.getElementById('noteViewTitle').value
-    n.content = document.getElementById('noteViewContent').innerHTML
+    n.content = sanitizeHtml(document.getElementById('noteViewContent').innerHTML)
     n.updated = Date.now()
     saveNotes(notes)
     document.getElementById('noteViewFooter').textContent = `Last edited ${new Date().toLocaleString()}`
@@ -868,7 +891,7 @@ async function loadVideo(videoId) {
     if (pubDate) setPublishedDate(pubDate)
     updatePrivacy(privacy)
     renderSidebar(); updateCardAddBtn()
-  } catch (e) { document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
+  } catch (e) { currentVideo = null; document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
 }
 let pendingDaUrl = ''
 document.getElementById('ytBtn').addEventListener('click', () => {
@@ -934,19 +957,19 @@ document.querySelectorAll('.settings-cat').forEach(cat => {
     if (this.dataset.cat === 'patchnotes') loadPatchNotes()
   })
 })
-function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; localStorage.setItem('ytSettings', JSON.stringify(s)) }
+function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; safeSetItem('ytSettings', JSON.stringify(s)) }
 function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
-document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { if (this.id === 'blurAllNSFWToggle') return; this.classList.toggle('on') }))
+document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { this.classList.toggle('on') }))
 document.querySelectorAll('.theme-option').forEach(opt => {
   opt.addEventListener('click', function () {
     document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
     this.classList.add('active')
     const t = this.dataset.theme; document.body.className = t === 'white' ? '' : 'theme-' + t
-    localStorage.setItem('theme', t); document.getElementById('systemTheme').checked = false
+    safeSetItem('theme', t); document.getElementById('systemTheme').checked = false
   })
 })
 document.getElementById('systemTheme').addEventListener('change', function () {
-  if (this.checked) { document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : ''; localStorage.setItem('theme', 'system') }
+  if (this.checked) { document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : ''; safeSetItem('theme', 'system') }
   else { const s = localStorage.getItem('theme') || 'white'; document.body.className = s === 'white' ? '' : 'theme-' + s }
 })
 const savedTheme = localStorage.getItem('theme') || 'white'
@@ -996,7 +1019,6 @@ const blurAllToggle = document.getElementById('blurAllNSFWToggle')
 if (blurAllToggle) {
   blurAllToggle.classList.toggle('on', getBlurAllNSFW())
   blurAllToggle.addEventListener('click', () => {
-    blurAllToggle.classList.toggle('on')
     saveBlurAllNSFW(blurAllToggle.classList.contains('on'))
   })
 }
@@ -1008,7 +1030,7 @@ window.addEventListener('beforeunload', () => { const t = document.querySelector
 applyToolbarSettings()
 
 function loadHistory() { try { return JSON.parse(localStorage.getItem('linkHistory') || '[]') } catch { return [] } }
-function saveHistory(h) { localStorage.setItem('linkHistory', JSON.stringify(h)) }
+function saveHistory(h) { safeSetItem('linkHistory', JSON.stringify(h)) }
 
 // ─── Calendar ──────────────────────────────────────────
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -1144,7 +1166,7 @@ if (lastSeen !== APP_VERSION) {
     `).join('')
     document.getElementById('updateOverlay').classList.add('open')
   }).catch(() => {})
-  localStorage.setItem('ytLastVersion', APP_VERSION)
+  safeSetItem('ytLastVersion', APP_VERSION)
 }
 document.getElementById('updateCloseBtn').addEventListener('click', () => {
   document.getElementById('updateOverlay').classList.remove('open')
