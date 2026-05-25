@@ -1,4 +1,4 @@
-var CACHE = 'yt-vault-v1'
+var CACHE = 'yt-vault-1.2.0'
 var URLS = [
   '../index.html',
   'index.html',
@@ -7,11 +7,15 @@ var URLS = [
   'js/renderer.js',
   'assets/icons/app-icon-192.svg',
   'assets/icons/app-icon-512.svg',
+  'assets/icons/anthropic-symbol.svg',
+  'assets/icons/anthropic-logotype.svg',
   'assets/manifest.json'
 ]
+self.addEventListener('message', function (e) {
+  if (e.data && e.data.action === 'skipWaiting') self.skipWaiting()
+})
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(URLS) }))
-  self.skipWaiting()
 })
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== CACHE }).map(function (k) { return caches.delete(k) })) }))

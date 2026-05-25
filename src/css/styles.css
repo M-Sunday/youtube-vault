@@ -1,5 +1,27 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ─── SPLASH SCREEN ──────────────────────────────────── */
+#splash {
+    position: fixed; inset: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--splash-bg, #f5f5f7);
+    opacity: 1; transition: opacity 0.4s ease;
+}
+#splash.fade { opacity: 0; pointer-events: none; }
+.splash-content {
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.splash-content svg { width: 64px; height: 64px; animation: splashPulse 1.6s ease-in-out infinite; }
+@keyframes splashPulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+#splashText {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px; font-weight: 500; color: #86868b;
+    letter-spacing: 0.3px;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
     background: #f5f5f7; color: #1d1d1f;
@@ -221,7 +243,7 @@ body.theme-obsidian .ctx-icon { color: #98989e; }
 .settings-clear-btn:hover { background: #f5f5f7; border-color: #1d1d1f; }
 
 /* Themes */
-body.theme-black { background: #1c1c1e; color: #f5f5f7; }
+body.theme-black { background: #1c1c1e; color: #f5f5f7; --splash-bg: #1c1c1e; }
 body.theme-black .sidebar, body.theme-black .main-area, body.theme-black .card, body.theme-black .settings-cat.active, body.theme-black .theme-option.active, body.theme-black .ctx-menu { background: #2c2c2e; border-color: #3a3a3c; }
 body.theme-black .top-bar { color: #f5f5f7; background: #2c2c2e; border-color: #3a3a3c; }
 body.theme-black .card-body h1, body.theme-black .settings-plugin-name, body.theme-black .cal-date, body.theme-black .tree-label, body.theme-black .top-bar-input input, body.theme-black .sidebar-header-left, body.theme-black .settings-pane-header h2, body.theme-black .notes-area { color: #f5f5f7; }
@@ -253,7 +275,7 @@ body.theme-black .ctx-item:hover { background: #3a3a3c; }
 body.theme-black .ctx-divider { background: #3a3a3c; }
 body.theme-black .tree-folder.drop-zone { background: #3a3a3c; border-color: #f5f5f7; }
 
-body.theme-obsidian { background: #19191e; color: #e8e8ec; }
+body.theme-obsidian { background: #19191e; color: #e8e8ec; --splash-bg: #19191e; }
 body.theme-obsidian .sidebar, body.theme-obsidian .main-area, body.theme-obsidian .card, body.theme-obsidian .settings-cat.active, body.theme-obsidian .theme-option.active, body.theme-obsidian .ctx-menu { background: #1e1e24; border-color: #2a2a30; }
 body.theme-obsidian .top-bar { color: #e8e8ec; background: #1e1e24; border-color: #2a2a30; }
 body.theme-obsidian .card-body h1, body.theme-obsidian .settings-plugin-name, body.theme-obsidian .cal-date, body.theme-obsidian .tree-label, body.theme-obsidian .top-bar-input input, body.theme-obsidian .sidebar-header-left, body.theme-obsidian .settings-pane-header h2, body.theme-obsidian .notes-area { color: #e8e8ec; }
@@ -286,7 +308,7 @@ body.theme-obsidian .ctx-divider { background: #2a2a30; }
 body.theme-obsidian .tree-folder.drop-zone { background: #2a2a30; border-color: #e8e8ec; }
 
 /* ─── ANTHROPIC THEME ──────────────────────────────────── */
-body.theme-anthropic { background: #E8E0D8; color: #191919; font-family: 'DM Serif Display', 'Georgia', 'Times New Roman', serif; }
+body.theme-anthropic { background: #E8E0D8; color: #191919; --splash-bg: #E8E0D8; font-family: 'DM Serif Display', 'Georgia', 'Times New Roman', serif; }
 body.theme-anthropic .grid-section-header, body.theme-anthropic .sidebar-header-left, body.theme-anthropic .tree-label, body.theme-anthropic .card-body h1, body.theme-anthropic .grid-item-title, body.theme-anthropic .note-view-title, body.theme-anthropic .settings-pane-header h2, body.theme-anthropic .settings-plugin-name, body.theme-anthropic .settings-cat, body.theme-anthropic .cal-day-name, body.theme-anthropic .cal-month-year, body.theme-anthropic .folder-dialog h3, body.theme-anthropic .sidebar-add button, body.theme-anthropic .sidebar-footer-btn, body.theme-anthropic .dialog-btn, body.theme-anthropic .card-add-btn, body.theme-anthropic .note-view-btn, body.theme-anthropic .top-bar-input input { font-family: 'DM Sans', 'Inter', 'Styrene A', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; }
 body.theme-anthropic .sidebar, body.theme-anthropic .main-area, body.theme-anthropic .card, body.theme-anthropic .settings-cat.active, body.theme-anthropic .theme-option.active, body.theme-anthropic .ctx-menu { background: #FFFFFF; border-color: #D4A27F; }
 body.theme-anthropic .top-bar { color: #191919; background: #FFFFFF; border-color: #D4A27F; }

@@ -1171,3 +1171,47 @@ if (lastSeen !== APP_VERSION) {
 document.getElementById('updateCloseBtn').addEventListener('click', () => {
   document.getElementById('updateOverlay').classList.remove('open')
 })
+
+// ─── Splash screen ──────────────────────────────────────
+;(function(){
+  var splash = document.getElementById('splash')
+  var splashText = document.getElementById('splashText')
+  if (!splash) return
+  var faded = false
+
+  function fadeOut() {
+    if (faded) return; faded = true
+    splash.classList.add('fade')
+    setTimeout(function(){ splash.style.display = 'none' }, 500)
+  }
+
+  function trackWorker(w) {
+    splashText.textContent = 'Updating\u2026'
+    if (w.state === 'installed' && navigator.serviceWorker.controller) {
+      w.postMessage({ action: 'skipWaiting' })
+    }
+    w.addEventListener('statechange', function() {
+      if (this.state === 'activated') fadeOut()
+    })
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      if (!faded) fadeOut()
+    })
+
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      if (reg.waiting) { trackWorker(reg.waiting); return }
+      if (reg.installing) { trackWorker(reg.installing); return }
+      if (reg.active) setTimeout(function() { if (!faded) fadeOut() }, 1500)
+
+      reg.addEventListener('updatefound', function() {
+        if (reg.installing) trackWorker(reg.installing)
+      })
+    }).catch(function() {
+      setTimeout(fadeOut, 1000)
+    })
+  } else {
+    setTimeout(fadeOut, 1000)
+  }
+})()
