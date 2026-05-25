@@ -3,7 +3,7 @@ const path = require('path')
 
 try {
   require('electron-reload')(__dirname, {
-    electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+    electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
   })
 } catch (_) {}
 
@@ -17,7 +17,7 @@ function createWindow() {
       webSecurity: false
     }
   })
-  win.loadFile('index.html')
+  win.loadFile('src/index.html')
 }
 
 app.whenReady().then(createWindow)

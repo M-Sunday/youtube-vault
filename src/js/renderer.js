@@ -34,7 +34,6 @@ function renderSidebar() {
     html += `<div class="tree-item expanded" data-folder="${name}"><div class="tree-folder" draggable="false"${color ? ` data-color="${color}" style="--folder-color:${color}"` : ''}><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="${icon}" class="tree-folder-icon"></i><span class="tree-label">${name}</span></div><div class="tree-children">`
 
     let entryIds = [...ids]
-    // Pinned first
     const pinned = entryIds.filter(id => pins.includes(id))
     const unpinned = entryIds.filter(id => !pins.includes(id))
     entryIds = [...pinned, ...unpinned]
@@ -46,7 +45,6 @@ function renderSidebar() {
       const isPinned = pins.includes(id)
       html += `<div class="tree-item" data-video-id="${id}" draggable="true"><div class="tree-file${currentVideo?.id === id ? ' active' : ''}${isPinned ? ' pinned' : ''}"><i data-lucide="file-video-2" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${v.title}</span><span class="tree-sublabel">${v.channel}</span></div></div></div>`
     }
-    // Folder notes
     for (const n of getNotes()) {
       if (n.folder !== name) continue
       if (query && !n.title.toLowerCase().includes(query)) continue
@@ -55,7 +53,6 @@ function renderSidebar() {
     }
     html += '</div></div>'
   }
-  // Bookmarks
   const bookmarks = getBookmarks()
   if (bookmarks.length) {
     html += `<div class="tree-item expanded" data-bookmarks="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="bookmark" class="tree-folder-icon"></i><span class="tree-label">Bookmarks</span></div><div class="tree-children">`
@@ -65,7 +62,6 @@ function renderSidebar() {
     }
     html += '</div></div>'
   }
-  // Notes (unassigned)
   const notes = getNotes().filter(n => !n.folder)
   if (notes.length) {
     html += `<div class="tree-item expanded" data-notes="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="file-text" class="tree-folder-icon"></i><span class="tree-label">Notes</span></div><div class="tree-children">`
@@ -145,7 +141,6 @@ function bindSidebarEvents() {
         showContextMenu(e.clientX, e.clientY, null, item.dataset.folder)
     })
   })
-  // Mobile long-press for sidebar items
   document.querySelectorAll('.tree-folder, .tree-file').forEach(el => {
     let longTimer = null, longPressed = false
     el.addEventListener('touchstart', (e) => {
@@ -207,7 +202,6 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId) {
       const isPinned = getPins().includes(videoId)
       pinItem.innerHTML = `<i data-lucide="pin" class="ctx-icon"></i> ${isPinned ? 'Unpin' : 'Pin'}`
     }
-    // Populate "Move to" section (folders for videos, folders for notes)
     const moveToEl = document.getElementById('ctxMoveTo')
     const folders = getFolders()
     const currentFolder = isNote ? (getNotes().filter(n => n.id === noteId)[0]?.folder || null) : folderName
@@ -239,7 +233,6 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId) {
 
 document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'))
 
-// Delegated context menu actions (handles both static and dynamic items)
 document.getElementById('ctxMenu').addEventListener('click', (e) => {
   const item = e.target.closest('.ctx-item')
   if (!item) return
@@ -376,12 +369,10 @@ async function addBookmark() {
   const bms = getBookmarks()
   const id = '_bm_' + Date.now()
   const bm = { id, url, title: bookmarkTitleInput.value.trim() || url, added: Date.now() }
-  // Try to fetch preview image from page meta tags or API
   const proxyUrls = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
     `https://corsproxy.io/?url=${encodeURIComponent(url)}`
   ]
-  // Twitter/X: try dedicated API that returns media URLs
   const twMatch = url.match(/https?:\/\/(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/i)
   if (twMatch) {
     proxyUrls.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.vxtwitter.com/Twitter/status/${twMatch[1]}`)}`)
@@ -400,13 +391,11 @@ async function addBookmark() {
       const t = setTimeout(() => ctrl.abort(), 5000)
       const text = await (await fetch(proxyUrl, { signal: ctrl.signal })).text()
       clearTimeout(t)
-      // Try as JSON (vxtwitter API)
       try {
         const json = JSON.parse(text)
         const mediaUrl = json?.media_extended?.[0]?.url || json?.media?.[0]?.url
         if (mediaUrl) { bm.image = mediaUrl; break }
       } catch (_) {}
-      // Try as HTML meta tags
       for (const pat of imgPatterns) {
         const m = text.match(pat)
         if (m) { bm.image = m[1].replace(/&amp;/g, '&'); break }
@@ -459,7 +448,6 @@ function openNote(id) {
   const notes = getNotes()
   const n = notes.filter(x => x.id === id)[0]
   if (!n) return
-  // Close grid view if open
   const gridBtn = document.getElementById('gridBtn')
   if (gridBtn.classList.contains('active')) gridBtn.click()
   document.querySelector('.container').style.display = 'none'
@@ -477,7 +465,6 @@ function closeNoteView() {
   renderSidebar()
 }
 
-// Auto-save note on input
 let noteSaveTimer = null
 document.getElementById('noteViewTitle').addEventListener('input', noteSaveContent)
 document.getElementById('noteViewContent').addEventListener('input', noteSaveContent)
@@ -498,7 +485,6 @@ function noteSaveContent() {
   }, 300)
 }
 
-// Undo / Redo buttons for contenteditable
 document.getElementById('noteUndoBtn').addEventListener('click', () => {
   document.getElementById('noteViewContent').focus()
   document.execCommand('undo')
@@ -508,7 +494,6 @@ document.getElementById('noteRedoBtn').addEventListener('click', () => {
   document.execCommand('redo')
 })
 
-// Paste images: browser handles it natively in contenteditable
 document.getElementById('noteViewContent').addEventListener('paste', function () {
   setTimeout(() => {
     this.querySelectorAll('img').forEach(img => {
@@ -529,14 +514,6 @@ document.getElementById('noteDeleteBtn').addEventListener('click', () => {
   renderSidebar()
 })
 document.getElementById('noteCloseBtn').addEventListener('click', closeNoteView)
-
-// Note toolbar
-document.getElementById('noteMenuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('closed'))
-document.getElementById('noteBookmarkBtn').addEventListener('click', () => document.getElementById('bookmarkDialog').classList.add('open'))
-document.getElementById('noteGridBtn').addEventListener('click', () => {
-  closeNoteView()
-  document.getElementById('gridBtn').click()
-})
 
 // Note dialog
 document.getElementById('newNoteBtn').addEventListener('click', () => {
@@ -567,12 +544,6 @@ function renderGridView() {
   const folders = getFolders()
   const meta = getFolderMeta()
   const videos = getVideos()
-  html = `<div class="grid-toolbar">
-    <button class="menu-btn" id="gridMenuBtn"><i data-lucide="panel-left" class="menu-btn-icon"></i></button>
-    <span class="grid-toolbar-title">Vault</span>
-    <button class="menu-btn" id="gridBookmarkBtn"><i data-lucide="bookmark" style="width:18px;height:18px"></i></button>
-    <button class="menu-btn active" id="gridCloseBtn"><i data-lucide="layout-grid" style="width:18px;height:18px"></i></button>
-  </div>`
   for (const [name, ids] of Object.entries(folders)) {
     if (!ids.length) continue
     const color = meta[name]?.color || ''
@@ -583,7 +554,6 @@ function renderGridView() {
       const thumb = v.thumbnail || `https://img.youtube.com/vi/${id}/maxresdefault.jpg`
       html += `<div class="grid-item" data-video-id="${id}"><img class="grid-item-img" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${id}/hqdefault.jpg'" /><div class="grid-item-info"><div class="grid-item-title">${v.title}</div><div class="grid-item-sublabel">${v.channel}</div></div></div>`
     }
-    // Folder notes in grid
     for (const n of getNotes().filter(x => x.folder === name)) {
       const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 80)
       html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${stripHtml(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
@@ -598,7 +568,6 @@ function renderGridView() {
     }
     html += '</div></div>'
   }
-  // Notes in grid (unassigned only)
   const notes = getNotes().filter(x => !x.folder)
   if (notes.length) {
     html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="file-text" style="width:16px;height:16px;flex-shrink:0"></i> Notes</div><div class="grid-items">`
@@ -610,7 +579,6 @@ function renderGridView() {
   }
   el.innerHTML = html || '<div style="padding:30px;text-align:center;font-size:13px;color:#8e8e93">Nothing to show yet.</div>'
   loadIcons()
-  // Click handlers
   el.querySelectorAll('[data-video-id]').forEach(item => {
     item.addEventListener('click', () => {
       const id = item.dataset.videoId
@@ -635,17 +603,7 @@ document.getElementById('gridBtn').addEventListener('click', function () {
   const open = this.classList.toggle('active')
   document.getElementById('gridView').classList.toggle('open', open)
   document.querySelector('.content').style.display = open ? 'none' : ''
-  document.querySelector('.top-bar').style.display = open ? 'none' : ''
   if (open) { if (currentNoteId) closeNoteView(); renderGridView() }
-})
-
-// Grid toolbar event delegation
-document.getElementById('gridView').addEventListener('click', function (e) {
-  const btn = e.target.closest('button')
-  if (!btn) return
-  if (btn.id === 'gridMenuBtn') document.getElementById('sidebar').classList.toggle('closed')
-  else if (btn.id === 'gridBookmarkBtn') document.getElementById('bookmarkDialog').classList.add('open')
-  else if (btn.id === 'gridCloseBtn') document.getElementById('gridBtn').click()
 })
 
 // ─── Sidebar toolbar ──────────────────────────────────
@@ -733,7 +691,6 @@ async function loadVideo(videoId) {
     const title = data.title || 'Unknown'
     const channel = data.author_name || ''
     let sec = 0, dateStr = '', privacy = 'PUBLIC'
-    // Try proxies for duration/date/privacy
     const proxies = [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
       `https://corsproxy.io/?url=${encodeURIComponent(url)}`
@@ -870,7 +827,7 @@ function updatePrivacy(s) {
 
 // ─── Patch notes ──────────────────────────────────────
 function loadPatchNotes() {
-  fetch('changelog.json').then(r => r.json()).then(log => {
+  fetch('assets/changelog.json').then(r => r.json()).then(log => {
     document.getElementById('patchNotesList').innerHTML = log.map(u => `
       <div style="margin-bottom:18px">
         <div style="font-weight:600;margin-bottom:2px">${u.version} — ${u.date}</div>
@@ -893,7 +850,7 @@ const APP_VERSION = '1.2.0'
 
 // ─── Init ──────────────────────────────────────────────
 document.getElementById('appVersionLabel').textContent = APP_VERSION
-loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridMenuBtn').classList.add('active')
+loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridBtn').classList.add('active')
 
 // Service worker update
 if ('serviceWorker' in navigator) {
@@ -918,7 +875,7 @@ if (history.length) {
 // ─── Update check ──────────────────────────────────────
 const lastSeen = localStorage.getItem('ytLastVersion')
 if (lastSeen !== APP_VERSION) {
-  fetch('changelog.json').then(r => r.json()).then(log => {
+  fetch('assets/changelog.json').then(r => r.json()).then(log => {
     const updates = log.filter(e => {
       if (!lastSeen) return e.version === APP_VERSION
       const v = e.version.split('.').map(Number)
