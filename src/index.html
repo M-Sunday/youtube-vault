@@ -20,9 +20,6 @@
                 <span class="sidebar-title">Vault</span>
             </div>
             <div class="sidebar-header-right">
-                <button class="sidebar-icon-btn" id="pinBtn">
-                    <i data-lucide="pin" class="sidebar-icon"></i>
-                </button>
                 <button class="sidebar-icon-btn" id="settingsBtn">
                     <i data-lucide="settings" class="sidebar-icon"></i>
                 </button>
@@ -74,6 +71,7 @@
                 <button id="ytBtn">
                     <i data-lucide="arrow-right"></i>
                 </button>
+                <div class="history-dropdown" id="historyDropdown"></div>
             </div>
         </div>
 
@@ -145,6 +143,19 @@
         </div>
     </div>
 
+    <!-- Direct Access dialog -->
+    <div class="folder-dialog-overlay" id="daDialog">
+        <div class="folder-dialog">
+            <h3>Add Direct Access</h3>
+            <p style="font-size:13px;color:#86868b;margin-bottom:10px" id="daUrlDisplay"></p>
+            <input type="text" id="daTitleInput" placeholder="Title (optional)" spellcheck="false" />
+            <div class="folder-dialog-actions">
+                <button class="dialog-btn cancel" id="daDialogCancel">Cancel</button>
+                <button class="dialog-btn confirm" id="daDialogConfirm">Add</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Note dialog -->
     <div class="folder-dialog-overlay" id="noteDialog">
         <div class="folder-dialog note-dialog">
@@ -165,7 +176,8 @@
         <div class="ctx-divider" id="ctxDiv1"></div>
         <div class="ctx-item" data-action="open-link"><i data-lucide="external-link" class="ctx-icon"></i> Open link</div>
         <div class="ctx-item" data-action="archive"><i data-lucide="archive" class="ctx-icon"></i> Archive</div>
-        <div class="ctx-item" data-action="pin"><i data-lucide="pin" class="ctx-icon"></i> Pin</div>
+        <div class="ctx-item" data-action="blur"><i data-lucide="eye" class="ctx-icon"></i> Blur</div>
+        <div class="ctx-item" data-action="pin"><i data-lucide="pin-off" class="ctx-icon"></i> Pin</div>
         <div class="ctx-divider" id="ctxDiv2"></div>
         <div class="ctx-item" data-action="move-up"><i data-lucide="chevron-up" class="ctx-icon"></i> Move up</div>
         <div class="ctx-item" data-action="move-down"><i data-lucide="chevron-down" class="ctx-icon"></i> Move down</div>
@@ -189,6 +201,7 @@
                     <div class="settings-cat" data-cat="toolbar">Toolbar</div>
                     <div class="settings-cat" data-cat="files">Files and links</div>
                     <div class="settings-cat" data-cat="history">Link history</div>
+                    <div class="settings-cat" data-cat="nsfw"><i data-lucide="eye-off" style="width:16px;height:16px;flex-shrink:0"></i> NSFW</div>
                     <div class="settings-cat" data-cat="patchnotes">Patch notes</div>
                 </div>
                 <div class="settings-sidebar-footer" id="settingsClose">
@@ -234,6 +247,16 @@
                         <div class="settings-plugin"><span class="settings-plugin-name">Clear on exit</span><div class="settings-toggle"></div></div>
                     </div>
                     <div class="settings-footer-info"><button class="settings-clear-btn">Clear history</button></div>
+                </div>
+                <div class="settings-pane" id="pane-nsfw" style="display:none">
+                    <div class="settings-pane-header"><h2>NSFW</h2><p class="settings-pane-desc">Mark sites as NSFW to blur their thumbnails.</p></div>
+                    <div class="settings-plugin-list" style="margin-top:20px">
+                        <div class="settings-plugin"><span class="settings-plugin-name">Blur all NSFW</span><div class="settings-toggle" id="blurAllNSFWToggle"></div></div>
+                    </div>
+                    <div style="margin-top:16px">
+                        <p style="font-size:12px;color:#86868b;margin-bottom:6px">Do you want to add other websites we should blur?</p>
+                        <textarea id="nsfwDomains" placeholder="pornhub.com&#10;xvideos.com&#10;redgifs.com" style="width:100%;height:120px;padding:10px 14px;border:1px solid #e8e8ed;border-radius:10px;font-size:13px;font-family:inherit;outline:none;resize:vertical;background:#f5f5f7;color:#1d1d1f;box-sizing:border-box"></textarea>
+                    </div>
                 </div>
                 <div class="settings-pane" id="pane-patchnotes" style="display:none">
                     <div class="settings-pane-header"><h2>Patch notes</h2><p class="settings-pane-desc">Changelog history for this app.</p></div>

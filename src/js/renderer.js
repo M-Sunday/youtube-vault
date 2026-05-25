@@ -9,9 +9,24 @@ function getPins() { try { return JSON.parse(localStorage.getItem('ytPins') || '
 function savePins(p) { localStorage.setItem('ytPins', JSON.stringify(p)) }
 function getBookmarks() { try { return JSON.parse(localStorage.getItem('ytBookmarks') || '[]') } catch { return [] } }
 function saveBookmarks(b) { localStorage.setItem('ytBookmarks', JSON.stringify(b)) }
+function getDirectAccess() { try { return JSON.parse(localStorage.getItem('ytDirectAccess') || '[]') } catch { return [] } }
+function saveDirectAccess(d) { localStorage.setItem('ytDirectAccess', JSON.stringify(d)) }
+function getNSFW() { try { return JSON.parse(localStorage.getItem('ytNSFW') || '[]') } catch { return [] } }
+function saveNSFW(n) { localStorage.setItem('ytNSFW', JSON.stringify(n)) }
+function getBlurAllNSFW() { return localStorage.getItem('ytBlurAllNSFW') === 'true' }
+function saveBlurAllNSFW(v) { localStorage.setItem('ytBlurAllNSFW', v ? 'true' : 'false') }
+function isNSFW(url) {
+  try {
+    if (!getBlurAllNSFW()) return false
+    const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase()
+    return getNSFW().some(n => domain === n || domain.endsWith('.' + n))
+  } catch { return false }
+}
 function getNotes() { try { return JSON.parse(localStorage.getItem('ytNotes') || '[]') } catch { return [] } }
 function saveNotes(n) { localStorage.setItem('ytNotes', JSON.stringify(n)) }
 function stripHtml(str) { return str.replace(/<[^>]*>/g, '') }
+function getCollapsed() { try { return JSON.parse(localStorage.getItem('ytCollapsed') || '{}') } catch { return {} } }
+function saveCollapsed(c) { localStorage.setItem('ytCollapsed', JSON.stringify(c)) }
 
 let currentVideo = null
 let dragVideoId = null
@@ -30,8 +45,11 @@ function renderSidebar() {
   for (const [name, ids] of Object.entries(folders)) {
     if (name === 'Archived' && !ids.length) continue
     const color = meta[name]?.color || ''
-    const icon = name === 'Archived' ? 'archive' : 'folder'
-    html += `<div class="tree-item expanded" data-folder="${name}"><div class="tree-folder" draggable="false"${color ? ` data-color="${color}" style="--folder-color:${color}"` : ''}><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="${icon}" class="tree-folder-icon"></i><span class="tree-label">${name}</span></div><div class="tree-children">`
+    const hasContents = ids.length || getNotes().filter(n => n.folder === name).length
+    const icon = name === 'Archived' ? 'archive' : (hasContents ? 'folder-fill' : 'folder')
+    const collapsed = getCollapsed()
+    const isCollapsed = collapsed['folder:' + name]
+    html += `<div class="tree-item ${isCollapsed ? '' : 'expanded'}" data-folder="${name}"><div class="tree-folder" draggable="false"${color ? ` data-color="${color}" style="--folder-color:${color}"` : ''}><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="${icon}" class="tree-folder-icon"></i><span class="tree-label">${name}</span></div><div class="tree-children">`
 
     let entryIds = [...ids]
     const pinned = entryIds.filter(id => pins.includes(id))
@@ -49,32 +67,47 @@ function renderSidebar() {
       if (n.folder !== name) continue
       if (query && !n.title.toLowerCase().includes(query)) continue
       const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 50)
-      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
+      html += `<div class="tree-item" data-note-id="${n.id}"><div class="tree-file"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
     }
     html += '</div></div>'
   }
   const bookmarks = getBookmarks()
   if (bookmarks.length) {
-    html += `<div class="tree-item expanded" data-bookmarks="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="bookmark" class="tree-folder-icon"></i><span class="tree-label">Bookmarks</span></div><div class="tree-children">`
+    const bmCollapsed = getCollapsed()['section:bookmarks']
+    html += `<div class="tree-item ${bmCollapsed ? '' : 'expanded'}" data-bookmarks="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="bookmark-fill" class="tree-folder-icon"></i><span class="tree-label">Bookmarks</span></div><div class="tree-children">`
     for (const bm of bookmarks) {
       if (query && !bm.title.toLowerCase().includes(query) && !bm.url.toLowerCase().includes(query)) continue
-      html += `<div class="tree-item" data-bookmark-id="${bm.id}"><div class="tree-file"><div class="bm-thumb-wrap">${bm.image ? `<img class="bm-thumb" src="${bm.image}" onerror="this.style.display='none'" />` : `<i data-lucide="external-link" class="tree-file-icon" style="margin:4px"></i>`}</div><div class="tree-file-meta"><span class="tree-label">${bm.title || bm.url}</span><span class="tree-sublabel">${bm.url}</span></div></div></div>`
+      const bmNsfw = isNSFW(bm.url) || bm.blurred
+      html += `<div class="tree-item" data-bookmark-id="${bm.id}"><div class="tree-file"><div class="bm-thumb-wrap">${bm.image ? `<img class="bm-thumb${bmNsfw ? ' nsfw-blur' : ''}" src="${bm.image}" onerror="this.style.display='none'" />` : `<i data-lucide="external-link" class="tree-file-icon" style="margin:4px"></i>`}</div><div class="tree-file-meta"><span class="tree-label">${bm.title || bm.url}</span><span class="tree-sublabel">${bm.url}</span></div></div></div>`
     }
     html += '</div></div>'
   }
   const notes = getNotes().filter(n => !n.folder)
   if (notes.length) {
-    html += `<div class="tree-item expanded" data-notes="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="file-text" class="tree-folder-icon"></i><span class="tree-label">Notes</span></div><div class="tree-children">`
+    const nCollapsed = getCollapsed()['section:notes']
+    html += `<div class="tree-item ${nCollapsed ? '' : 'expanded'}" data-notes="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="file-text-fill" class="tree-folder-icon"></i><span class="tree-label">Notes</span></div><div class="tree-children">`
     for (const n of notes) {
       if (query && !n.title.toLowerCase().includes(query)) continue
       const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 50)
-      html += `<div class="tree-item ${currentNoteId === n.id ? 'active' : ''}" data-note-id="${n.id}"><div class="tree-file${currentNoteId === n.id ? ' active' : ''}"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
+      html += `<div class="tree-item" data-note-id="${n.id}"><div class="tree-file"><i data-lucide="file-text" class="tree-file-icon"></i><div class="tree-file-meta"><span class="tree-label">${n.title || 'Untitled'}</span><span class="tree-sublabel">${preview}${stripHtml(n.content || '').length > 50 ? '…' : ''}</span></div></div></div>`
+    }
+    html += '</div></div>'
+  }
+  const da = getDirectAccess()
+  if (da.length) {
+    const daCollapsed = getCollapsed()['section:directaccess']
+    html += `<div class="tree-item ${daCollapsed ? '' : 'expanded'}" data-directaccess="true"><div class="tree-folder" draggable="false"><i data-lucide="chevron-down" class="tree-chevron"></i><i data-lucide="link" class="tree-folder-icon"></i><span class="tree-label">Direct Access</span></div><div class="tree-children">`
+    for (const d of da) {
+      if (query && !d.title.toLowerCase().includes(query) && !d.url.toLowerCase().includes(query)) continue
+      const nsfw = isNSFW(d.url) || d.blurred
+      html += `<div class="tree-item" data-da-id="${d.id}"><div class="tree-file"><div class="bm-thumb-wrap">${d.image ? `<img class="bm-thumb${nsfw ? ' nsfw-blur' : ''}" src="${d.image}" onerror="this.style.display='none'" />` : `<i data-lucide="external-link" class="tree-file-icon" style="margin:4px"></i>`}</div><div class="tree-file-meta"><span class="tree-label">${d.title}</span><span class="tree-sublabel">${d.url}</span></div></div></div>`
     }
     html += '</div></div>'
   }
   tree.innerHTML = html || `<div style="padding:20px;text-align:center;font-size:12px;color:#8e8e93">No videos yet.<br>Add one with the button above.</div>`
   loadIcons()
   bindSidebarEvents()
+  if (document.getElementById('gridView').classList.contains('open')) renderGridView()
 }
 
 function bindSidebarEvents() {
@@ -98,14 +131,26 @@ function bindSidebarEvents() {
   document.querySelectorAll('.tree-folder').forEach(f => {
     f.addEventListener('click', (e) => {
       if (e.target.closest('.folder-rename')) return
-      f.closest('.tree-item')?.classList.toggle('expanded')
+      const item = f.closest('.tree-item')
+      if (!item) return
+      const collapsed = getCollapsed()
+      const folder = item.dataset.folder
+      const bm = item.dataset.bookmarks
+      const nt = item.dataset.notes
+      const da = item.dataset.directaccess
+      const key = folder ? 'folder:' + folder : bm ? 'section:bookmarks' : nt ? 'section:notes' : da ? 'section:directaccess' : null
+      if (key) {
+        collapsed[key] = item.classList.contains('expanded')
+        saveCollapsed(collapsed)
+      }
+      item.classList.toggle('expanded')
     })
   })
 
   document.querySelectorAll('.tree-file').forEach(file => {
     file.addEventListener('click', () => {
       const id = file.closest('[data-video-id]')?.dataset.videoId
-      if (id && id !== 'placeholder') { const v = getVideos()[id]; if (v) { loadVideoById(id); if (window.innerWidth <= 640) document.getElementById('sidebar').classList.add('closed') } }
+      if (id && id !== 'placeholder') { const v = getVideos()[id]; if (v) { loadVideoById(id); showCardView(); if (window.innerWidth <= 640) document.getElementById('sidebar').classList.add('closed') } }
       const bm = file.closest('[data-bookmark-id]')
       if (bm) {
         const bms = getBookmarks().filter(b => b.id === bm.dataset.bookmarkId)
@@ -113,6 +158,11 @@ function bindSidebarEvents() {
       }
       const note = file.closest('[data-note-id]')
       if (note) { openNote(note.dataset.noteId); if (window.innerWidth <= 640) document.getElementById('sidebar').classList.add('closed') }
+      const da = file.closest('[data-da-id]')
+      if (da) {
+        const das = getDirectAccess().filter(d => d.id === da.dataset.daId)
+        if (das[0]?.url) { window.open(das[0].url); if (window.innerWidth <= 640) document.getElementById('sidebar').classList.add('closed') }
+      }
     })
   })
 
@@ -127,8 +177,9 @@ function bindSidebarEvents() {
   document.querySelectorAll('.tree-file').forEach(file => {
     file.addEventListener('contextmenu', (e) => {
       e.preventDefault()
-      const entry = file.closest('[data-video-id]'), folder = file.closest('[data-folder]'), bm = file.closest('[data-bookmark-id]'), note = file.closest('[data-note-id]')
-      if (bm) showContextMenu(e.clientX, e.clientY, null, null, bm.dataset.bookmarkId)
+      const entry = file.closest('[data-video-id]'), folder = file.closest('[data-folder]'), bm = file.closest('[data-bookmark-id]'), note = file.closest('[data-note-id]'), da = file.closest('[data-da-id]')
+      if (da) showContextMenu(e.clientX, e.clientY, null, null, null, null, da.dataset.daId)
+      else if (bm) showContextMenu(e.clientX, e.clientY, null, null, bm.dataset.bookmarkId)
       else if (note) showContextMenu(e.clientX, e.clientY, null, null, null, note.dataset.noteId)
       else if (entry) showContextMenu(e.clientX, e.clientY, entry?.dataset.videoId, folder?.dataset.folder)
     })
@@ -149,8 +200,10 @@ function bindSidebarEvents() {
       longTimer = setTimeout(() => {
         longPressed = true
         const touch = e.touches[0]
-        const item = el.closest('[data-folder]'), video = el.closest('[data-video-id]'), bm = el.closest('[data-bookmark-id]'), note = el.closest('[data-note-id]')
-        if (video) {
+        const item = el.closest('[data-folder]'), video = el.closest('[data-video-id]'), bm = el.closest('[data-bookmark-id]'), note = el.closest('[data-note-id]'), da = el.closest('[data-da-id]')
+        if (da) {
+          showContextMenu(touch.clientX, touch.clientY, null, null, null, null, da.dataset.daId)
+        } else if (video) {
           showContextMenu(touch.clientX, touch.clientY, video.dataset.videoId, item?.dataset.folder || null)
         } else if (bm) {
           showContextMenu(touch.clientX, touch.clientY, null, null, bm.dataset.bookmarkId)
@@ -169,29 +222,39 @@ function bindSidebarEvents() {
 }
 
 // ─── Context menu ─────────────────────────────────────
-let ctxTarget = null, ctxFolder = null, ctxBookmark = null, ctxNote = null
-function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId) {
+let ctxTarget = null, ctxFolder = null, ctxBookmark = null, ctxNote = null, ctxDA = null
+function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId, daId) {
   const menu = document.getElementById('ctxMenu')
-  ctxTarget = videoId; ctxFolder = folderName; ctxBookmark = bookmarkId; ctxNote = noteId
+  ctxTarget = videoId; ctxFolder = folderName; ctxBookmark = bookmarkId; ctxNote = noteId; ctxDA = daId
   const isTouch = 'ontouchstart' in window
   menu.style.left = (isTouch ? x - 40 : x) + 'px'
   menu.style.top = (isTouch ? y - 40 : y) + 'px'
   menu.classList.add('open')
   const isBm = bookmarkId !== null && bookmarkId !== undefined
   const isNote = noteId !== null && noteId !== undefined
+  const isDA = daId !== null && daId !== undefined
   const showVideo = videoId !== null && videoId !== undefined
-  menu.querySelector('[data-action="rename-folder"]').style.display = videoId ? 'none' : (isBm || isNote) ? 'none' : ''
-  menu.querySelector('[data-action="delete-folder"]').style.display = videoId ? 'none' : (isBm || isNote) ? 'none' : ''
-  menu.querySelector('[data-action="open-link"]').style.display = (showVideo || isBm) ? '' : 'none'
+  menu.querySelector('[data-action="rename-folder"]').style.display = videoId ? 'none' : (isBm || isNote || isDA) ? 'none' : ''
+  menu.querySelector('[data-action="delete-folder"]').style.display = videoId ? 'none' : (isBm || isNote || isDA) ? 'none' : ''
+  menu.querySelector('[data-action="open-link"]').style.display = (showVideo || isBm || isDA) ? '' : 'none'
   menu.querySelector('[data-action="archive"]').style.display = showVideo ? '' : 'none'
+  const hasUrl = showVideo ? !!getVideos()[videoId]?.url : isBm ? !!getBookmarks().filter(b => b.id === bookmarkId)[0]?.url : isDA ? true : false
+  menu.querySelector('[data-action="blur"]').style.display = (showVideo && hasUrl) || isBm || isDA ? '' : 'none'
+  if ((showVideo && hasUrl) || isBm || isDA) {
+    let blurred = false, url = ''
+    if (showVideo) { const v = getVideos()[videoId]; url = v?.url || ''; blurred = v?.blurred || isNSFW(url) }
+    else if (isBm) { const b = getBookmarks().filter(x => x.id === bookmarkId)[0]; url = b?.url || ''; blurred = b?.blurred || isNSFW(url) }
+    else if (isDA) { const d = getDirectAccess().filter(x => x.id === daId)[0]; url = d?.url || ''; blurred = d?.blurred || isNSFW(url) }
+    menu.querySelector('[data-action="blur"]').innerHTML = `<i data-lucide="${blurred ? 'eye-off' : 'eye'}" class="ctx-icon"></i> ${blurred ? 'Unblur' : 'Blur'}`
+  }
   menu.querySelector('[data-action="pin"]').style.display = showVideo ? '' : 'none'
   menu.querySelector('[data-action="move-up"]').style.display = showVideo ? '' : 'none'
   menu.querySelector('[data-action="move-down"]').style.display = showVideo ? '' : 'none'
-  menu.querySelector('[data-action="delete"]').style.display = (showVideo || isBm || isNote) ? '' : 'none'
+  menu.querySelector('[data-action="delete"]').style.display = (showVideo || isBm || isNote || isDA) ? '' : 'none'
   const delItem = menu.querySelector('[data-action="delete"]')
-  delItem.innerHTML = `<i data-lucide="trash-2" class="ctx-icon"></i> ${isNote ? 'Delete note' : isBm ? 'Delete bookmark' : 'Delete'}`
+  delItem.innerHTML = `<i data-lucide="trash-2" class="ctx-icon"></i> ${isNote ? 'Delete note' : isBm ? 'Delete bookmark' : isDA ? 'Delete direct access' : 'Delete'}`
   delItem.className = 'ctx-item ctx-danger'
-  document.getElementById('ctxDiv1').style.display = (videoId || isBm || isNote) ? '' : 'none'
+  document.getElementById('ctxDiv1').style.display = (videoId || isBm || isNote || isDA) ? '' : 'none'
   document.getElementById('ctxDiv2').style.display = showVideo ? '' : 'none'
   document.getElementById('ctxDiv3').style.display = (showVideo || isNote) ? '' : 'none'
   document.getElementById('ctxMoveTo').classList.remove('show')
@@ -200,7 +263,7 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId) {
     const pinItem = menu.querySelector('[data-action="pin"]')
     if (videoId) {
       const isPinned = getPins().includes(videoId)
-      pinItem.innerHTML = `<i data-lucide="pin" class="ctx-icon"></i> ${isPinned ? 'Unpin' : 'Pin'}`
+      pinItem.innerHTML = `<i data-lucide="${isPinned ? 'pin-off' : 'pin'}" class="ctx-icon"></i> ${isPinned ? 'Unpin' : 'Pin'}`
     }
     const moveToEl = document.getElementById('ctxMoveTo')
     const folders = getFolders()
@@ -214,7 +277,9 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId) {
       }
       for (const name of folderEntries) {
         const color = (getFolderMeta()[name]?.color || '')
-        mHtml += `<div class="ctx-item" data-action="move-to" data-folder="${name}"><i data-lucide="folder" class="ctx-icon"${color ? ` style="color:${color}"` : ''}></i> Move to ${name}</div>`
+        const folders = getFolders()
+        const hasContents = (folders[name] || []).length || getNotes().filter(n => n.folder === name).length
+        mHtml += `<div class="ctx-item" data-action="move-to" data-folder="${name}"><i data-lucide="${hasContents ? 'folder-fill' : 'folder'}" class="ctx-icon"${color ? ` style="color:${color}"` : ''}></i> Move to ${name}</div>`
       }
       moveToEl.innerHTML = mHtml
       moveToEl.classList.add('show')
@@ -251,6 +316,10 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
     saveNotes(ns); renderSidebar()
     if (currentNoteId === ctxNote) { currentNoteId = null; closeNoteView() }
   }
+  if (a === 'delete' && ctxDA && !ctxTarget && !ctxBookmark && !ctxNote) {
+    let das = getDirectAccess().filter(d => d.id !== ctxDA)
+    saveDirectAccess(das); renderSidebar()
+  }
   if (a === 'archive' && ctxTarget) {
     const fs = getFolders(); for (const ids of Object.values(fs)) { const i = ids.indexOf(ctxTarget); if (i > -1) ids.splice(i, 1) }
     if (!fs['Archived']) fs['Archived'] = []; fs['Archived'].push(ctxTarget); saveFolders(fs); renderSidebar()
@@ -258,7 +327,19 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
   if (a === 'pin') {
     const pins = getPins(); const idx = pins.indexOf(ctxTarget)
     if (idx > -1) pins.splice(idx, 1); else pins.push(ctxTarget)
-    savePins(pins); renderSidebar()
+    savePins(pins); renderSidebar(); if (currentVideo?.id === ctxTarget) updatePinBadge(ctxTarget)
+  }
+  if (a === 'blur') {
+    if (ctxTarget) {
+      const vs = getVideos(); const v = vs[ctxTarget]
+      if (v) { v.blurred = !v.blurred; saveVideos(vs); renderSidebar(); if (currentVideo?.id === ctxTarget) loadVideoById(ctxTarget) }
+    } else if (ctxBookmark) {
+      const bms = getBookmarks(); const b = bms.filter(x => x.id === ctxBookmark)[0]
+      if (b) { b.blurred = !b.blurred; saveBookmarks(bms); renderSidebar() }
+    } else if (ctxDA) {
+      const das = getDirectAccess(); const d = das.filter(x => x.id === ctxDA)[0]
+      if (d) { d.blurred = !d.blurred; saveDirectAccess(das); renderSidebar() }
+    }
   }
   if (a === 'rename-folder' && ctxFolder) {
       const label = document.querySelector(`[data-folder="${ctxFolder}"] .tree-label`)
@@ -286,9 +367,13 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
       const v = vs[ctxTarget]
       if (v?.url) window.open(v.url)
     }
-    if (a === 'open-link' && ctxBookmark && !ctxTarget) {
+    if (a === 'open-link' && ctxBookmark && !ctxTarget && !ctxDA) {
       const bm = getBookmarks().filter(b => b.id === ctxBookmark)[0]
       if (bm?.url) window.open(bm.url)
+    }
+    if (a === 'open-link' && ctxDA && !ctxTarget && !ctxBookmark) {
+      const da = getDirectAccess().filter(d => d.id === ctxDA)[0]
+      if (da?.url) window.open(da.url)
     }
     if ((a === 'move-up' || a === 'move-down') && ctxTarget) {
       const fs = getFolders()
@@ -544,15 +629,19 @@ function renderGridView() {
   const folders = getFolders()
   const meta = getFolderMeta()
   const videos = getVideos()
+  const pins = getPins()
   for (const [name, ids] of Object.entries(folders)) {
     if (!ids.length) continue
     const color = meta[name]?.color || ''
-    html += `<div class="grid-section"><div class="grid-section-header"${color ? ` style="color:${color}"` : ''}><i data-lucide="folder" style="width:16px;height:16px;flex-shrink:0"></i> ${name}</div><div class="grid-items">`
+    const hasContents = ids.length || getNotes().filter(n => n.folder === name).length
+    html += `<div class="grid-section"><div class="grid-section-header"${color ? ` style="color:${color}"` : ''}><i data-lucide="${hasContents ? 'folder-fill' : 'folder'}" style="width:16px;height:16px;flex-shrink:0"></i> ${name}</div><div class="grid-items">`
     for (const id of ids) {
       const v = videos[id]
       if (!v) continue
       const thumb = v.thumbnail || `https://img.youtube.com/vi/${id}/maxresdefault.jpg`
-      html += `<div class="grid-item" data-video-id="${id}"><img class="grid-item-img" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${id}/hqdefault.jpg'" /><div class="grid-item-info"><div class="grid-item-title">${v.title}</div><div class="grid-item-sublabel">${v.channel}</div></div></div>`
+      const pinned = pins.includes(id)
+      const vBlur = v.blurred
+      html += `<div class="grid-item" data-video-id="${id}">${pinned ? '<div class="pin-badge"><i data-lucide="pin-off" style="width:14px;height:14px"></i></div>' : ''}<div style="position:relative">${vBlur ? '<div class="nsfw-overlay"><i data-lucide="eye-off" style="width:20px;height:20px"></i></div>' : ''}<img class="grid-item-img${vBlur ? ' nsfw-blur' : ''}" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${id}/hqdefault.jpg'" /></div><div class="grid-item-info"><div class="grid-item-title">${v.title}</div><div class="grid-item-sublabel">${v.channel}</div></div></div>`
     }
     for (const n of getNotes().filter(x => x.folder === name)) {
       const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 80)
@@ -562,18 +651,28 @@ function renderGridView() {
   }
   const bms = getBookmarks()
   if (bms.length) {
-    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="bookmark" style="width:16px;height:16px;flex-shrink:0"></i> Bookmarks</div><div class="grid-items">`
+    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="bookmark-fill" style="width:16px;height:16px;flex-shrink:0"></i> Bookmarks</div><div class="grid-items">`
     for (const bm of bms) {
-      html += `<div class="grid-item bm" data-bookmark-id="${bm.id}">${bm.image ? `<img class="grid-item-img" src="${bm.image}" loading="lazy" />` : '<div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed"><i data-lucide="external-link" style="width:24px;height:24px;color:#8e8e93"></i></div>'}<div class="grid-item-info"><div class="grid-item-title">${bm.title || bm.url}</div><div class="grid-item-sublabel">${bm.url}</div></div></div>`
+      const bmNsfw = isNSFW(bm.url) || bm.blurred
+      html += `<div class="grid-item bm" data-bookmark-id="${bm.id}">${bm.image ? `<div style="position:relative">${bmNsfw ? '<div class="nsfw-overlay"><i data-lucide="eye-off" style="width:20px;height:20px"></i></div>' : ''}<img class="grid-item-img${bmNsfw ? ' nsfw-blur' : ''}" src="${bm.image}" loading="lazy" /></div>` : '<div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed"><i data-lucide="external-link" style="width:24px;height:24px;color:#8e8e93"></i></div>'}<div class="grid-item-info"><div class="grid-item-title">${bm.title || bm.url}</div><div class="grid-item-sublabel">${bm.url}</div></div></div>`
     }
     html += '</div></div>'
   }
   const notes = getNotes().filter(x => !x.folder)
   if (notes.length) {
-    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="file-text" style="width:16px;height:16px;flex-shrink:0"></i> Notes</div><div class="grid-items">`
+    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="file-text-fill" style="width:16px;height:16px;flex-shrink:0"></i> Notes</div><div class="grid-items">`
     for (const n of notes) {
       const preview = stripHtml(n.content || '').replace(/\n/g, ' ').substring(0, 80)
       html += `<div class="grid-item note" data-note-id="${n.id}"><div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed;aspect-ratio:auto;height:60px"><i data-lucide="file-text" style="width:24px;height:24px;color:#8e8e93"></i></div><div class="grid-item-info"><div class="grid-item-title">${n.title || 'Untitled'}</div><div class="grid-item-sublabel">${preview}${stripHtml(n.content || '').length > 80 ? '…' : ''}</div></div></div>`
+    }
+    html += '</div></div>'
+  }
+  const das = getDirectAccess()
+  if (das.length) {
+    html += `<div class="grid-section"><div class="grid-section-header"><i data-lucide="link" style="width:16px;height:16px;flex-shrink:0"></i> Direct Access</div><div class="grid-items">`
+    for (const d of das) {
+      const nsfw = isNSFW(d.url) || d.blurred
+      html += `<div class="grid-item bm" data-da-id="${d.id}">${d.image ? `<div style="position:relative">${nsfw ? '<div class="nsfw-overlay"><i data-lucide="eye-off" style="width:20px;height:20px"></i></div>' : ''}<img class="grid-item-img${nsfw ? ' nsfw-blur' : ''}" src="${d.image}" loading="lazy" onerror="this.style.display='none'" /></div>` : '<div class="grid-item-img" style="display:flex;align-items:center;justify-content:center;background:#e8e8ed"><i data-lucide="external-link" style="width:24px;height:24px;color:#8e8e93"></i></div>'}<div class="grid-item-info"><div class="grid-item-title">${d.title}</div><div class="grid-item-sublabel">${d.url}</div></div></div>`
     }
     html += '</div></div>'
   }
@@ -592,12 +691,23 @@ function renderGridView() {
       if (bm?.url) window.open(bm.url)
     })
   })
+  el.querySelectorAll('[data-da-id]').forEach(item => {
+    item.addEventListener('click', () => {
+      const d = getDirectAccess().filter(x => x.id === item.dataset.daId)[0]
+      if (d?.url) window.open(d.url)
+    })
+  })
   el.querySelectorAll('[data-note-id]').forEach(item => {
     item.addEventListener('click', () => {
       const nid = item.dataset.noteId
       if (nid) { openNote(nid) }
     })
   })
+}
+function showCardView() {
+  document.getElementById('gridView').classList.remove('open')
+  document.getElementById('gridBtn').classList.remove('active')
+  document.querySelector('.content').style.display = ''
 }
 document.getElementById('gridBtn').addEventListener('click', function () {
   const open = this.classList.toggle('active')
@@ -607,7 +717,6 @@ document.getElementById('gridBtn').addEventListener('click', function () {
 })
 
 // ─── Sidebar toolbar ──────────────────────────────────
-document.getElementById('pinBtn').addEventListener('click', function () { this.classList.toggle('pinned') })
 document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('closed'))
 document.getElementById('sidebarBackdrop').addEventListener('click', () => document.getElementById('sidebar').classList.add('closed'))
 document.getElementById('searchInput').addEventListener('input', renderSidebar)
@@ -623,15 +732,31 @@ function loadVideoById(id) {
   if (v.pubDate) setPublishedDate(new Date(v.pubDate))
   updatePrivacy(v.privacy || 'PUBLIC')
   if (currentNoteId) closeNoteView()
-  renderSidebar(); updateCardAddBtn()
+  updatePinBadge(id); showCardView(); renderSidebar(); updateCardAddBtn()
+}
+function updatePinBadge(id) {
+  const wrap = document.getElementById('imageWrap')
+  const old = wrap.querySelector('.pin-badge')
+  if (old) old.remove()
+  if (getPins().includes(id)) {
+    const badge = document.createElement('div')
+    badge.className = 'pin-badge'
+    badge.innerHTML = '<i data-lucide="pin-off" style="width:14px;height:14px"></i>'
+    wrap.appendChild(badge)
+    loadIcons()
+  }
 }
 
 function clearCard() {
+  currentVideo = null
+  currentVideo = null
   document.getElementById('thumbnail').src = ''
   document.getElementById('durationBadge').textContent = '–'
-  document.getElementById('videoTitle').textContent = 'Paste a YouTube link above'
+  document.getElementById('videoTitle').textContent = 'Paste a video link above'
   document.getElementById('channelName').textContent = ''
   document.getElementById('cardAddRow').style.display = 'none'
+  const badge = document.getElementById('imageWrap').querySelector('.pin-badge')
+  if (badge) badge.remove()
 }
 
 // ─── Thumbnail click to open link ─────────────────────
@@ -649,11 +774,21 @@ function updateCardAddBtn() {
     row.style.display = 'flex'
     btn.classList.add('saved')
     btn.innerHTML = '<i data-lucide="check" class="card-add-icon"></i> Saved'
+    btn.onmouseover = () => {
+      btn.innerHTML = '<i data-lucide="trash-2" class="card-add-icon"></i> Unlink'
+      loadIcons()
+    }
+    btn.onmouseout = () => {
+      btn.innerHTML = '<i data-lucide="check" class="card-add-icon"></i> Saved'
+      loadIcons()
+    }
+    btn.onclick = (e) => { e.stopPropagation(); if (currentVideo) unlinkCurrentVideo() }
     loadIcons()
   } else {
     row.style.display = 'flex'
     btn.classList.remove('saved')
     btn.innerHTML = '<i data-lucide="plus" class="card-add-icon"></i> Add video'
+    btn.onmouseover = btn.onmouseout = btn.onclick = null
     loadIcons()
   }
 }
@@ -673,6 +808,18 @@ function addCurrentVideo() {
   const t = document.querySelector('#pane-history .settings-toggle:first-child')
   if (t?.classList.contains('on')) { const h = loadHistory().filter(x => x.id !== id); h.unshift({ id, title, channel }); saveHistory(h) }
 }
+function unlinkCurrentVideo() {
+  if (!currentVideo) return
+  const id = currentVideo.id
+  const vs = getVideos()
+  if (!vs[id]) return
+  delete vs[id]; saveVideos(vs)
+  const fs = getFolders()
+  for (const ids of Object.values(fs)) { const i = ids.indexOf(id); if (i > -1) ids.splice(i, 1) }
+  saveFolders(fs)
+  const pins = getPins(); const pi = pins.indexOf(id); if (pi > -1) { pins.splice(pi, 1); savePins(pins) }
+  renderSidebar(); updateCardAddBtn()
+}
 document.getElementById('addBtn').addEventListener('click', addCurrentVideo)
 document.getElementById('cardAddBtn').addEventListener('click', addCurrentVideo)
 
@@ -682,6 +829,7 @@ function getVideoId(url) {
   return null
 }
 async function loadVideo(videoId) {
+  showCardView()
   const url = `https://www.youtube.com/watch?v=${videoId}`
   document.getElementById('thumbnail').src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
   document.getElementById('durationBadge').textContent = '...'
@@ -722,11 +870,55 @@ async function loadVideo(videoId) {
     renderSidebar(); updateCardAddBtn()
   } catch (e) { document.getElementById('durationBadge').textContent = '–'; document.getElementById('videoTitle').textContent = 'Could not load video info'; document.getElementById('channelName').textContent = 'Try again or check the link' }
 }
+let pendingDaUrl = ''
 document.getElementById('ytBtn').addEventListener('click', () => {
-  const id = getVideoId(document.getElementById('ytInput').value.trim())
-  if (id) loadVideo(id); else document.getElementById('videoTitle').textContent = 'Invalid YouTube link'
+  const input = document.getElementById('ytInput').value.trim()
+  const id = getVideoId(input)
+  if (id) { loadVideo(id); return }
+  if (/^https?:\/\//i.test(input) || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(input)) {
+    pendingDaUrl = input.match(/^https?:\/\//i) ? input : 'https://' + input
+    document.getElementById('daUrlDisplay').textContent = pendingDaUrl
+    document.getElementById('daTitleInput').value = ''
+    document.getElementById('daDialog').classList.add('open')
+    setTimeout(() => document.getElementById('daTitleInput').focus(), 100)
+  } else {
+    document.getElementById('videoTitle').textContent = 'Invalid YouTube link'
+  }
 })
-document.getElementById('ytInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('ytBtn').click() })
+document.getElementById('daDialogCancel').addEventListener('click', () => { document.getElementById('daDialog').classList.remove('open'); pendingDaUrl = '' })
+document.getElementById('daDialogConfirm').addEventListener('click', async () => {
+  if (!pendingDaUrl) return
+  const das = getDirectAccess()
+  const title = document.getElementById('daTitleInput').value.trim() || pendingDaUrl
+  let domain = ''
+  try { domain = new URL(pendingDaUrl).hostname } catch (_) { domain = pendingDaUrl.replace(/^https?:\/\//, '').split('/')[0] }
+  const da = { id: '_da_' + Date.now(), url: pendingDaUrl, title, added: Date.now(), image: `https://www.google.com/s2/favicons?domain=${domain}&sz=128` }
+  das.push(da)
+  saveDirectAccess(das)
+  document.getElementById('ytInput').value = ''
+  document.getElementById('daDialog').classList.remove('open')
+  pendingDaUrl = ''
+  renderSidebar()
+})
+document.getElementById('daTitleInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('daDialogConfirm').click(); if (e.key === 'Escape') document.getElementById('daDialogCancel').click() })
+document.getElementById('daDialog').addEventListener('mousedown', (e) => { if (e.target === document.getElementById('daDialog')) document.getElementById('daDialogCancel').click() })
+function showHistoryDropdown() {
+  const dd = document.getElementById('historyDropdown')
+  const t = document.querySelector('#pane-history .settings-toggle:first-child')
+  if (!t?.classList.contains('on')) { dd.classList.remove('open'); return }
+  const items = loadHistory()
+  if (!items.length) { dd.innerHTML = '<div class="history-empty">No recent links</div>'; dd.classList.add('open'); return }
+  dd.innerHTML = items.map(h => `<div class="history-item" data-id="${h.id}"><i data-lucide="history" style="width:14px;height:14px;flex-shrink:0;color:#8e8e93"></i><div class="history-item-meta"><span class="history-item-title">${h.title}</span><span class="history-item-channel">${h.channel}</span></div></div>`).join('')
+  dd.querySelectorAll('.history-item').forEach(el => {
+    el.addEventListener('click', () => { const id = el.dataset.id; if (id) { loadVideoById(id); dd.classList.remove('open') } })
+  })
+  loadIcons(dd)
+  dd.classList.add('open')
+}
+document.getElementById('ytInput').addEventListener('focus', () => { showCardView(); clearCard(); showHistoryDropdown() })
+document.getElementById('ytInput').addEventListener('blur', () => setTimeout(() => document.getElementById('historyDropdown')?.classList.remove('open'), 200))
+document.getElementById('ytInput').addEventListener('input', () => document.getElementById('historyDropdown')?.classList.remove('open'))
+document.getElementById('ytInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { document.getElementById('historyDropdown')?.classList.remove('open'); document.getElementById('ytBtn').click() }; if (e.key === 'Escape') document.getElementById('historyDropdown')?.classList.remove('open') })
 
 // ─── Settings ─────────────────────────────────────────
 const settingsOverlay = document.getElementById('settingsOverlay')
@@ -738,13 +930,13 @@ document.querySelectorAll('.settings-cat').forEach(cat => {
     document.querySelectorAll('.settings-cat').forEach(c => c.classList.remove('active'))
     this.classList.add('active')
     document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none')
-    document.getElementById({ theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
+    document.getElementById({ theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', nsfw: 'pane-nsfw', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
     if (this.dataset.cat === 'patchnotes') loadPatchNotes()
   })
 })
 function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; localStorage.setItem('ytSettings', JSON.stringify(s)) }
 function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
-document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { this.classList.toggle('on') }))
+document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { if (this.id === 'blurAllNSFWToggle') return; this.classList.toggle('on') }))
 document.querySelectorAll('.theme-option').forEach(opt => {
   opt.addEventListener('click', function () {
     document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
@@ -792,6 +984,22 @@ document.querySelectorAll('#pane-history .settings-toggle').forEach((t, i) => {
     if (i === 0 && !this.classList.contains('on')) saveHistory([])
   })
 })
+const nsfwTextarea = document.getElementById('nsfwDomains')
+if (nsfwTextarea) {
+  nsfwTextarea.value = getNSFW().join('\n')
+  nsfwTextarea.addEventListener('input', () => {
+    const domains = nsfwTextarea.value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean)
+    saveNSFW(domains)
+  })
+}
+const blurAllToggle = document.getElementById('blurAllNSFWToggle')
+if (blurAllToggle) {
+  blurAllToggle.classList.toggle('on', getBlurAllNSFW())
+  blurAllToggle.addEventListener('click', () => {
+    blurAllToggle.classList.toggle('on')
+    saveBlurAllNSFW(blurAllToggle.classList.contains('on'))
+  })
+}
 document.querySelector('.settings-clear-btn')?.addEventListener('click', () => {
   if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
 })
@@ -848,9 +1056,54 @@ document.addEventListener('keydown', (e) => {
 // ─── Updcheck / version ──────────────────────────────
 const APP_VERSION = '1.2.0'
 
+// ─── Debug color toggle ────────────────────────────────
+let debugOn = false
+const debugColorCache = new Map()
+const DEBUG_PALETTE = [
+  '#ff453a', '#ff9f0a', '#ffd60a', '#30d158', '#0a84ff',
+  '#bf5af2', '#ff375f', '#64d2ff', '#ff6482', '#5e5ce6',
+  '#ff6b6b', '#ffb340', '#00c7be', '#66d9e8', '#a284f0'
+]
+function hashColor(str) {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h)
+  return DEBUG_PALETTE[Math.abs(h) % DEBUG_PALETTE.length]
+}
+function debugLabelFor(el) {
+  return el.id || Array.from(el.classList).join('.') || el.tagName.toLowerCase()
+}
+function toggleDebug() {
+  debugOn = !debugOn
+  const els = document.querySelectorAll('body *:not(.debug-label):not(svg):not(svg *)')
+  if (!debugOn) {
+    els.forEach(el => {
+      el.style.outline = ''
+      el.style.position = ''
+      const label = el.querySelector('.debug-label')
+      if (label) label.remove()
+    })
+    return
+  }
+  els.forEach(el => {
+    const labelText = debugLabelFor(el)
+    if (!labelText) return
+    let color = debugColorCache.get(labelText)
+    if (!color) { color = hashColor(labelText); debugColorCache.set(labelText, color) }
+    el.style.outline = `1.5px solid ${color}`
+    el.style.position = 'relative'
+    if (!el.querySelector('.debug-label')) {
+      const label = document.createElement('div')
+      label.className = 'debug-label'
+      label.textContent = labelText
+      label.style.cssText = `position:absolute;top:0;left:0;font-size:9px;font-family:monospace;background:${color};color:#fff;padding:1px 4px;border-radius:0 0 3px 0;z-index:99999;pointer-events:none;line-height:1.2;`
+      el.appendChild(label)
+    }
+  })
+}
+
 // ─── Init ──────────────────────────────────────────────
 document.getElementById('appVersionLabel').textContent = APP_VERSION
-loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridBtn').classList.add('active')
+loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridBtn').classList.add('active'); document.querySelector('.content').style.display = 'none'
 
 // Service worker update
 if ('serviceWorker' in navigator) {

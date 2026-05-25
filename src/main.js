@@ -1,9 +1,9 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
 
 try {
   require('electron-reload')(__dirname, {
-    electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
+    electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron.cmd')
   })
 } catch (_) {}
 
@@ -18,6 +18,27 @@ function createWindow() {
     }
   })
   win.loadFile('src/index.html')
+
+  const template = [
+    { role: 'fileMenu' },
+    { role: 'editMenu' },
+    { role: 'viewMenu' },
+    { role: 'windowMenu' },
+    {
+      label: 'Debug',
+      submenu: [
+        {
+          label: 'Toggle Colors',
+          accelerator: 'CmdOrCtrl+D',
+          click: () => win.webContents.executeJavaScript('toggleDebug()')
+        }
+      ]
+    },
+    { role: 'helpMenu' }
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 }
 
 app.whenReady().then(createWindow)
