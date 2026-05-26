@@ -1957,31 +1957,6 @@ document.getElementById('updateCloseBtn').addEventListener('click', () => {
   document.getElementById('updateOverlay').classList.remove('open')
 })
 
-// ─── Splash screen ──────────────────────────────────────
-;(function(){
-  var splash = document.getElementById('splash')
-  var splashText = document.getElementById('splashText')
-  if (!splash) return
-  var faded = false
-  var icon = splash.querySelector('.splash-content svg, .splash-content img')
-  if (icon) {
-    if (!navigator.onLine) { icon.style.filter = 'grayscale(1)'; icon.style.opacity = '0.5' }
-    icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
-    function randomSpin() {
-      if (faded) return
-      icon.style.transform = 'rotate(' + (360 * (Math.floor(Math.random() * 3) + 1)) + 'deg)'
-      setTimeout(function(){ icon.style.transition = 'none'; icon.style.transform = 'rotate(0deg)'; setTimeout(function(){ icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'; randomSpin() }, 50) }, 800)
-    }
-    setTimeout(randomSpin, 2000)
-  }
-  if (!navigator.onLine) { splash.classList.add('offline'); splashText.textContent = "You're offline" }
-  function fadeOut() {
-    if (faded) return; faded = true
-    splash.classList.add('fade')
-    setTimeout(function(){ splash.style.display = 'none' }, 500)
-  }
-  setTimeout(fadeOut, navigator.onLine ? 3000 : 2000)
-})()
 // Online status indicator
 ;(function(){
   const ind = document.getElementById('onlineIndicator')
