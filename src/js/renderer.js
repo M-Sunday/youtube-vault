@@ -678,14 +678,14 @@ document.getElementById('noteRedoBtn').addEventListener('click', () => {
 
 document.getElementById('noteViewContent').addEventListener('paste', function (e) {
   const items = e.clipboardData?.items
-  let hadImage = false
+  let handled = false
   if (items) {
     for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        e.preventDefault()
-        hadImage = true
+      if (item.type.startsWith('image/') && typeof item.getAsFile === 'function') {
         const blob = item.getAsFile()
         if (!blob) continue
+        e.preventDefault()
+        handled = true
         const reader = new FileReader()
         reader.onload = function (ev) {
           const img = document.createElement('img')
@@ -713,16 +713,8 @@ document.getElementById('noteViewContent').addEventListener('paste', function (e
       }
     }
   }
-  if (!hadImage) {
-    setTimeout(() => {
-      this.querySelectorAll('img').forEach(img => {
-        img.style.maxWidth = ''
-        img.style.borderRadius = ''
-        img.style.margin = ''
-        img.removeAttribute('width')
-        img.removeAttribute('height')
-      })
-    }, 0)
+  if (!handled) {
+    setTimeout(noteSaveContent, 0)
   }
 })
 
@@ -737,9 +729,13 @@ document.getElementById('noteCloseBtn').addEventListener('click', closeNoteView)
 
 // Note dialog
 document.getElementById('newNoteBtn').addEventListener('click', () => {
-  noteTitleInput.value = ''; noteContentInput.value = ''
-  noteDialog.classList.add('open')
-  setTimeout(() => noteTitleInput.focus(), 100)
+  const notes = getNotes()
+  const id = '_nt_' + Date.now()
+  notes.push({ id, title: 'Untitled', content: '', added: Date.now() })
+  saveNotes(notes)
+  renderSidebar()
+  openNote(id)
+  setTimeout(() => { document.getElementById('noteViewTitle').focus(); document.getElementById('noteViewTitle').select() }, 100)
 })
 document.getElementById('noteDialogCancel').addEventListener('click', () => noteDialog.classList.remove('open'))
 document.getElementById('noteDialogConfirm').addEventListener('click', () => {
@@ -1749,7 +1745,7 @@ document.getElementById('shortcutsClose').addEventListener('click', () => docume
 document.getElementById('shortcutsOverlay').addEventListener('click', (e) => { if (e.target === document.getElementById('shortcutsOverlay')) e.target.style.display = 'none' })
 
 // ─── Updcheck / version ──────────────────────────────
-const APP_VERSION = '1.4.0'
+const APP_VERSION = '1.4.1'
 
 // ─── Debug inspect mode (hover) ────────────────────────
 let debugOn = false
@@ -1865,46 +1861,64 @@ function _onDebugKey(e) {
 document.getElementById('appVersionLabel').textContent = APP_VERSION
 loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridBtn').classList.add('active'); document.querySelector('.content').style.display = 'none'
 
+function showSplashForUpdate() {
+  const s = document.getElementById('splash')
+  if (!s) return
+  s.style.display = ''
+  s.classList.remove('fade')
+  const img = s.querySelector('.splash-content img')
+  if (img) { img.style.transition = 'none'; img.style.transform = 'rotate(0deg)' }
+  const t = document.getElementById('splashText')
+  if (t) t.textContent = navigator.onLine ? 'Updating…' : "You're offline"
+}
 // Service worker update
 if ('serviceWorker' in navigator) {
-  let updateReg = null
+  let swUpdateTimer = null
   navigator.serviceWorker.register('sw.js').then(reg => {
-    updateReg = reg
-    if (reg.waiting) showUpdateBanner(reg.waiting)
-    reg.addEventListener('updatefound', () => {
-      const sw = reg.installing || reg.waiting
-      if (sw) showUpdateBanner(sw)
-    })
-  })
-  function showUpdateBanner(sw) {
-    const toast = document.getElementById('updateToast')
-    const text = document.getElementById('updateToastText')
-    const btn = document.getElementById('updateToastBtn')
-    const laterBtn = document.getElementById('updateLaterBtn')
-    if (!toast || !btn) return
-    text.textContent = 'Update available'
-    toast.classList.add('show')
-    if (laterBtn) laterBtn.style.display = ''
-    btn.onclick = () => {
-      sw.postMessage({ action: 'skipWaiting' })
-      btn.onclick = null
-      text.textContent = 'Updating…'
-      btn.style.display = 'none'
-      if (laterBtn) laterBtn.style.display = 'none'
-    }
-    if (laterBtn) {
-      laterBtn.onclick = () => {
-        toast.classList.remove('show')
-        setTimeout(() => {
-          if (!toast.classList.contains('show')) {
-            text.textContent = 'Update available'
-            toast.classList.add('show')
-          }
-        }, 180000)
+    function showUpdateBanner(sw) {
+      if (localStorage.getItem('ytSwVersion') === APP_VERSION) return
+      const toast = document.getElementById('updateToast')
+      const text = document.getElementById('updateToastText')
+      const btn = document.getElementById('updateToastBtn')
+      const laterBtn = document.getElementById('updateLaterBtn')
+      if (!toast || !btn) return
+      text.textContent = 'Update available'
+      toast.classList.add('show')
+      if (laterBtn) laterBtn.style.display = ''
+      btn.onclick = () => {
+        showSplashForUpdate()
+        sw.postMessage({ action: 'skipWaiting' })
+        btn.onclick = null
+        text.textContent = 'Updating…'
+        btn.style.display = 'none'
+        if (laterBtn) laterBtn.style.display = 'none'
+      }
+      if (laterBtn) {
+        laterBtn.onclick = () => {
+          toast.classList.remove('show')
+          if (swUpdateTimer) clearTimeout(swUpdateTimer)
+          swUpdateTimer = setTimeout(() => {
+            if (!toast.classList.contains('show')) {
+              text.textContent = 'Update available'
+              toast.classList.add('show')
+            }
+          }, 180000)
+        }
       }
     }
-  }
+    if (reg.waiting && localStorage.getItem('ytSwVersion') !== APP_VERSION) showUpdateBanner(reg.waiting)
+    reg.addEventListener('updatefound', () => {
+      const sw = reg.installing || reg.waiting
+      if (!sw) return
+      sw.addEventListener('statechange', () => {
+        if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdateBanner(sw)
+        }
+      })
+    })
+  })
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    localStorage.setItem('ytSwVersion', APP_VERSION)
     window.location.reload()
   })
 }

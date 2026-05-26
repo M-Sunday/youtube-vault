@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.4.1",
+    "date": "2026-05-26",
+    "title": "Update Toast Fixes, Paste & Note Improvements",
+    "changes": [
+      "Update toast no longer shows on every reload — only when a real update is available",
+      "Pressing Update now shows the splash screen before reloading (no more jarring flash)",
+      "Mobile image paste no longer blocked by Chrome (won't show 'this app does not permit that')",
+      "New note button immediately opens the note editor, skipping the dialog prompt"
+    ]
+  },
+  {
     "version": "1.4.0",
     "date": "2026-05-26",
     "title": "Search Landing, Bulk Select, Drag-to-Reorder Grid, Keyboard Shortcuts",
