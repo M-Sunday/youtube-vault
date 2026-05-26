@@ -623,11 +623,7 @@ function openNote(id) {
   const notes = getNotes()
   const n = notes.filter(x => x.id === id)[0]
   if (!n) return
-  const gridBtn = document.getElementById('gridBtn')
-  if (gridBtn.classList.contains('active')) gridBtn.click()
-  document.getElementById('searchLanding').style.display = 'none'
-  document.querySelector('.content').style.display = 'none'
-  document.getElementById('noteView').style.display = 'flex'
+  setView('note')
   document.getElementById('noteViewTitle').value = n.title || ''
   document.getElementById('noteViewContent').innerHTML = sanitizeHtml(n.content || '')
   document.getElementById('noteViewFooter').textContent = `Last edited ${new Date(n.updated || n.added).toLocaleString()}`
@@ -636,13 +632,7 @@ function openNote(id) {
 
 function closeNoteView() {
   currentNoteId = null
-  document.getElementById('noteView').style.display = 'none'
-  if (currentVideo) {
-    document.querySelector('.content').style.display = ''
-  } else {
-    clearCard()
-  }
-  renderSidebar()
+  if (currentVideo) { setView('card'); renderSidebar() } else clearCard()
 }
 
 let noteSaveTimer = null
@@ -1027,24 +1017,26 @@ function renderGridView() {
   })
   updateBatchBar()
 }
-function showCardView() {
-  document.getElementById('gridView').classList.remove('open')
-  document.getElementById('gridBtn').classList.remove('active')
-  document.getElementById('searchLanding').style.display = 'none'
-  document.querySelector('.content').style.display = ''
+function setView(view) {
+  var gv = document.getElementById('gridView'), sl = document.getElementById('searchLanding'), ct = document.querySelector('.content'), nv = document.getElementById('noteView'), gb = document.getElementById('gridBtn')
+  gv.classList.remove('open'); gb.classList.remove('active'); sl.style.display = 'none'; ct.style.display = 'none'; nv.style.display = 'none'
+  if (view === 'grid') { gv.classList.add('open'); gb.classList.add('active') }
+  else if (view === 'card') ct.style.display = ''
+  else if (view === 'landing') sl.style.display = 'flex'
+  else if (view === 'note') nv.style.display = 'flex'
 }
+function showCardView() { setView('card') }
 document.getElementById('gridBtn').addEventListener('click', function () {
   const open = this.classList.toggle('active')
-  document.getElementById('gridView').classList.toggle('open', open)
-  document.querySelector('.content').style.display = open ? 'none' : ''
   if (open) {
+    if (currentNoteId) closeNoteView()
+    setView('grid')
     document.getElementById('ytInput').value = ''
-    document.getElementById('searchLanding').style.display = 'none'
-    if (currentNoteId) { closeNoteView(); document.querySelector('.content').style.display = 'none' }
     renderGridView()
   } else {
     selectedGridItems.clear(); updateBatchBar()
     if (!currentVideo) clearCard()
+    else setView('card')
   }
 })
 
@@ -1161,10 +1153,7 @@ function clearCard() {
   document.getElementById('cardAddRow').style.display = 'none'
   const badge = document.getElementById('imageWrap').querySelector('.pin-badge')
   if (badge) badge.remove()
-  document.getElementById('noteView').style.display = 'none'
-  document.querySelector('.content').style.display = 'none'
-  document.getElementById('searchLanding').style.display = 'flex'
-  renderSearchLanding()
+  setView('landing'); renderSearchLanding()
 }
 
 // ─── Thumbnail click to open link ─────────────────────
@@ -1860,7 +1849,7 @@ function _onDebugKey(e) {
 
 // ─── Init ──────────────────────────────────────────────
 document.getElementById('appVersionLabel').textContent = APP_VERSION
-loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getElementById('gridView').classList.add('open'); document.getElementById('gridBtn').classList.add('active'); document.querySelector('.content').style.display = 'none'
+loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); setView('grid')
 
 function showSplashForUpdate() {
   const s = document.getElementById('splash')
