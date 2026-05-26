@@ -31,6 +31,32 @@ function createWindow() {
           label: 'Toggle Colors',
           accelerator: 'CmdOrCtrl+D',
           click: () => win.webContents.executeJavaScript('toggleDebug()')
+        },
+        { type: 'separator' },
+        {
+          label: 'Online',
+          click: () => win.webContents.executeJavaScript(`
+            Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => true });
+            window.dispatchEvent(new Event('online'));
+          `)
+        },
+        {
+          label: 'Bad Signal (2G)',
+          click: () => win.webContents.executeJavaScript(`
+            Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => true });
+            if (navigator.connection) {
+              Object.defineProperty(navigator.connection, 'effectiveType', { configurable: true, get: () => '2g' });
+              navigator.connection.dispatchEvent(new Event('change'));
+            }
+            window.dispatchEvent(new Event('online'));
+          `)
+        },
+        {
+          label: 'Offline',
+          click: () => win.webContents.executeJavaScript(`
+            Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
+            window.dispatchEvent(new Event('offline'));
+          `)
         }
       ]
     },

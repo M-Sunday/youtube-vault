@@ -146,6 +146,8 @@ body.theme-obsidian .history-item-channel { color: #8e8e9a; }
 .top-bar-input:focus-within { border-color: #1d1d1f; background: #fff; }
 .top-bar-input:focus-within input { width: 320px; }
 .top-bar-input input { width: 200px; border: none; padding: 6px 0; font-size: 13px; font-family: inherit; background: transparent; outline: none; color: #1d1d1f; transition: width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.top-bar-input input:disabled { opacity: 0.35; cursor: not-allowed; }
+.top-bar-input input:disabled + button { opacity: 0.35; pointer-events: none; }
 .top-bar-input input::placeholder { color: #8e8e93; }
 .top-bar-input button { width: 26px; height: 26px; border: none; border-radius: 999px; background: #1d1d1f; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.15s; }
 .top-bar-input button:hover { opacity: 0.8; }
@@ -180,8 +182,10 @@ body.theme-obsidian .history-item-channel { color: #8e8e9a; }
 .card-add-icon { width: 14px; height: 14px; }
 
 /* Update toast */
-.update-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 500; background: #1d1d1f; color: #fff; font-size: 13px; padding: 8px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-.update-toast.show { opacity: 1; }
+.update-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 500; background: #1d1d1f; color: #fff; font-size: 13px; padding: 8px 14px 8px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.update-toast.show { opacity: 1; pointer-events: auto; }
+#updateToastBtn { background: #0a84ff; color: #fff; border: none; border-radius: 999px; padding: 4px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+#updateToastBtn:hover { opacity: 0.8; }
 
 /* Calendar */
 .calendar { padding: 16px 24px 20px; border-top: 1px solid #e8e8ed; margin-top: 16px; }
@@ -302,6 +306,7 @@ body.theme-black .card-add-btn:hover { background: #3a3a3c; color: #f5f5f7; bord
 body.theme-black .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-black .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
 body.theme-black .update-toast { background: #f5f5f7; color: #1c1c1e; }
+body.theme-black #updateToastBtn { background: #0a84ff; color: #fff; }
 body.theme-black .tree-file.active { background: #3a3a3c; }
 body.theme-black .tree-file.pinned { border-color: #f5f5f7; background: #3a3a3c; }
 body.theme-black .ctx-item { color: #f5f5f7; }
@@ -335,6 +340,7 @@ body.theme-obsidian .card-add-btn:hover { background: #2a2a30; color: #e8e8ec; b
 body.theme-obsidian .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-obsidian .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
 body.theme-obsidian .update-toast { background: #e8e8ec; color: #19191e; }
+body.theme-obsidian #updateToastBtn { background: #0a84ff; color: #fff; }
 body.theme-obsidian .tree-file.active { background: #2a2a30; }
 body.theme-obsidian .tree-file.pinned { border-color: #e8e8ec; background: #2a2a30; }
 body.theme-obsidian .ctx-item { color: #e8e8ec; }
@@ -470,7 +476,8 @@ body.compact .content { padding: 20px 12px; }
 
 .search-landing { display: flex; align-items: center; justify-content: center; flex: 1; padding: 40px 20px; }
 .search-landing-content { max-width: 480px; width: 100%; text-align: center; }
-.search-landing-title { font-size: 28px; font-weight: 700; letter-spacing: -0.4px; color: #1d1d1f; margin: 0 0 20px; }
+.search-landing-title { font-size: 28px; font-weight: 700; letter-spacing: -0.4px; color: #1d1d1f; margin: 0 0 20px; transition: opacity 0.3s; }
+.search-landing-title.offline { opacity: 0.35; }
 body.theme-black .search-landing-title { color: #f5f5f7; }
 body.theme-obsidian .search-landing-title { color: #e8e8ec; }
 .search-landing-divider { height: 1px; background: #e8e8ed; margin: 0 0 20px; }
@@ -821,8 +828,11 @@ body.theme-obsidian .shortcut-keys kbd { background: #2a2a30; border-color: #3a3
   .settings-content { padding: 16px 20px; }
 
   .top-bar { padding: 6px 10px; gap: 6px; }
+  .top-bar:focus-within .menu-btn, .top-bar:focus-within .online-indicator { display: none; }
+  .top-bar:focus-within .top-bar-input { flex: 1; min-width: 0; }
   .top-bar-input { min-width: 0; flex: 1; }
   .top-bar-input input { width: 100%; font-size: 13px; }
+  .top-bar-input input:disabled { opacity: 0.4; cursor: not-allowed; }
   .content { padding: 16px 12px; }
   .card-body { padding: 14px 16px 0; }
   .card-body h1 { font-size: 16px; }

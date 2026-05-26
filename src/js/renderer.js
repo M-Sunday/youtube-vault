@@ -1630,12 +1630,31 @@ loadIcons(); renderCalendar(); renderSidebar(); renderGridView(); document.getEl
 
 // Service worker update
 if ('serviceWorker' in navigator) {
+  let updateReg = null
   navigator.serviceWorker.register('sw.js').then(reg => {
+    updateReg = reg
+    if (reg.waiting) showUpdateBanner(reg.waiting)
     reg.addEventListener('updatefound', () => {
-      const toast = document.getElementById('updateToast')
-      toast.classList.add('show')
-      setTimeout(() => toast.classList.remove('show'), 3000)
+      const sw = reg.installing || reg.waiting
+      if (sw) showUpdateBanner(sw)
     })
+  })
+  function showUpdateBanner(sw) {
+    const toast = document.getElementById('updateToast')
+    const text = document.getElementById('updateToastText')
+    const btn = document.getElementById('updateToastBtn')
+    if (!toast || !btn) return
+    text.textContent = 'Update available'
+    toast.classList.add('show')
+    btn.onclick = () => {
+      sw.postMessage({ action: 'skipWaiting' })
+      btn.onclick = null
+      text.textContent = 'Updating…'
+      btn.style.display = 'none'
+    }
+  }
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload()
   })
 }
 const history = loadHistory()
@@ -1703,6 +1722,9 @@ document.getElementById('updateCloseBtn').addEventListener('click', () => {
   const ind = document.getElementById('onlineIndicator')
   if (!ind) return
   const text = ind.querySelector('.online-indicator-text')
+  const title = document.getElementById('searchLandingTitle')
+  const searchInput = document.getElementById('ytInput')
+  const searchBtn = document.getElementById('ytBtn')
   function update() {
     const on = navigator.onLine
     const conn = navigator.connection
@@ -1714,6 +1736,12 @@ document.getElementById('updateCloseBtn').addEventListener('click', () => {
     }
     ind.className = 'online-indicator badge' + (cls ? ' ' + cls : '')
     if (text) text.textContent = label
+    if (title) {
+      if (!on) { title.textContent = "You're offline"; title.classList.add('offline') }
+      else { title.textContent = 'What do you want to search?'; title.classList.remove('offline') }
+    }
+    if (searchInput) { searchInput.disabled = !on; searchInput.placeholder = on ? 'Paste YouTube link' : 'Search unavailable offline' }
+    if (searchBtn) searchBtn.disabled = !on
   }
   window.addEventListener('online', update)
   window.addEventListener('offline', update)

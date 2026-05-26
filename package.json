@@ -1,6 +1,6 @@
 {
-  "name": "my-mac-app",
-  "version": "1.0.0",
+  "name": "youtube-vault",
+  "version": "1.4.0",
   "main": "src/main.js",
   "scripts": {
     "start": "electron ."
