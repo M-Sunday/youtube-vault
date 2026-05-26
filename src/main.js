@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron')
 const path = require('path')
 
 try {
@@ -65,6 +65,14 @@ function createWindow() {
 
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
+
+  ipcMain.handle('pick-folder', async () => {
+    const result = await dialog.showOpenDialog(win, {
+      properties: ['openDirectory'],
+      title: 'Choose download location'
+    })
+    return result.canceled ? null : result.filePaths[0]
+  })
 }
 
 app.whenReady().then(createWindow)

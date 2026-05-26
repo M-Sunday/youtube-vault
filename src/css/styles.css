@@ -179,6 +179,10 @@ body.theme-obsidian .history-item-channel { color: #8e8e9a; }
 .card-add-btn:hover { background: #f5f5f7; border-color: #8e8e93; color: #3a3a3c; }
 .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; cursor: pointer; }
+.dl-progress { padding: 4px 24px 0; display: flex; align-items: center; gap: 8px; }
+.dl-progress-track { flex: 1; height: 4px; background: #e8e8ed; border-radius: 999px; overflow: hidden; }
+.dl-progress-fill { height: 100%; width: 0%; background: #0a84ff; border-radius: 999px; transition: width 0.2s; }
+.dl-progress-text { font-size: 11px; color: #8e8e93; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
 .card-add-icon { width: 14px; height: 14px; }
 
 /* Update toast */
@@ -253,6 +257,9 @@ body.theme-obsidian .ctx-icon { color: #98989e; }
 .settings-plugin-name { font-size: 14px; color: #1d1d1f; }
 .settings-toggle { width: 36px; height: 20px; border-radius: 999px; background: #c7c7cc; position: relative; cursor: pointer; transition: background 0.15s; flex-shrink: 0; }
 .settings-toggle.on { background: #30d158; }
+.settings-select { background: #f5f5f7; border: 1px solid #e8e8ed; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-family: inherit; color: #1d1d1f; outline: none; cursor: pointer; }
+body.theme-black .settings-select { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.theme-obsidian .settings-select { background: #2a2a30; border-color: #3a3a40; color: #e8e8ec; }
 .settings-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: transform 0.15s; }
 .settings-toggle.on::after { transform: translateX(16px); }
 .settings-footer-info { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e8e8ed; display: flex; flex-direction: column; gap: 12px; }
@@ -308,6 +315,9 @@ body.theme-black .card-add-btn { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .card-add-btn:hover { background: #3a3a3c; color: #f5f5f7; border-color: #8e8e93; }
 body.theme-black .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-black .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
+body.theme-black .dl-progress-track { background: #3a3a3c; }
+body.theme-black .dl-progress-fill { background: #0a84ff; }
+body.theme-black .dl-progress-text { color: #a1a1a6; }
 body.theme-black .update-toast { background: #f5f5f7; color: #1c1c1e; }
 body.theme-black #updateToastBtn { background: #0a84ff; color: #fff; }
 body.theme-black #updateLaterBtn { border-color: #8e8e93; color: #8e8e93; }
@@ -343,6 +353,9 @@ body.theme-obsidian .card-add-btn { border-color: #2a2a30; color: #8e8e9a; }
 body.theme-obsidian .card-add-btn:hover { background: #2a2a30; color: #e8e8ec; border-color: #7e7e8c; }
 body.theme-obsidian .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-obsidian .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
+body.theme-obsidian .dl-progress-track { background: #2a2a30; }
+body.theme-obsidian .dl-progress-fill { background: #0a84ff; }
+body.theme-obsidian .dl-progress-text { color: #8e8e9a; }
 body.theme-obsidian .update-toast { background: #e8e8ec; color: #19191e; }
 body.theme-obsidian #updateToastBtn { background: #0a84ff; color: #fff; }
 body.theme-obsidian #updateLaterBtn { border-color: #8e8e9a; color: #8e8e9a; }
@@ -459,6 +472,9 @@ body.theme-anthropic .card-add-btn { border-color: #D4A27F; color: #7a7a7a; }
 body.theme-anthropic .card-add-btn:hover { background: #E8E0D8; color: #191919; border-color: #191919; }
 body.theme-anthropic .card-add-btn.saved { border-color: #D4A27F; color: #D4A27F; }
 body.theme-anthropic .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
+body.theme-anthropic .dl-progress-track { background: #E8E0D8; }
+body.theme-anthropic .dl-progress-fill { background: #D4A27F; }
+body.theme-anthropic .dl-progress-text { color: #7a7a7a; }
 body.theme-anthropic .update-toast { background: #191919; color: #FFFFFF; }
 body.theme-anthropic .folder-color[data-color="#1d1d1f"].active { border-color: #191919; }
 body.theme-anthropic .theme-option:hover { background: #E8E0D8; }
@@ -843,6 +859,7 @@ body.theme-obsidian .shortcut-keys kbd { background: #2a2a30; border-color: #3a3
   .card-body h1 { font-size: 16px; }
   .calendar { padding: 10px 16px 16px; }
   .card-add-row { padding: 6px 16px 0; }
+  .dl-progress { padding: 4px 16px 0; }
   .grid-view { padding: 12px; }
   .grid-items { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .online-indicator .online-indicator-text { display: none; }
