@@ -1,5 +1,44 @@
 [
   {
+    "version": "1.4.0",
+    "date": "2026-05-26",
+    "title": "Search Landing, Bulk Select, Drag-to-Reorder Grid, Keyboard Shortcuts",
+    "changes": [
+      "Search landing view: centered 'What do you want to search?' with recent history miniatures",
+      "Context menu stays within screen bounds (no more cut-off at edges)",
+      "Grid items now show horizontal ellipsis (⋯) button for context menu",
+      "Right-click on any grid item opens context menu",
+      "Bulk select: Ctrl+click multiple grid items; batch delete, pin, blur, or move to folder",
+      "Drag-to-reorder grid items within sections with blue drop-line indicator",
+      "Keyboard shortcuts overlay (? key): lists all available shortcuts",
+      "Search bar clears automatically when switching to grid view",
+      "Sidebar search focus via / or Ctrl+F",
+      "Bookmark/DA grid images now use object-fit: cover for zoomed-in look",
+      "Pin badge moved to top-left so it no longer overlaps the grid menu button",
+      "Settings pane icons added to all categories (Theme, Basic info, Toolbar, etc.)",
+      "Link History settings pane shows clickable history miniatures with thumbnails",
+      "Search landing auto-refreshes when a new video is saved",
+      "Top-bar history dropdown removed (redundant with search landing history)"
+    ]
+  },
+  {
+    "version": "1.3.0",
+    "date": "2026-05-25",
+    "title": "Context Menu Everywhere, Three-Dot Buttons, Splash Icon Spin",
+    "changes": [
+      "Three-dot (ellipsis-vertical) buttons on sidebar tree items for mobile context menu",
+      "Long-press on sidebar items triggers context menu",
+      "Three-dot buttons always visible at opacity 0.6 (not just hover)",
+      "Grid items got context menu via ellipsis button, right-click, and long-press",
+      "Drag-to-reorder sidebar items (videos, bookmarks, notes, direct access)",
+      "Copy link button next to 'Saved' on video card",
+      "Splash icon spin animation with cubic-bezier curve",
+      "Replaced Anthropic branding with app's own splash icon",
+      "Image paste support in notes",
+      "Dark theme scrollbar styling across all views"
+    ]
+  },
+  {
     "version": "1.2.0",
     "date": "2026-05-24",
     "title": "Settings Overhaul, Default Grid, Patch Notes",
