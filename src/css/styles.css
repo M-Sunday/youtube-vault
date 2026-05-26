@@ -186,6 +186,9 @@ body.theme-obsidian .history-item-channel { color: #8e8e9a; }
 .update-toast.show { opacity: 1; pointer-events: auto; }
 #updateToastBtn { background: #0a84ff; color: #fff; border: none; border-radius: 999px; padding: 4px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
 #updateToastBtn:hover { opacity: 0.8; }
+#updateLaterBtn { background: transparent; color: #a1a1a6; border: 1px solid #a1a1a6; border-radius: 999px; padding: 4px 14px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+#updateLaterBtn:hover { opacity: 0.7; }
+.update-toast-actions { display: flex; align-items: center; gap: 6px; }
 
 /* Calendar */
 .calendar { padding: 16px 24px 20px; border-top: 1px solid #e8e8ed; margin-top: 16px; }
@@ -307,6 +310,7 @@ body.theme-black .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-black .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
 body.theme-black .update-toast { background: #f5f5f7; color: #1c1c1e; }
 body.theme-black #updateToastBtn { background: #0a84ff; color: #fff; }
+body.theme-black #updateLaterBtn { border-color: #8e8e93; color: #8e8e93; }
 body.theme-black .tree-file.active { background: #3a3a3c; }
 body.theme-black .tree-file.pinned { border-color: #f5f5f7; background: #3a3a3c; }
 body.theme-black .ctx-item { color: #f5f5f7; }
@@ -341,6 +345,7 @@ body.theme-obsidian .card-add-btn.saved { border-color: #30d158; color: #30d158;
 body.theme-obsidian .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
 body.theme-obsidian .update-toast { background: #e8e8ec; color: #19191e; }
 body.theme-obsidian #updateToastBtn { background: #0a84ff; color: #fff; }
+body.theme-obsidian #updateLaterBtn { border-color: #8e8e9a; color: #8e8e9a; }
 body.theme-obsidian .tree-file.active { background: #2a2a30; }
 body.theme-obsidian .tree-file.pinned { border-color: #e8e8ec; background: #2a2a30; }
 body.theme-obsidian .ctx-item { color: #e8e8ec; }
@@ -831,7 +836,7 @@ body.theme-obsidian .shortcut-keys kbd { background: #2a2a30; border-color: #3a3
   .top-bar:focus-within .menu-btn, .top-bar:focus-within .online-indicator { display: none; }
   .top-bar:focus-within .top-bar-input { flex: 1; min-width: 0; }
   .top-bar-input { min-width: 0; flex: 1; }
-  .top-bar-input input { width: 100%; font-size: 13px; }
+  .top-bar-input input { flex: 1; min-width: 0; font-size: 13px; }
   .top-bar-input input:disabled { opacity: 0.4; cursor: not-allowed; }
   .content { padding: 16px 12px; }
   .card-body { padding: 14px 16px 0; }

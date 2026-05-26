@@ -1643,14 +1643,28 @@ if ('serviceWorker' in navigator) {
     const toast = document.getElementById('updateToast')
     const text = document.getElementById('updateToastText')
     const btn = document.getElementById('updateToastBtn')
+    const laterBtn = document.getElementById('updateLaterBtn')
     if (!toast || !btn) return
     text.textContent = 'Update available'
     toast.classList.add('show')
+    if (laterBtn) laterBtn.style.display = ''
     btn.onclick = () => {
       sw.postMessage({ action: 'skipWaiting' })
       btn.onclick = null
       text.textContent = 'Updating…'
       btn.style.display = 'none'
+      if (laterBtn) laterBtn.style.display = 'none'
+    }
+    if (laterBtn) {
+      laterBtn.onclick = () => {
+        toast.classList.remove('show')
+        setTimeout(() => {
+          if (!toast.classList.contains('show')) {
+            text.textContent = 'Update available'
+            toast.classList.add('show')
+          }
+        }, 180000)
+      }
     }
   }
   navigator.serviceWorker.addEventListener('controllerchange', () => {
