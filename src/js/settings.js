@@ -59,12 +59,14 @@ document.querySelectorAll('.theme-option').forEach(opt => {
   })
 })
 document.getElementById('systemTheme').addEventListener('change', function () {
+  document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
   if (this.checked) { document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : ''; safeSetItem('theme', 'system') }
-  else { const s = localStorage.getItem('theme') || 'white'; document.body.className = s === 'white' ? '' : 'theme-' + s }
+  else { const s = localStorage.getItem('theme') || 'white'; document.body.className = s === 'white' ? '' : 'theme-' + s; document.querySelector(`.theme-option[data-theme="${s}"]`)?.classList.add('active') }
 })
 const savedTheme = localStorage.getItem('theme') || 'white'
+document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
 if (savedTheme === 'system') { document.getElementById('systemTheme').checked = true; document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : '' }
-else if (savedTheme !== 'white') { document.body.className = 'theme-' + savedTheme; document.querySelector(`.theme-option[data-theme="${savedTheme}"]`)?.classList.add('active') }
+else { document.body.className = savedTheme === 'white' ? '' : 'theme-' + savedTheme; document.querySelector(`.theme-option[data-theme="${savedTheme}"]`)?.classList.add('active') }
 
 const SETTINGS_KEYS = {
   toolbar: ['showSidebarBtn', 'showYtInput', 'compactMode'],

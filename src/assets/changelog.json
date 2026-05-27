@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.4.3",
+    "date": "2026-05-27",
+    "title": "Theme Fix, Settings Spin, Auto-Update on Return",
+    "changes": [
+      "Theme settings no longer show multiple themes as active at once",
+      "Settings gear icon spins on click",
+      "App checks for updates on visibility change (like Discord) and auto-applies with splash",
+      "System theme toggle properly clears theme option active state"
+    ]
+  },
+  {
     "version": "1.4.2",
     "date": "2026-05-27",
     "title": "Modular Codebase, Debug Inspector, Hierarchy Sidebar",
