@@ -90,7 +90,7 @@ async function addBookmark() {
   saveBookmarks(bms)
   bookmarkUrlInput.value = ''; bookmarkTitleInput.value = ''
   bookmarkDialog.classList.remove('open')
-  renderSidebar()
+  renderSidebar(); renderGridView()
 }
 document.getElementById('newBookmarkBtn').addEventListener('click', () => {
   bookmarkUrlInput.value = ''; bookmarkTitleInput.value = ''
