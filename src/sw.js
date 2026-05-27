@@ -1,4 +1,4 @@
-var CACHE = 'yt-vault-1.4.3'
+var CACHE = 'yt-vault-1.4.4'
 var URLS = [
   'index.html',
   'css/base.css',

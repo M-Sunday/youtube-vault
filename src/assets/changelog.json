@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.4.4",
+    "date": "2026-05-27",
+    "title": "NSFW Blur Fix, Auto-Apply, Splash on Toggle",
+    "changes": [
+      "NSFW now matches keywords in titles, channels, URLs (not just exact domains)",
+      "Blur applies to entire grid item (image + title + channel text, not just the image)",
+      "Sidebar bookmark/DA labels also blur with NSFW",
+      "NSFW toggle shows splash + reloads to apply changes cleanly",
+      "Bookmark grid images hide on error (no more CORS error text)",
+      "New DAs and bookmarks immediately appear in grid view",
+      "Manifest version field added so Android shows correct version number"
+    ]
+  },
+  {
     "version": "1.4.3",
     "date": "2026-05-27",
     "title": "Theme Fix, Settings Spin, Auto-Update on Return",

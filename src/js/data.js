@@ -77,4 +77,4 @@ let currentVideo = null
 let dragVideoId = null
 let currentNoteId = null
 
-const APP_VERSION = '1.4.3'
+const APP_VERSION = '1.4.4'
