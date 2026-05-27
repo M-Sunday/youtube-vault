@@ -115,6 +115,10 @@ body.theme-black .onb-input::placeholder { color: #48484a; }
 body.theme-black .onb-input:focus { border-color: #5a9eff; }
 body.theme-black .onb-name-display { color: #f5f5f7; }
 body.theme-black .grid-empty-text { color: #636366; }
+body.theme-black .wb-text { color: #f5f5f7; }
+body.theme-black .wb-btn { background: #5a9eff; }
+body.theme-black .wb-btn:hover { background: #3a8aff; }
+body.theme-black #onboarding { background: var(--splash-bg, #1c1c1e); }
 body.theme-black .note-view-footer { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .image-wrap img { background: #3a3a3c; }
 body.theme-black .settings-select { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
@@ -279,6 +283,10 @@ body.theme-obsidian .onb-input::placeholder { color: #484854; }
 body.theme-obsidian .onb-input:focus { border-color: #5a9eff; }
 body.theme-obsidian .onb-name-display { color: #e8e8ec; }
 body.theme-obsidian .grid-empty-text { color: #63636e; }
+body.theme-obsidian .wb-text { color: #e8e8ec; }
+body.theme-obsidian .wb-btn { background: #5a9eff; }
+body.theme-obsidian .wb-btn:hover { background: #3a8aff; }
+body.theme-obsidian #onboarding { background: var(--splash-bg, #19191e); }
 body.theme-obsidian .note-view-footer { border-color: #2a2a30; color: #7e7e8c; }
 body.theme-obsidian .image-wrap img { background: #2a2a30; }
 body.theme-obsidian .settings-history-item-title { color: #e8e8ec; }
@@ -379,6 +387,10 @@ body.theme-anthropic .onb-input::placeholder { color: #b8aa9a; }
 body.theme-anthropic .onb-input:focus { border-color: #D4A27F; }
 body.theme-anthropic .onb-name-display { color: #191919; }
 body.theme-anthropic .grid-empty-text { color: #8a7e72; }
+body.theme-anthropic .wb-text { color: #191919; }
+body.theme-anthropic .wb-btn { background: #D4A27F; }
+body.theme-anthropic .wb-btn:hover { background: #b88966; }
+body.theme-anthropic #onboarding { background: var(--splash-bg, #E8E0D8); }
 body.theme-anthropic .note-view-header { background: #FFFFFF; border-color: #D4A27F; }
 body.theme-anthropic .note-view-footer { border-color: #E8E0D8; color: #7a7a7a; }
 body.theme-anthropic .tree-folder:hover, body.theme-anthropic .tree-file:hover { background: #E8E0D8; color: #191919; }

@@ -63,8 +63,11 @@ function showSplashForUpdate() {
   if (!s) return
   s.style.display = ''
   s.classList.remove('fade')
+  s.classList.remove('onboarding')
   const img = s.querySelector('.splash-content img')
   if (img) { img.style.transition = 'none'; img.style.transform = 'rotate(0deg)' }
   const t = document.getElementById('splashText')
-  if (t) t.textContent = navigator.onLine ? 'Updating…' : "You're offline"
+  if (t) { t.style.display = 'block'; t.textContent = navigator.onLine ? 'Updating…' : "You're offline" }
+  const step0 = document.getElementById('onbStep0')
+  if (step0) step0.style.display = 'none'
 }

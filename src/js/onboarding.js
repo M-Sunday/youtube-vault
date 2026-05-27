@@ -3,10 +3,11 @@
   if (getUserName()) return
 
   var splash = document.getElementById('splash')
+  var splashIcon = document.getElementById('splashIcon')
   var splashTitle = document.getElementById('splashTitle')
   var splashText = document.getElementById('splashText')
-  var onboardingWrap = document.getElementById('onboardingWrap')
   var step0 = document.getElementById('onbStep0')
+  var onboarding = document.getElementById('onboarding')
   var step1 = document.getElementById('onbStep1')
   var step2 = document.getElementById('onbStep2')
   var welcomeText = document.getElementById('onbWelcome')
@@ -25,24 +26,35 @@
     welcomeText.classList.add('onb-fade-out')
     next0.classList.remove('onb-visible')
     next0.classList.add('onb-fade-out')
-
     splashTitle.classList.add('onb-title-out')
+
+    // Zoom animation: icon → circle → covers screen
+    splash.style.overflow = 'hidden'
+    splashIcon.style.transition = 'all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)'
+    splashIcon.style.borderRadius = '50%'
+    splashIcon.style.transform = 'scale(80)'
+    splashIcon.style.opacity = '0.9'
+
     splashText.textContent = 'Getting set up'
     splashText.style.display = 'block'
-    requestAnimationFrame(function() {
-      splashText.classList.add('onb-visible')
-    })
+    splashText.style.transition = 'none'
+    splashText.style.opacity = '1'
 
     setTimeout(function() {
-      step0.style.display = 'none'
-      step1.style.display = 'block'
-      requestAnimationFrame(function() {
-        step1.querySelector('.onb-label').classList.add('onb-visible')
-        nameInput.style.opacity = '1'
-        nameInput.style.transform = 'translateY(0)'
-      })
-      setTimeout(function() { nameInput.focus() }, 400)
-    }, 500)
+      splash.style.opacity = '0'
+      splash.style.transition = 'opacity 0.4s ease'
+      setTimeout(function() {
+        splash.style.display = 'none'
+        onboarding.style.display = 'flex'
+        step1.style.display = 'block'
+        requestAnimationFrame(function() {
+          step1.querySelector('.onb-label').classList.add('onb-visible')
+          nameInput.style.opacity = '1'
+          nameInput.style.transform = 'translateY(0)'
+        })
+        setTimeout(function() { nameInput.focus() }, 400)
+      }, 400)
+    }, 1100)
   }
 
   next0.addEventListener('click', goToStep1)
@@ -84,12 +96,12 @@
 
   yesBtn.addEventListener('click', function() {
     saveUserName(nameInput.value.trim())
-    splash.classList.remove('onboarding')
-    splash.classList.add('fade')
+    onboarding.style.transition = 'opacity 0.4s ease'
+    onboarding.style.opacity = '0'
     setTimeout(function() {
-      splash.style.display = 'none'
+      onboarding.style.display = 'none'
       if (window.startApp) window.startApp()
-    }, 500)
+    }, 400)
   })
 
   noBtn.addEventListener('click', function() {

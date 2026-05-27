@@ -384,26 +384,41 @@
             </div>
             <p id="splashText">Checking for updates...</p>
 
-            <!-- Onboarding steps (first-time user) -->
-            <div id="onboardingWrap" style="display:none">
-                <div id="onbStep0" class="onb-step">
-                    <p class="onb-welcome" id="onbWelcome">Hello and welcome to Vault</p>
-                    <button class="onb-btn" id="onbNext0">Next →</button>
-                </div>
-                <div id="onbStep1" class="onb-step" style="display:none">
-                    <p class="onb-label">What is your name?</p>
-                    <input type="text" id="onbNameInput" class="onb-input" placeholder="Your name" maxlength="30" />
-                    <button class="onb-btn" id="onbNext1" style="display:none">Next →</button>
-                </div>
-                <div id="onbStep2" class="onb-step" style="display:none">
-                    <p class="onb-label">Is this your name?</p>
-                    <p class="onb-name-display" id="onbNameDisplay"></p>
-                    <div class="onb-btn-row">
-                        <button class="onb-btn" id="onbYes">Yes</button>
-                        <button class="onb-btn" id="onbNo">No</button>
-                    </div>
+            <!-- Step 0 (first-time user) inside splash -->
+            <div id="onbStep0" class="onb-step" style="display:none">
+                <p class="onb-welcome" id="onbWelcome">Hello and welcome to Vault</p>
+                <button class="onb-btn" id="onbNext0">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding steps 1+2 (appears after splash zoom transition) -->
+    <div id="onboarding" style="display:none">
+        <div class="splash-content">
+            <div id="onbStep1" class="onb-step" style="display:none">
+                <p class="onb-label">What is your name?</p>
+                <input type="text" id="onbNameInput" class="onb-input" placeholder="Your name" maxlength="30" />
+                <button class="onb-btn" id="onbNext1" style="display:none">Next →</button>
+            </div>
+            <div id="onbStep2" class="onb-step" style="display:none">
+                <p class="onb-label">Is this your name?</p>
+                <p class="onb-name-display" id="onbNameDisplay"></p>
+                <div class="onb-btn-row">
+                    <button class="onb-btn" id="onbYes">Yes</button>
+                    <button class="onb-btn" id="onbNo">No</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Welcome back (returning user after splash) -->
+    <div id="welcomeBack" style="display:none">
+        <div class="splash-content">
+            <div class="splash-row">
+                <img src="assets/icons/app-icon-splash.svg" width="72" height="72" alt="" />
+            </div>
+            <p class="wb-text" id="wbText">Welcome back</p>
+            <button class="wb-btn" id="wbBtn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
         </div>
     </div>
 
@@ -429,12 +444,20 @@
       if (isFirstTime) {
         splash.classList.add('onboarding')
         splashText.style.display = 'none'
-        document.getElementById('onboardingWrap').style.display = 'block'
+        document.getElementById('onbStep0').style.display = ''
       } else {
         function fadeOut() {
           if (faded) return; faded = true
           splash.classList.add('fade')
-          setTimeout(function(){ splash.style.display = 'none' }, 500)
+          setTimeout(function(){
+            splash.style.display = 'none'
+            var wb = document.getElementById('welcomeBack')
+            if (wb) {
+              document.getElementById('wbText').textContent = 'Welcome back, ' + localStorage.getItem('ytUserName')
+              wb.style.display = 'flex'
+              setTimeout(function(){ document.getElementById('wbText').classList.add('wb-visible'); setTimeout(function(){ document.getElementById('wbBtn').classList.add('wb-visible') }, 400) }, 200)
+            }
+          }, 500)
         }
         setTimeout(fadeOut, navigator.onLine ? 3000 : 2000)
       }

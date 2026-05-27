@@ -2,16 +2,17 @@
   {
     "version": "1.5.0",
     "date": "2026-05-27",
-    "title": "Onboarding Flow, User Name, Auto-Link Notes",
+    "title": "Onboarding Flow, Welcome Back, Zoom Animation, User Name",
     "changes": [
-      "First-time user sees multi-step onboarding: welcome → name → confirm → app",
-      "Splash transitions from onboarding to normal app on completion",
+      "First-time onboarding: step 0 (welcome) → zoom animation → step 1 (name) → step 2 (confirm)",
+      "Next button triggers icon zoom → circle → cover screen → fade to reveal name input",
+      "Returning users see 'Welcome back, [name]' overlay after splash with arrow button",
       "User name saved and shown as 'Name's Workbench' in empty grid state",
       "Name editable in Settings > Basic info",
       "Notes auto-detect bare URLs and https:// links, render them bold + clickable",
       "Bare domains (nintendo.com) also auto-linked with https:// prepended",
       "Link detection runs on blur and before save in note editor",
-      "Theme colors for onboarding elements and note links (black, obsidian, anthropic)",
+      "Theme colors for onboarding, welcome back, and note links across all themes",
       "Start Over in Debug menu opens fresh isolated window (partition: temp)",
       "onboarding.js added to SW cache"
     ]
