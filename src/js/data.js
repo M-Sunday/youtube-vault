@@ -24,6 +24,9 @@ function isNSFW(item) {
     const title = item?.title || ''
     const channel = item?.channel || ''
 
+    const text = (url + ' ' + title + ' ' + channel).toLowerCase()
+    if (words.some(n => text.includes(n))) return true
+
     if (url) {
       let fullUrl = url
       if (!/^https?:\/\//i.test(url)) {
@@ -31,12 +34,9 @@ function isNSFW(item) {
       }
       try {
         const domain = new URL(fullUrl).hostname.replace(/^www\./, '').toLowerCase()
-        if (words.some(n => domain === n || domain.endsWith('.' + n))) return true
+        if (words.some(n => domain === n || domain.endsWith('.' + n) || domain.startsWith(n + '.'))) return true
       } catch {}
     }
-
-    const text = (title + ' ' + channel).toLowerCase()
-    if (words.some(n => text.includes(n))) return true
 
     return false
   } catch { return false }
