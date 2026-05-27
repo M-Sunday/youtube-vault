@@ -295,48 +295,24 @@ function _onDebugKey(e) {
 
 // ─── Service worker update ────────────────────────────
 if ('serviceWorker' in navigator) {
-  let swUpdateTimer = null
+  var _swReg = null
   navigator.serviceWorker.register('sw.js').then(reg => {
-    function showUpdateBanner(sw) {
+    _swReg = reg
+    function applyUpdate(sw) {
       if (localStorage.getItem('ytSwVersion') === APP_VERSION) return
-      const toast = document.getElementById('updateToast')
-      const text = document.getElementById('updateToastText')
-      const btn = document.getElementById('updateToastBtn')
-      const laterBtn = document.getElementById('updateLaterBtn')
-      if (!toast || !btn) return
-      text.textContent = 'Update available'
-      toast.classList.add('show')
-      if (laterBtn) laterBtn.style.display = ''
-      btn.onclick = () => {
-        showSplashForUpdate()
-        sw.postMessage({ action: 'skipWaiting' })
-        btn.onclick = null
-        text.textContent = 'Updating…'
-        btn.style.display = 'none'
-        if (laterBtn) laterBtn.style.display = 'none'
-      }
-      if (laterBtn) {
-        laterBtn.onclick = () => {
-          toast.classList.remove('show')
-          if (swUpdateTimer) clearTimeout(swUpdateTimer)
-          swUpdateTimer = setTimeout(() => {
-            if (!toast.classList.contains('show')) {
-              text.textContent = 'Update available'
-              toast.classList.add('show')
-            }
-          }, 180000)
-        }
-      }
+      showSplashForUpdate()
+      sw.postMessage({ action: 'skipWaiting' })
     }
-    if (reg.waiting && localStorage.getItem('ytSwVersion') !== APP_VERSION) showUpdateBanner(reg.waiting)
+    if (reg.waiting && localStorage.getItem('ytSwVersion') !== APP_VERSION) applyUpdate(reg.waiting)
     reg.addEventListener('updatefound', () => {
-      const sw = reg.installing || reg.waiting
+      var sw = reg.installing || reg.waiting
       if (!sw) return
       sw.addEventListener('statechange', () => {
-        if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-          showUpdateBanner(sw)
-        }
+        if (sw.state === 'installed' && navigator.serviceWorker.controller) applyUpdate(sw)
       })
+    })
+    document.addEventListener('visibilitychange', function onShow() {
+      if (document.visibilityState === 'visible' && _swReg) _swReg.update()
     })
   })
   navigator.serviceWorker.addEventListener('controllerchange', () => {

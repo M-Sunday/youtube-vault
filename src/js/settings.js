@@ -1,6 +1,10 @@
 // ─── Settings ─────────────────────────────────────────
 const settingsOverlay = document.getElementById('settingsOverlay')
-document.getElementById('settingsBtn').addEventListener('click', () => settingsOverlay.classList.add('open'))
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  settingsOverlay.classList.add('open')
+  var icon = document.querySelector('#settingsBtn .sidebar-icon')
+  if (icon) { icon.classList.remove('spin'); void icon.offsetWidth; icon.classList.add('spin') }
+})
 document.getElementById('settingsClose').addEventListener('click', () => settingsOverlay.classList.remove('open'))
 settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) settingsOverlay.classList.remove('open') })
 document.querySelectorAll('.settings-cat').forEach(cat => {
