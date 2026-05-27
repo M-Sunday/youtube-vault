@@ -112,7 +112,13 @@ const blurAllToggle = document.getElementById('blurAllNSFWToggle')
 if (blurAllToggle) {
   blurAllToggle.classList.toggle('on', getBlurAllNSFW())
   blurAllToggle.addEventListener('click', () => {
-    saveBlurAllNSFW(blurAllToggle.classList.contains('on')); renderSidebar(); renderGridView()
+    saveBlurAllNSFW(blurAllToggle.classList.contains('on'))
+    settingsOverlay.classList.remove('open')
+    var s = document.getElementById('splash')
+    if (s) { s.style.display = ''; s.classList.remove('fade') }
+    var t = document.getElementById('splashText')
+    if (t) t.textContent = 'Applying\u2026'
+    setTimeout(function(){ location.reload() }, 400)
   })
 }
 const dlTypeEl = document.getElementById('dlType')
