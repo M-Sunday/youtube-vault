@@ -12,10 +12,10 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 - **Notes** — Rich-text notes with image paste, assignable to folders
 - **Direct Access** — Quick-launch links with thumbnail previews
 - **Grid view** — Browse all content in a visual grid with sections per type
-- **Search landing** — Centered search prompt with recent history miniatures (click to reload)
+- **Search landing** — Centered search prompt with recent history miniatures (click to reload). Shows when focusing the YouTube URL input or the sidebar search.
 - **Bulk select** — Ctrl+click grid items for batch delete, move, pin, or blur
 - **Drag to reorder** — Reorder grid items within sections (videos, bookmarks, notes, DAs) with blue drop-line indicators. Touch drag via long-press on mobile.
-- **Drag to folder** — Drag sidebar items between folders
+- **Drag to folder** — Drag video grid items onto sidebar folders to move them. Also drag sidebar items between folders.
 - **Context menus** — Right-click, long-press (mobile), or three-dot button on any item
 - **Keyboard shortcuts** — Press `?` to view all shortcuts
 - **Settings panel** — Theme, toolbar toggles, file/link history options, NSFW filters, download options, patch notes
@@ -24,8 +24,10 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 - **Search** — Filter sidebar items by title
 - **Pin items** — Pin important videos to the top
 - **Offline mode** — Detects connection status, greys search bar when offline, shows persistent online indicator (green/yellow/red badge in top-bar)
+- **Slow connection detection** — Shows yellow indicator when `effectiveType` is 2g/3g
 - **Patch notes** — In-app changelog shown on version updates and in Settings
-- **Service worker** — Caches static assets for offline use; Update notification with Update/Later buttons
+- **Service worker** — Caches static assets for offline use; Update notification with Update/Later buttons (3-min reminder)
+- **Debug inspector** — Ctrl+D to toggle element inspector (colored overlay, title label, dims, style badges). Ctrl+Shift+H for hierarchy sidebar panel. Click to lock and copy CSS selector. Network simulation available via Debug menu.
 
 ## Usage
 
@@ -38,6 +40,8 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 7. **Reorder** — Drag grid items within a section to reorder them; drag sidebar items to move between folders
 8. **Download** — Open a saved video, click the Download button below the player (desktop Electron only — uses yt-dlp)
 9. **Settings** — Click the gear icon in the sidebar header
+10. **Search landing** — Click the YouTube URL input or the sidebar search to open the search landing with recent history
+11. **Debug** — Press Ctrl+D to inspect elements; Ctrl+Shift+H for hierarchy sidebar
 
 ## Keyboard shortcuts
 
@@ -52,7 +56,8 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 | `Ctrl+Shift+Z` | Redo in note editor |
 | `Ctrl+click` | Select multiple grid items |
 | `Escape` | Close modals / blur input |
-| `Ctrl+D` | Toggle element inspector (Debug menu) |
+| `Ctrl+D` | Toggle element inspector (colored overlay + title label) |
+| `Ctrl+Shift+H` | Toggle hierarchy sidebar panel (indented ancestry tree) |
 
 ## Data
 
@@ -88,13 +93,30 @@ Storage keys:
 
 ```
 src/
-├── main.js              # Electron main process (window, menu, IPC)
+├── main.js              # Electron main process (window, Debug menu, IPC folder picker)
 ├── index.html           # App shell with inline splash script
 ├── css/
-│   └── styles.css       # All styling (~870 lines)
+│   ├── base.css         # Reset, splash, scrollbars, keyframes
+│   ├── layout.css       # Sidebar, top-bar, main area, backdrop, drop zone
+│   ├── components.css   # Card, toast, calendar, ctx menu, settings, grid, notes, dialogs
+│   ├── themes.css       # All body.theme-* + body.compact rules
+│   └── mobile.css       # @media (max-width: 640px) responsive overrides
 ├── js/
-│   ├── renderer.js      # All application logic (~2000 lines)
-│   └── icons.js         # Local SVG icon loader
+│   ├── data.js          # localStorage CRUD helpers, selectedGridItems, APP_VERSION
+│   ├── views.js         # setView(), showCardView(), clearCard(), renderSearchLanding()
+│   ├── calendar.js      # Calendar rendering, published date, privacy
+│   ├── settings.js      # Settings panel, load/save history, toolbar toggles
+│   ├── sidebar.js       # Sidebar tree, folder drag, toolbar events
+│   ├── context-menu.js  # Context menu positioning and actions
+│   ├── notes.js         # Rich-text editor, undo/redo, paste handler
+│   ├── dialogs.js       # Create folder, bookmark dialog
+│   ├── grid.js          # Grid view, batch actions, drag/touch reorder
+│   ├── card.js          # Video card view, add/unlink, pin badge
+│   ├── download.js      # yt-dlp/ffmpeg auto-download, progress bar
+│   ├── search.js        # YouTube link fetch, Direct Access dialog
+│   ├── extras.js        # Patch notes, keyboard shortcuts, debug inspector, SW update, online indicator
+│   ├── icons.js         # Local SVG icon loader
+│   └── app.js           # Bootstrap init sequence
 ├── assets/
 │   ├── changelog.json   # Version history
 │   ├── manifest.json    # PWA manifest
@@ -126,7 +148,7 @@ Requires Electron. The app auto-opens in grid view by default.
 ## Tech stack
 
 - **Electron** — desktop wrapper
-- **Vanilla JS** — no frameworks
+- **Vanilla JS** — no frameworks (15 modular JS files)
 - **localStorage** — persistence
 - **Service Worker** — offline caching + update detection
 - **Custom SVG icons** — 36 local icons (no CDN)

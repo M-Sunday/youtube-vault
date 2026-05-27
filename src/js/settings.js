@@ -1,0 +1,144 @@
+// ─── Settings ─────────────────────────────────────────
+const settingsOverlay = document.getElementById('settingsOverlay')
+document.getElementById('settingsBtn').addEventListener('click', () => settingsOverlay.classList.add('open'))
+document.getElementById('settingsClose').addEventListener('click', () => settingsOverlay.classList.remove('open'))
+settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) settingsOverlay.classList.remove('open') })
+document.querySelectorAll('.settings-cat').forEach(cat => {
+  cat.addEventListener('click', function () {
+    document.querySelectorAll('.settings-cat').forEach(c => c.classList.remove('active'))
+    this.classList.add('active')
+    document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none')
+    document.getElementById({ theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', nsfw: 'pane-nsfw', download: 'pane-download', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
+    if (this.dataset.cat === 'patchnotes') loadPatchNotes()
+    if (this.dataset.cat === 'history') renderSettingsHistory()
+  })
+})
+function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; safeSetItem('ytSettings', JSON.stringify(s)) }
+function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
+function renderSettingsHistory() {
+  const el = document.getElementById('settingsHistoryList')
+  if (!el) return
+  let items = loadHistory()
+  if (!items.length) {
+    const vs = getVideos(); const fs = getFolders()
+    const all = (fs['Videos'] || []).map(id => vs[id] ? { id, title: vs[id].title, channel: vs[id].channel } : null).filter(Boolean)
+    all.sort((a, b) => (b.added || 0) - (a.added || 0))
+    items = all.slice(0, 10)
+  }
+  if (!items.length) { el.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#8e8e93">No link history yet</div>'; return }
+  el.innerHTML = items.map(h =>
+    `<div class="settings-history-item" data-id="${h.id}">
+      <img class="settings-history-item-img" src="https://img.youtube.com/vi/${h.id}/hqdefault.jpg" loading="lazy" onerror="this.style.display='none'" />
+      <div class="settings-history-item-meta">
+        <span class="settings-history-item-title">${h.title}</span>
+        <span class="settings-history-item-channel">${h.channel}</span>
+      </div>
+    </div>`
+  ).join('')
+  el.querySelectorAll('.settings-history-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.id
+      if (id) { document.getElementById('settingsOverlay').classList.remove('open'); loadVideoById(id) }
+    })
+  })
+}
+document.getElementById('settingsClearHistoryBtn')?.addEventListener('click', () => {
+  if (confirm('Clear link history?')) { saveHistory([]); renderSettingsHistory(); if (document.getElementById('searchLanding').style.display === 'flex') renderSearchLanding() }
+})
+document.querySelectorAll('.settings-toggle').forEach(t => t.addEventListener('click', function () { this.classList.toggle('on') }))
+document.querySelectorAll('.theme-option').forEach(opt => {
+  opt.addEventListener('click', function () {
+    document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
+    this.classList.add('active')
+    const t = this.dataset.theme; document.body.className = t === 'white' ? '' : 'theme-' + t
+    safeSetItem('theme', t); document.getElementById('systemTheme').checked = false
+  })
+})
+document.getElementById('systemTheme').addEventListener('change', function () {
+  if (this.checked) { document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : ''; safeSetItem('theme', 'system') }
+  else { const s = localStorage.getItem('theme') || 'white'; document.body.className = s === 'white' ? '' : 'theme-' + s }
+})
+const savedTheme = localStorage.getItem('theme') || 'white'
+if (savedTheme === 'system') { document.getElementById('systemTheme').checked = true; document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-obsidian' : '' }
+else if (savedTheme !== 'white') { document.body.className = 'theme-' + savedTheme; document.querySelector(`.theme-option[data-theme="${savedTheme}"]`)?.classList.add('active') }
+
+const SETTINGS_KEYS = {
+  toolbar: ['showSidebarBtn', 'showYtInput', 'compactMode'],
+  files: ['autoUpdateLinks', 'confirmDeletion', 'detectAllExt'],
+  history: ['saveLinkHistory', 'clearOnExit']
+}
+function applyToolbarSettings() {
+  document.getElementById('menuBtn').style.display = loadSetting('showSidebarBtn', true) ? '' : 'none'
+  document.querySelector('.top-bar-input').style.display = loadSetting('showYtInput', true) ? '' : 'none'
+  document.body.classList.toggle('compact', loadSetting('compactMode', false))
+}
+document.querySelectorAll('#pane-toolbar .settings-toggle').forEach((t, i) => {
+  const on = loadSetting(SETTINGS_KEYS.toolbar[i], true)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
+  t.addEventListener('click', function () {
+    saveSetting(SETTINGS_KEYS.toolbar[i], this.classList.contains('on'))
+    applyToolbarSettings()
+  })
+})
+document.querySelectorAll('#pane-files .settings-toggle').forEach((t, i) => {
+  const on = loadSetting(SETTINGS_KEYS.files[i], true)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
+  t.addEventListener('click', function () { saveSetting(SETTINGS_KEYS.files[i], this.classList.contains('on')) })
+})
+document.querySelectorAll('#pane-history .settings-toggle').forEach((t, i) => {
+  const on = loadSetting(SETTINGS_KEYS.history[i], i === 0)
+  if (on) t.classList.add('on'); else t.classList.remove('on')
+  t.addEventListener('click', function () {
+    saveSetting(SETTINGS_KEYS.history[i], this.classList.contains('on'))
+    if (i === 0 && !this.classList.contains('on')) saveHistory([])
+    if (document.getElementById('searchLanding').style.display === 'flex') renderSearchLanding()
+  })
+})
+const nsfwTextarea = document.getElementById('nsfwDomains')
+if (nsfwTextarea) {
+  nsfwTextarea.value = getNSFW().join('\n')
+  nsfwTextarea.addEventListener('input', () => {
+    const domains = nsfwTextarea.value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean)
+    saveNSFW(domains)
+  })
+}
+const blurAllToggle = document.getElementById('blurAllNSFWToggle')
+if (blurAllToggle) {
+  blurAllToggle.classList.toggle('on', getBlurAllNSFW())
+  blurAllToggle.addEventListener('click', () => {
+    saveBlurAllNSFW(blurAllToggle.classList.contains('on'))
+  })
+}
+const dlTypeEl = document.getElementById('dlType')
+const dlVideoSettings = document.querySelector('.dl-video-settings')
+const dlAudioSettings = document.querySelector('.dl-audio-settings')
+function toggleDlSettings(type) {
+  if (!dlVideoSettings || !dlAudioSettings) return
+  dlVideoSettings.style.display = type === 'video' ? '' : 'none'
+  dlAudioSettings.style.display = type === 'audio' ? '' : 'none'
+}
+if (dlTypeEl) {
+  const saved = localStorage.getItem('dlType') || 'video'
+  dlTypeEl.value = saved
+  toggleDlSettings(saved)
+  dlTypeEl.addEventListener('change', () => {
+    localStorage.setItem('dlType', dlTypeEl.value)
+    toggleDlSettings(dlTypeEl.value)
+  })
+}
+['dlVideoQuality','dlAudioFormat','dlAudioBitrate','dlVideoCodec'].forEach(id => {
+  const el = document.getElementById(id)
+  if (!el) return
+  const saved = localStorage.getItem(id)
+  if (saved) el.value = saved
+  el.addEventListener('change', () => localStorage.setItem(id, el.value))
+})
+document.querySelector('#pane-basic .settings-clear-btn')?.addEventListener('click', () => {
+  if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
+})
+window.addEventListener('beforeunload', () => { const t = document.querySelector('#pane-history .settings-toggle:last-child'); if (t?.classList.contains('on')) localStorage.removeItem('linkHistory') })
+
+applyToolbarSettings()
+
+function loadHistory() { try { return JSON.parse(localStorage.getItem('linkHistory') || '[]') } catch { return [] } }
+function saveHistory(h) { safeSetItem('linkHistory', JSON.stringify(h)) }

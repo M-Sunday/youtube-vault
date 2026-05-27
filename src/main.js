@@ -32,6 +32,11 @@ function createWindow() {
           accelerator: 'CmdOrCtrl+D',
           click: () => win.webContents.executeJavaScript('toggleDebug()')
         },
+        {
+          label: 'Show Hierarchy',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: () => win.webContents.executeJavaScript('toggleDebugHierarchy()')
+        },
         { type: 'separator' },
         {
           label: 'Online',

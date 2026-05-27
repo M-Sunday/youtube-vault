@@ -1,0 +1,68 @@
+/* ─── MOBILE / PWA ───────────────────────────────────── */
+@media (max-width: 640px) {
+  body { padding: 0; gap: 0; }
+
+.sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 280px; min-width: 280px; height: 100vh;
+    z-index: 20; border-radius: 0; border: none;
+    border-right: 1px solid #e8e8ed;
+    transform: translateX(0); margin: 0;
+    transition: transform 0.25s ease;
+    opacity: 1; pointer-events: auto;
+  }
+  .sidebar.closed {
+    transform: translateX(-100%);
+    opacity: 0; pointer-events: none;
+  }
+
+  .sidebar-backdrop {
+    display: block; position: fixed; inset: 0;
+    z-index: 19; background: rgba(0,0,0,0.3);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .sidebar:not(.closed) ~ .sidebar-backdrop {
+    opacity: 1; pointer-events: auto;
+  }
+
+  .main-area {
+    height: 100vh; width: 100%; border-radius: 0; border: none;
+  }
+
+  .settings-modal {
+    width: 100%; height: 100%; border-radius: 0;
+    flex-direction: column;
+  }
+  .settings-sidebar {
+    width: 100%; min-width: 0;
+    flex-direction: row; overflow-x: auto;
+    border-right: none; border-bottom: 1px solid #d1d1d6;
+    flex-shrink: 0;
+  }
+  .settings-sidebar-header { display: none; }
+  .settings-categories {
+    display: flex; padding: 8px; gap: 4px; overflow-x: auto; flex: 1;
+  }
+  .settings-cat { white-space: nowrap; flex-shrink: 0; }
+  .settings-sidebar-footer {
+    border: none; padding: 8px 12px; flex-shrink: 0;
+  }
+  .settings-content { padding: 16px 20px; }
+
+  .top-bar { padding: 6px 10px; gap: 6px; }
+  .top-bar.search-expanded .menu-btn, .top-bar.search-expanded .online-indicator { display: none; }
+  .top-bar.search-expanded .top-bar-input { flex: 1; min-width: 0; }
+  .top-bar-input { min-width: 0; flex: 1; }
+  .top-bar-input input { flex: 1; min-width: 0; font-size: 13px; }
+  .top-bar-input input:disabled { opacity: 0.4; cursor: not-allowed; }
+  .content { padding: 16px 12px; }
+  .card-body { padding: 14px 16px 0; }
+  .card-body h1 { font-size: 16px; }
+  .calendar { padding: 10px 16px 16px; }
+  .card-add-row { padding: 6px 16px 0; }
+  .dl-progress { padding: 4px 16px 0; }
+  .grid-view { padding: 12px; }
+  .grid-items { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .online-indicator .online-indicator-text { display: none; }
+}
