@@ -1,6 +1,7 @@
 {
   "name": "YouTube Vault",
   "short_name": "Vault",
+  "version": "1.4.3",
   "description": "Save and organize YouTube videos",
   "start_url": "../index.html",
   "scope": "../",
