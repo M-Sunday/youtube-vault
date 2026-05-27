@@ -166,6 +166,13 @@ if (dlTypeEl) {
 document.querySelector('#pane-basic .settings-clear-btn')?.addEventListener('click', () => {
   if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
 })
+var settingsNameInput = document.getElementById('settingsUserName')
+if (settingsNameInput) {
+  settingsNameInput.value = getUserName()
+  settingsNameInput.addEventListener('input', function() {
+    saveUserName(this.value.trim())
+  })
+}
 window.addEventListener('beforeunload', () => { const t = document.querySelector('#pane-history .settings-toggle:last-child'); if (t?.classList.contains('on')) localStorage.removeItem('linkHistory') })
 
 applyToolbarSettings()

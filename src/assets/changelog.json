@@ -1,5 +1,22 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-05-27",
+    "title": "Onboarding Flow, User Name, Auto-Link Notes",
+    "changes": [
+      "First-time user sees multi-step onboarding: welcome → name → confirm → app",
+      "Splash transitions from onboarding to normal app on completion",
+      "User name saved and shown as 'Name's Workbench' in empty grid state",
+      "Name editable in Settings > Basic info",
+      "Notes auto-detect bare URLs and https:// links, render them bold + clickable",
+      "Bare domains (nintendo.com) also auto-linked with https:// prepended",
+      "Link detection runs on blur and before save in note editor",
+      "Theme colors for onboarding elements and note links (black, obsidian, anthropic)",
+      "Start Over in Debug menu opens fresh isolated window (partition: temp)",
+      "onboarding.js added to SW cache"
+    ]
+  },
+  {
     "version": "1.4.5",
     "date": "2026-05-27",
     "title": "NSFW Chip UI, Auto-Apply, Disabled Unblur When Auto-Blurred",

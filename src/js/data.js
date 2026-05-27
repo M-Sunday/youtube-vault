@@ -96,8 +96,11 @@ function sanitizeHtml(str) {
   return str
 }
 
+function getUserName() { return localStorage.getItem('ytUserName') || '' }
+function saveUserName(name) { localStorage.setItem('ytUserName', name) }
+
 let currentVideo = null
 let dragVideoId = null
 let currentNoteId = null
 
-const APP_VERSION = '1.4.5'
+const APP_VERSION = '1.5.0'

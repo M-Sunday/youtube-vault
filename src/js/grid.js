@@ -52,7 +52,7 @@ function renderGridView() {
     }
     html += '</div></div>'
   }
-  el.innerHTML = html || '<div style="padding:30px;text-align:center;font-size:13px;color:#8e8e93">Nothing to show yet.</div>'
+  el.innerHTML = html || function(){ var n = getUserName(); return '<div class="grid-empty"><div class="grid-empty-text">' + (n ? n + "'s Workbench" : 'Nothing to show yet') + '</div></div>' }()
   loadIcons()
   el.querySelectorAll('[data-video-id]').forEach(item => {
     item.addEventListener('click', () => {

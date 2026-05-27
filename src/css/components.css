@@ -111,6 +111,10 @@
 .theme-anthropic { background: #E8E0D8; }
 .settings-clear-btn { padding: 8px 18px; border: 1px solid #d1d1d6; border-radius: 8px; background: #fff; font-size: 13px; font-family: inherit; color: #3a3a3c; cursor: pointer; transition: background 0.12s; }
 .settings-clear-btn:hover { background: #f5f5f7; border-color: #1d1d1f; }
+.settings-field-row { display: flex; flex-direction: column; gap: 6px; }
+.settings-field-label { font-size: 13px; font-weight: 600; color: #3a3a3c; }
+.settings-text-input { font-family: inherit; font-size: 15px; padding: 8px 12px; border: 1px solid #d1d1d6; border-radius: 8px; background: #fff; color: #1d1d1f; outline: none; transition: border-color 0.2s; }
+.settings-text-input:focus { border-color: #007aff; }
 .settings-history-list { margin-top: 12px; max-height: 240px; overflow-y: auto; }
 .settings-history-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: background 0.12s; }
 .settings-history-item:hover { background: rgba(120,120,128,0.08); }

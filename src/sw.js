@@ -1,4 +1,4 @@
-var CACHE = 'yt-vault-1.4.5'
+var CACHE = 'yt-vault-1.5.0'
 var URLS = [
   'index.html',
   'css/base.css',
@@ -20,6 +20,7 @@ var URLS = [
   'js/search.js',
   'js/icons.js',
   'js/extras.js',
+  'js/onboarding.js',
   'js/app.js',
   'assets/icons/app-icon-192.svg',
   'assets/icons/app-icon-512.svg',
