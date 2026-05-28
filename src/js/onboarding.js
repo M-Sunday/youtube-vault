@@ -88,6 +88,11 @@
     setTimeout(function() {
       onboarding.style.display = 'none'
       if (window.startApp) window.startApp()
+      var splash = document.getElementById('splash')
+      if (splash && !splash.classList.contains('fade')) {
+        splash.classList.add('fade')
+        setTimeout(function(){ splash.style.display = 'none' }, 500)
+      }
     }, 400)
   })
 

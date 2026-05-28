@@ -206,8 +206,8 @@ if (editBtn && editInput && userDisplay) {
     editInput.focus()
     editInput.select()
   })
-  function saveUserName() {
-    var val = editInput.value.trim()
+  function saveUserName(name) {
+    var val = name !== undefined ? name.trim() : editInput.value.trim()
     if (!val) return
     safeSetItem('ytUserName', val)
     userDisplay.textContent = val
