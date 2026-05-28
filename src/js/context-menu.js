@@ -20,7 +20,13 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId, daId) {
   const isNote = noteId !== null && noteId !== undefined
   const isDA = daId !== null && daId !== undefined
   const showVideo = videoId !== null && videoId !== undefined
-  menu.querySelector('[data-action="rename-folder"]').style.display = videoId ? 'none' : (isBm || isNote || isDA) ? 'none' : ''
+  const renameEl = menu.querySelector('[data-action="rename-folder"]')
+  renameEl.style.display = (showVideo || isBm || isNote || isDA || ctxFolder) ? '' : 'none'
+  if (ctxFolder) renameEl.innerHTML = '<i data-lucide="edit-3" class="ctx-icon"></i> Rename folder'
+  else if (showVideo) renameEl.innerHTML = '<i data-lucide="edit-3" class="ctx-icon"></i> Rename video'
+  else if (isNote) renameEl.innerHTML = '<i data-lucide="edit-3" class="ctx-icon"></i> Rename note'
+  else if (isBm) renameEl.innerHTML = '<i data-lucide="edit-3" class="ctx-icon"></i> Rename bookmark'
+  else if (isDA) renameEl.innerHTML = '<i data-lucide="edit-3" class="ctx-icon"></i> Rename direct access'
   menu.querySelector('[data-action="delete-folder"]').style.display = videoId ? 'none' : (isBm || isNote || isDA) ? 'none' : ''
   menu.querySelector('[data-action="open-link"]').style.display = (showVideo || isBm || isDA) ? '' : 'none'
   menu.querySelector('[data-action="archive"]').style.display = showVideo ? '' : 'none'
@@ -43,7 +49,7 @@ function showContextMenu(x, y, videoId, folderName, bookmarkId, noteId, daId) {
   const delItem = menu.querySelector('[data-action="delete"]')
   delItem.innerHTML = `<i data-lucide="trash-2" class="ctx-icon"></i> ${isNote ? 'Delete note' : isBm ? 'Delete bookmark' : isDA ? 'Delete direct access' : 'Delete'}`
   delItem.className = 'ctx-item ctx-danger'
-  document.getElementById('ctxDiv1').style.display = (videoId || isBm || isNote || isDA) ? '' : 'none'
+  document.getElementById('ctxDiv1').style.display = (showVideo || isBm || isDA) ? '' : 'none'
   document.getElementById('ctxDiv2').style.display = showVideo ? '' : 'none'
   document.getElementById('ctxDiv3').style.display = (showVideo || isNote) ? '' : 'none'
   document.getElementById('ctxMoveTo').classList.remove('show')
@@ -131,17 +137,42 @@ document.getElementById('ctxMenu').addEventListener('click', (e) => {
       if (d) { d.blurred = !d.blurred; saveDirectAccess(das); renderSidebar() }
     }
   }
-  if (a === 'rename-folder' && ctxFolder) {
-      const label = document.querySelector(`[data-folder="${ctxFolder}"] .tree-label`)
+    if (a === 'rename-folder') {
+      let selector
+      if (ctxFolder) selector = `[data-folder="${ctxFolder}"] .tree-label`
+      else if (ctxTarget) selector = `[data-video-id="${ctxTarget}"] .tree-label`
+      else if (ctxNote) selector = `[data-note-id="${ctxNote}"] .tree-label`
+      else if (ctxBookmark) selector = `[data-bookmark-id="${ctxBookmark}"] .tree-label`
+      else if (ctxDA) selector = `[data-da-id="${ctxDA}"] .tree-label`
+      if (!selector) return
+      const label = document.querySelector(selector)
       if (!label) return
       const old = label.textContent
       const input = document.createElement('input'); input.className = 'folder-rename'; input.value = old; input.autofocus = true
       label.replaceWith(input); input.focus(); input.select()
       const done = () => {
-        const name = input.value.trim() || old; const fs = getFolders(); const meta = getFolderMeta()
-        if (name === old) { saveFolders(fs); saveFolderMeta(meta); renderSidebar(); return }
-        fs[name] = fs[old]; meta[name] = meta[old] || {}; delete fs[old]; delete meta[old]
-        saveFolders(fs); saveFolderMeta(meta); renderSidebar()
+        const name = input.value.trim() || old
+        if (name === old) { renderSidebar(); return }
+        if (ctxFolder) {
+          const fs = getFolders(); const meta = getFolderMeta()
+          fs[name] = fs[old]; meta[name] = meta[old] || {}; delete fs[old]; delete meta[old]
+          saveFolders(fs); saveFolderMeta(meta)
+        } else if (ctxTarget) {
+          const vs = getVideos(); const v = vs[ctxTarget]
+          if (v) { v.title = name; saveVideos(vs) }
+          if (currentVideo?.id === ctxTarget) document.getElementById('videoTitle').textContent = name
+        } else if (ctxNote) {
+          const notes = getNotes(); const n = notes.filter(x => x.id === ctxNote)[0]
+          if (n) { n.title = name; saveNotes(notes) }
+          if (currentNoteId === ctxNote) document.getElementById('noteViewTitle').value = name
+        } else if (ctxBookmark) {
+          const bms = getBookmarks(); const b = bms.filter(x => x.id === ctxBookmark)[0]
+          if (b) { b.title = name; saveBookmarks(bms) }
+        } else if (ctxDA) {
+          const das = getDirectAccess(); const d = das.filter(x => x.id === ctxDA)[0]
+          if (d) { d.title = name; saveDirectAccess(das) }
+        }
+        renderSidebar()
       }
       input.addEventListener('blur', done)
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') { input.value = old; input.blur() } })

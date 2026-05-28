@@ -78,7 +78,7 @@ document.getElementById('daDialogConfirm').addEventListener('click', async () =>
   document.getElementById('ytInput').value = ''
   document.getElementById('daDialog').classList.remove('open')
   pendingDaUrl = ''
-  renderSidebar(); renderGridView()
+  renderSidebar(); renderGridView(); closeSidebarMobile()
 })
 
 document.getElementById('daTitleInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('daDialogConfirm').click(); if (e.key === 'Escape') document.getElementById('daDialogCancel').click() })

@@ -146,8 +146,11 @@ document.getElementById('newNoteBtn').addEventListener('click', () => {
   saveNotes(notes)
   renderSidebar()
   openNote(id)
+  closeSidebarMobile()
   setTimeout(() => { document.getElementById('noteViewTitle').focus(); document.getElementById('noteViewTitle').select() }, 100)
 })
+
+// Note events
 document.getElementById('noteDialogCancel').addEventListener('click', () => noteDialog.classList.remove('open'))
 document.getElementById('noteDialogConfirm').addEventListener('click', () => {
   const title = noteTitleInput.value.trim() || 'Untitled'
@@ -160,6 +163,7 @@ document.getElementById('noteDialogConfirm').addEventListener('click', () => {
   noteDialog.classList.remove('open')
   renderSidebar()
   openNote(id)
+  closeSidebarMobile()
 })
 noteTitleInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); noteContentInput.focus() } })
 noteDialog.addEventListener('mousedown', (e) => { if (e.target === noteDialog) noteDialog.classList.remove('open') })
@@ -174,7 +178,7 @@ function renderNoteTodos() {
   var html = '<div style="border-top:1px solid #e8e8ed;padding-top:8px;margin-top:4px">'
   n.todos.forEach(function(t, i) {
     var checked = t.done ? ' checked' : ''
-    html += '<div class="todo-row"><span class="todo-cb' + checked + '" data-todo-id="' + t.id + '"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="todo-cb-icon todo-cb-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="todo-cb-icon todo-cb-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></span><span class="todo-text' + (t.done ? ' done' : '') + '" contenteditable="true" data-todo-id="' + t.id + '">' + escapeHtml(t.text || '') + '</span></div>'
+    html += '<div class="todo-row"><span class="todo-cb' + checked + '" data-todo-id="' + t.id + '"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="todo-cb-icon todo-cb-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="todo-cb-icon todo-cb-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></span><span class="todo-text' + (t.done ? ' done' : '') + '" contenteditable="true" data-todo-id="' + t.id + '" spellcheck="false">' + escapeHtml(t.text || '') + '</span></div>'
   })
   html += '<button class="todo-add-btn" id="todoAddBtn"><i data-lucide="plus" style="width:14px;height:14px"></i> Add todo</button></div>'
   el.innerHTML = html

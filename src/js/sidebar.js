@@ -269,3 +269,7 @@ document.getElementById('searchInput').addEventListener('focus', () => {
   setView('landing')
   renderSearchLanding()
 })
+
+// ─── Mobile sidebar helper ────────────────────────────────
+function closeSidebarMobile() { if (window.innerWidth <= 640) document.getElementById('sidebar').classList.add('closed') }
+window.closeSidebarMobile = closeSidebarMobile

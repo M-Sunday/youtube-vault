@@ -259,7 +259,7 @@
                     </div>
                     <div class="settings-field-row" style="margin-top:12px">
                         <label class="settings-field-label">Version</label>
-                        <p class="settings-user-value" id="appVersionLabel">1.5.1</p>
+                        <p class="settings-user-value" id="appVersionLabel">1.5.2</p>
                     </div>
                     <div class="settings-field-row" style="margin-top:12px">
                         <label class="settings-field-label">Device</label>
@@ -481,19 +481,21 @@
         }
         function fadeOut() {
           if (faded) return; faded = true
-          if (window.startGridAnim) window.startGridAnim()
           splash.classList.add('fade')
           setTimeout(function(){
             splash.style.display = 'none'
+            if (window.startGridAnim) window.startGridAnim()
           }, 500)
         }
         setTimeout(fadeOut, navigator.onLine ? 4600 : 2000)
       }
       window.__splashFade = function() {
         if (faded) return; faded = true
-        if (window.startGridAnim) window.startGridAnim()
         splash.classList.add('fade')
-        setTimeout(function(){ splash.style.display = 'none' }, 500)
+        setTimeout(function(){
+          splash.style.display = 'none'
+          if (window.startGridAnim) window.startGridAnim()
+        }, 500)
       }
     })()
     </script>

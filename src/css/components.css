@@ -117,9 +117,8 @@
 .settings-text-input:focus { border-color: #007aff; }
 .settings-user-value { font-size: 15px; color: #1d1d1f; padding: 2px 0; }
 .settings-user-edit-wrap { display: flex; align-items: center; gap: 8px; position: relative; }
-.settings-user-edit-btn { display: none; align-items: center; justify-content: center; width: 26px; height: 26px; border: none; border-radius: 6px; background: #e8e8ed; color: #8e8e93; cursor: pointer; flex-shrink: 0; padding: 0; transition: background 0.12s, color 0.12s; }
+.settings-user-edit-btn { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: none; border-radius: 6px; background: #e8e8ed; color: #8e8e93; cursor: pointer; flex-shrink: 0; padding: 0; transition: background 0.12s, color 0.12s; }
 .settings-user-edit-btn:hover { background: #1d1d1f; color: #fff; }
-.settings-user-edit-wrap:hover .settings-user-edit-btn { display: flex; }
 .settings-user-edit-input { font-family: inherit; font-size: 15px; padding: 4px 10px; border: 1px solid #007aff; border-radius: 6px; background: #fff; color: #1d1d1f; outline: none; width: 200px; }
 .settings-danger-btn { width:100%; padding:12px; border:1px solid #ff453a; border-radius:10px; background:#ff453a; color:#fff; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:background 0.15s; }
 .settings-danger-btn:hover { background:#d63a2f; }
@@ -218,7 +217,8 @@
 .todo-cb.checked:hover .todo-cb-x { opacity: 1; transform: scale(1); }
 
 .todo-particle { position: fixed; width: 4px; height: 4px; border-radius: 50%; pointer-events: none; z-index: 99999; }
-.todo-row .todo-text { flex: 1; font-size: 14px; color: #3a3a3c; line-height: 1.4; }
+.todo-row .todo-text { flex: 1; font-size: 14px; color: #3a3a3c; line-height: 1.4; outline: none; border: none; background: transparent; padding: 2px 4px; border-radius: 4px; transition: background 0.12s; }
+.todo-row .todo-text:focus { background: rgba(120,120,128,0.08); }
 .todo-row .todo-text.done { text-decoration: line-through; opacity: .5; }
 .todo-add-btn { display: flex; align-items: center; gap: 6px; padding: 6px 0; cursor: pointer; font-size: 12px; color: #8e8e93; border: none; background: none; font-family: inherit; }
 .todo-add-btn:hover { color: #007aff; }

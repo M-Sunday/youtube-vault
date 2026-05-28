@@ -12,7 +12,6 @@ function createFolder() {
   saveFolders(fs); saveFolderMeta(meta); renderSidebar()
   folderDialog.classList.remove('open')
 }
-
 document.getElementById('newFolderBtn').addEventListener('click', () => {
   folderNameInput.value = ''
   document.querySelectorAll('.folder-color').forEach(c => c.classList.remove('active'))

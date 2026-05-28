@@ -1,0 +1,90 @@
+╔══════════════════════════════════════════════════════════════╗
+║           YOUTUBE VAULT — COMMIT CHECKLIST                  ║
+║       Read this BEFORE every commit to avoid regressions    ║
+╚══════════════════════════════════════════════════════════════╝
+
+─── 1. SERVICE WORKER ─────────────────────────────────────────
+☐ sw.js — bump CACHE version string (e.g. 'yt-vault-X.Y.Z')
+☐ sw.js — add ANY new file paths to URLS array
+    (new JS files, new SVG icons in assets/icons/ui/, etc.)
+☐ sw.js — if adding a new JS module, add it to URLS
+
+─── 2. VERSION BUMP ──────────────────────────────────────────
+☐ src/js/data.js        — const APP_VERSION = 'X.Y.Z'
+☐ src/index.html        — <span id="appVersionLabel">X.Y.Z</span>
+☐ src/assets/manifest.json — "version": "X.Y.Z"
+☐ package.json          — "version": "X.Y.Z"
+
+─── 3. PWA UPDATE DEADLOCK CHECK ──────────────────────────────
+The SW update flow (extras.js) had version guards that prevented
+the new SW from activating when both APP_VERSION and ytSwVersion
+were the same. If you add version checks anywhere in extras.js,
+make sure they don't create a deadlock.
+
+Current safe state (extras.js lines 301-305):
+    function applyUpdate(sw) {
+      showSplashForUpdate()
+      sw.postMessage({ action: 'skipWaiting' })
+    }
+    if (reg.waiting && navigator.serviceWorker.controller) applyUpdate(reg.waiting)
+☐ NO version guards in applyUpdate()
+☐ NO version guards in reg.waiting check
+
+─── 4. CSS ANIMATION DEADLOCK ────────────────────────────────
+If you add a CSS class with opacity:0 that controls visibility,
+make sure there is ALWAYS a path to add the .visible class.
+
+The grid cascade works like this:
+  app.js startApp() → renderGridView() (adds anim classes) → startGridAnim() (adds .visible)
+  onboarding.js → startApp() → __splashFade() (also calls startGridAnim)
+
+☐ app.js: startApp() calls startGridAnim() after renderGridView()
+☐ onboarding.js: calls __splashFade() (NOT raw DOM fade)
+☐ Inline splash script defines __splashFade() on window
+
+─── 5. FUNCTION OVERRIDE CHECK ───────────────────────────────
+If two JS files define the same global function, the last one
+loaded wins. Check script order in index.html:
+
+  data.js → views.js → calendar.js → settings.js → sidebar.js
+  → context-menu.js → notes.js → dialogs.js → grid.js → card.js
+  → download.js → search.js → icons.js → extras.js → onboarding.js
+  → app.js
+
+If your function needs to be overridden or called from multiple
+files, make sure the overriding version handles ALL call sites.
+
+Known conflict: saveUserName() exists in both data.js and
+settings.js. settings.js version wins. It MUST accept an
+optional name parameter to work from onboarding.js and
+Basic info pane.
+
+☐ No naming collisions between files
+☐ Overridden functions accept parameters from all call sites
+
+─── 6. SVG ICONS ──────────────────────────────────────────────
+All new icons go in: src/assets/icons/ui/{name}.svg
+They are loaded by loadIcons() from assets/icons/ui/{name}.svg
+The icon reference in HTML/JS uses: data-lucide="{name}"
+
+☐ New SVG file created in assets/icons/ui/
+☐ path added to sw.js URLS array (for PWA offline support)
+
+─── 7. TEST ON ALL SURFACES ──────────────────────────────────
+Always test on:
+☐ Electron (npm start) — loads fresh from disk
+☐ Browser (localhost or file://) — check console for errors
+☐ After pushing: close PWA completely and reopen to test SW update
+
+Common PWA pitfalls:
+  - Old SW caches old files → bump cache version in sw.js
+  - New files not in URLS → they fail offline
+  - Version guard deadlock → SW never activates
+
+─── 8. FULL COMMAND SEQUENCE ──────────────────────────────────
+  git add -A
+  git status                    # review what you're committing
+  git commit -m "title" -m "body line 1..."   # descriptive
+  git push origin main
+
+───────────────────────────────────────────────────────────────

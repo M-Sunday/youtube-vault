@@ -70,7 +70,7 @@ function addCurrentVideo() {
   if (!fs['Videos']) fs['Videos'] = []
   if (!fs['Videos'].includes(id)) fs['Videos'].push(id)
   saveFolders(fs)
-  renderSidebar(); updateCardAddBtn()
+  renderSidebar(); updateCardAddBtn(); closeSidebarMobile()
   const t = document.querySelector('#pane-history .settings-toggle:first-child')
   if (t?.classList.contains('on')) { const h = loadHistory().filter(x => x.id !== id); h.unshift({ id, title, channel }); saveHistory(h) }
   if (document.getElementById('searchLanding').style.display === 'flex') renderSearchLanding()
