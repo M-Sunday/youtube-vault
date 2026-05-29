@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════╗
-║           YOUTUBE VAULT — COMMIT CHECKLIST                  ║
+║           VAULT — COMMIT CHECKLIST                         ║
 ║       Read this BEFORE every commit to avoid regressions    ║
 ╚══════════════════════════════════════════════════════════════╝
 
@@ -10,10 +10,12 @@
 ☐ sw.js — if adding a new JS module, add it to URLS
 
 ─── 2. VERSION BUMP ──────────────────────────────────────────
-☐ src/js/data.js        — const APP_VERSION = 'X.Y.Z'
-☐ src/index.html        — <span id="appVersionLabel">X.Y.Z</span>
-☐ src/assets/manifest.json — "version": "X.Y.Z"
-☐ package.json          — "version": "X.Y.Z"
+☐ src/js/data.js              — const APP_VERSION = 'X.Y.Z'
+☐ src/index.html              — appVersionLabel AND settingsBasicVersion text
+☐ src/assets/manifest.json    — "version": "X.Y.Z"
+☐ package.json                — "version": "X.Y.Z"
+☐ src/sw.js                   — CACHE = 'yt-vault-X.Y.Z' (matches version exactly)
+☐ android/app/build.gradle    — versionCode +1, versionName "X.Y.Z"
 
 ─── 3. PWA UPDATE DEADLOCK CHECK ──────────────────────────────
 The SW update flow (extras.js) had version guards that prevented
