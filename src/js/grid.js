@@ -105,7 +105,7 @@ function renderGridView() {
     html += '</div></div>'
   }
   var n = getUserName()
-  el.innerHTML = '<div class="grid-workbench"><div class="grid-workbench-text">' + (n ? n + "'s Workbench" : '') + '</div><div class="grid-clock"></div><div class="grid-workbench-actions"><button class="wb-btn" data-action="challenge" title="New Challenge"><i data-lucide="sparkles" style="width:15px;height:15px"></i> New Challenge</button><button class="wb-btn" data-action="goal" title="New Goal"><i data-lucide="rocket" style="width:15px;height:15px"></i> New Goal</button><button class="wb-btn wb-btn-planet" data-action="planet" title="Planet View"><i data-lucide="orbit" style="width:15px;height:15px"></i> Planet View</button></div></div>' + html
+  el.innerHTML = '<div class="grid-workbench"><div class="grid-workbench-text">' + (n ? n + "'s Workbench" : '') + '</div><div class="grid-clock"></div><div class="grid-workbench-actions"><button class="wb-btn" data-action="challenge" title="New Challenge"><i data-lucide="sparkles" style="width:15px;height:15px"></i> New Challenge</button><button class="wb-btn" data-action="goal" title="New Goal"><i data-lucide="rocket" style="width:15px;height:15px"></i> New Goal</button><button class="wb-btn wb-btn-void" data-action="void" title="The Void"><i data-lucide="sparkle" style="width:15px;height:15px"></i> The Void</button></div></div>' + html
   if (!window.__gridAnimDone) {
     el.querySelectorAll('.grid-section').forEach(function(s) { s.classList.add('grid-section-anim') })
     el.querySelectorAll('.grid-item').forEach(function(s) { s.classList.add('grid-item-anim') })
@@ -603,8 +603,8 @@ document.getElementById('challengeDialogConfirm')?.addEventListener('click', fun
   checkAchievements()
   var rect = (document.querySelector('.wb-btn[data-action="challenge"]') || document.body).getBoundingClientRect()
   renderGridView()
-  var pv = document.getElementById('planetView')
-  if (pv && !pv.classList.contains('hidden')) renderPlanetView()
+  var vv = document.getElementById('voidView')
+  if (vv && !vv.classList.contains('hidden')) renderVoidView()
   burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#30d158')
 })
 

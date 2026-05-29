@@ -8,12 +8,12 @@
     <link rel="manifest" href="assets/manifest.json">
     <link rel="icon" href="assets/icons/app-icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/icons/app-icon-192.svg">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/themes.css">
-    <link rel="stylesheet" href="css/mobile.css">
-    <link rel="stylesheet" href="css/vault.css">
+    <link rel="stylesheet" href="css/base.css?v=2.0.1">
+    <link rel="stylesheet" href="css/layout.css?v=2.0.1">
+    <link rel="stylesheet" href="css/components.css?v=2.0.1">
+    <link rel="stylesheet" href="css/themes.css?v=2.0.1">
+    <link rel="stylesheet" href="css/mobile.css?v=2.0.1">
+    <link rel="stylesheet" href="css/vault.css?v=2.0.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -24,6 +24,8 @@
     body.native-android.theme-obsidian .main-area { background: #19191e; }
     body.native-android.theme-anthropic .main-area { background: #E8E0D8; }
     body.native-android .sidebar { padding-top: 40px !important; }
+    body.native-android .void-view-header { padding-top: max(12px, env(safe-area-inset-top, 0px)) !important; }
+    body.native-android .void-view-footer { padding: 10px max(20px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)) !important; }
     </style>
 </head>
 <body>
@@ -74,8 +76,8 @@
                 <i data-lucide="panel-left" class="menu-btn-icon"></i>
             </button>
 
-            <button class="menu-btn mr-6" id="bookmarkBtn">
-                <i data-lucide="bookmark" class="icon-lg"></i>
+            <button class="menu-btn mr-6" id="newVoidTopBtn" title="Add to Void">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
             </button>
             <button class="menu-btn mr-6" id="gridBtn">
                 <i data-lucide="layout-grid" class="icon-lg"></i>
@@ -103,10 +105,10 @@
                     </div>
                     <div class="card-add-row" id="cardAddRow">
                         <button class="card-add-btn" id="cardAddBtn"><i data-lucide="plus" class="card-add-icon"></i> Add video</button>
-                        <button class="card-add-btn hidden" id="dlBtn"><i data-lucide="download" class="card-add-icon"></i> Download</button>
-                        <button class="card-add-btn hidden" id="copyLinkBtn"><i data-lucide="link" class="card-add-icon"></i> Copy link</button>
+                        <button class="card-add-btn" id="dlBtn" style="display:none"><i data-lucide="download" class="card-add-icon"></i> Download</button>
+                        <button class="card-add-btn" id="copyLinkBtn" style="display:none"><i data-lucide="link" class="card-add-icon"></i> Copy link</button>
                     </div>
-                    <div class="dl-progress hidden" id="dlProgress">
+                    <div class="dl-progress" id="dlProgress" style="display:none">
                         <div class="dl-progress-track"><div class="dl-progress-fill" id="dlProgressFill"></div></div>
                         <span class="dl-progress-text" id="dlProgressText">0%</span>
                     </div>
@@ -114,7 +116,7 @@
                 </div>
             </div>
         </div>
-        <div class="search-landing hidden" id="searchLanding">
+        <div class="search-landing" id="searchLanding" style="display:none">
             <div class="search-landing-content">
                 <h2 class="search-landing-title" id="searchLandingTitle">What do you want to search?</h2>
                 <div class="search-landing-divider"></div>
@@ -122,7 +124,7 @@
             </div>
         </div>
         <div class="grid-view" id="gridView"></div>
-        <div class="batch-bar hidden" id="batchBar">
+        <div class="batch-bar" id="batchBar" style="display:none">
             <span class="batch-count" id="batchCount">0 selected</span>
             <div class="batch-actions">
                 <button class="batch-btn" id="batchDelete"><i data-lucide="trash-2" class="icon-sm"></i> Delete</button>
@@ -131,8 +133,8 @@
                 <button class="batch-btn" id="batchBlur"><i data-lucide="eye-off" class="icon-sm"></i> Blur</button>
             </div>
         </div>
-        <div class="batch-move-dropdown hidden" id="batchMoveDropdown"></div>
-        <div class="note-view hidden" id="noteView">
+        <div class="batch-move-dropdown" id="batchMoveDropdown" style="display:none"></div>
+        <div class="note-view" id="noteView" style="display:none">
             <div class="note-view-header">
                 <input class="note-view-title" id="noteViewTitle" placeholder="Note title" spellcheck="false" />
                 <div class="note-view-actions">
@@ -257,12 +259,12 @@
                         <div class="settings-user-edit-wrap">
                             <p class="settings-user-value" id="settingsUserNameDisplay">—</p>
                             <button class="settings-user-edit-btn" id="settingsUserNameEditBtn"><i data-lucide="edit-3" class="icon-sm"></i></button>
-                            <input type="text" class="settings-user-edit-input hidden" id="settingsUserNameEditInput" placeholder="Enter your name" maxlength="30" />
+                            <input type="text" class="settings-user-edit-input" id="settingsUserNameEditInput" style="display:none" placeholder="Enter your name" maxlength="30" />
                         </div>
                     </div>
                     <div class="settings-field-row mt-12">
                         <label class="settings-field-label">Version</label>
-                        <p class="settings-user-value" id="appVersionLabel">2.0.0</p>
+                        <p class="settings-user-value" id="appVersionLabel">2.0.1</p>
                     </div>
                     <div class="settings-field-row mt-12">
                         <label class="settings-field-label">Device</label>
@@ -273,7 +275,7 @@
                         <p class="settings-warning">This will permanently delete all your data and settings.</p>
                     </div>
                 </div>
-                <div class="settings-pane hidden" id="pane-theme">
+                <div class="settings-pane" id="pane-theme" style="display:none">
                     <div class="settings-pane-header"><h2>Theme</h2><p class="settings-pane-desc">Choose your preferred appearance.</p></div>
                     <div class="theme-options">
                         <div class="theme-option" data-theme="white"><div class="theme-preview theme-white"></div><span>White</span></div>
@@ -283,17 +285,17 @@
                     </div>
                     <label class="settings-checkbox"><input type="checkbox" id="systemTheme" /><span class="settings-checkbox-mark"></span><span>Have system theme</span></label>
                 </div>
-                <div class="settings-pane hidden" id="pane-basic">
+                <div class="settings-pane" id="pane-basic" style="display:none">
                     <div class="settings-pane-header"><h2>Basic info</h2><p class="settings-pane-desc">About this app.</p></div>
                     <div class="settings-field-row mt-16">
                         <label class="settings-field-label">Your name</label>
                         <input type="text" id="settingsUserName" class="settings-text-input" placeholder="Enter your name" maxlength="30" />
                     </div>
                     <div class="settings-footer-row flex flex-col gap-6 mt-20">
-                        <span id="settingsBasicVersion">Version 2.0.0</span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
+                        <span id="settingsBasicVersion">Version 2.0.1</span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
                     </div>
                 </div>
-                <div class="settings-pane hidden" id="pane-toolbar">
+                <div class="settings-pane" id="pane-toolbar" style="display:none">
                     <div class="settings-pane-header"><h2>Toolbar</h2><p class="settings-pane-desc">Customize your toolbar.</p></div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin"><span class="settings-plugin-name">Show sidebar button</span><div class="settings-toggle on"></div></div>
@@ -301,7 +303,7 @@
                         <div class="settings-plugin"><span class="settings-plugin-name">Compact mode</span><div class="settings-toggle"></div></div>
                     </div>
                 </div>
-                <div class="settings-pane hidden" id="pane-files">
+                <div class="settings-pane" id="pane-files" style="display:none">
                     <div class="settings-pane-header"><h2>Files and links</h2><p class="settings-pane-desc">How files and links are handled.</p></div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin"><span class="settings-plugin-name">Automatically update links</span><div class="settings-toggle on"></div></div>
@@ -309,7 +311,7 @@
                         <div class="settings-plugin"><span class="settings-plugin-name">Detect all file extensions</span><div class="settings-toggle"></div></div>
                     </div>
                 </div>
-                <div class="settings-pane hidden" id="pane-history">
+                <div class="settings-pane" id="pane-history" style="display:none">
                     <div class="settings-pane-header"><h2>Link history</h2><p class="settings-pane-desc">Recently opened YouTube links.</p></div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin"><span class="settings-plugin-name">Save link history</span><div class="settings-toggle on"></div></div>
@@ -318,7 +320,7 @@
                     <div class="settings-footer-info"><button class="settings-clear-btn" id="settingsClearHistoryBtn">Clear history</button></div>
                     <div class="settings-history-list" id="settingsHistoryList"></div>
                 </div>
-                <div class="settings-pane hidden" id="pane-nsfw">
+                <div class="settings-pane" id="pane-nsfw" style="display:none">
                     <div class="settings-pane-header"><h2>NSFW</h2><p class="settings-pane-desc">Mark sites as NSFW to blur their thumbnails.</p></div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin"><span class="settings-plugin-name">Blur all NSFW</span><div class="settings-toggle" id="blurAllNSFWToggle"></div></div>
@@ -332,11 +334,11 @@
                         </div>
                     </div>
                 </div>
-                    <div class="settings-pane hidden" id="pane-patchnotes">
+                    <div class="settings-pane" id="pane-patchnotes" style="display:none">
                     <div class="settings-pane-header"><h2>Patch notes</h2><p class="settings-pane-desc">Changelog history for this app.</p></div>
                     <div id="patchNotesList" class="mt-20"></div>
                 </div>
-                <div class="settings-pane hidden" id="pane-download">
+                <div class="settings-pane" id="pane-download" style="display:none">
                     <div class="settings-pane-header"><h2>Download</h2><p class="settings-pane-desc">Media download preferences.</p></div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin"><span class="settings-plugin-name">Type</span>
@@ -366,7 +368,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="settings-plugin-list dl-audio-settings hidden">
+                    <div class="settings-plugin-list dl-audio-settings" style="display:none">
                         <div class="settings-plugin"><span class="settings-plugin-name">Audio format</span>
                             <select class="settings-select" id="dlAudioFormat">
                                 <option value="mp3" selected>MP3</option>
@@ -393,26 +395,24 @@
         </div>
     </div>
 
-    <!-- Planet View -->
-    <div class="planet-view hidden" id="planetView">
-      <div class="planet-view-header">
-        <button class="planet-view-back" id="planetViewBack"><i data-lucide="arrow-left" class="icon-lg"></i> Back to Workbench</button>
-        <div class="planet-view-title">Planet View</div>
+    <!-- Void View -->
+    <div class="void-view hidden" id="voidView">
+      <div class="void-view-header">
+        <button class="void-view-back" id="voidViewBack"><i data-lucide="arrow-left" class="icon-lg"></i> Back to Workbench</button>
+        <div class="void-view-title">The Void</div>
       </div>
-      <div class="planet-view-canvas" id="planetCanvas">
-        <div class="planet-viewport" id="planetViewport">
-          <div class="planet-sun" id="planetSun">
-            <span id="planetSunLabel">✦</span>
-          </div>
-          <div class="planet-orbits" id="planetOrbits"></div>
+      <div class="void-view-canvas" id="voidCanvas">
+        <div class="void-viewport" id="voidViewport"></div>
+      </div>
+      <div class="void-view-footer">
+        <div class="void-input-row">
+          <input type="text" id="voidInput" placeholder="What idea is on your mind?" spellcheck="false" />
+          <button class="void-add-btn" id="voidAddBtn">Add to Void</button>
         </div>
-      </div>
-      <div class="planet-view-footer">
-        <div class="planet-void-input"><input type="text" id="planetVoidInput" placeholder="What idea is on your mind?" spellcheck="false" /><button id="planetAddBtn">Add to Void</button></div>
-        <div class="planet-zoom-controls">
-          <button class="planet-zoom-btn" id="planetZoomIn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
-          <button class="planet-zoom-btn" id="planetZoomOut"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
-          <button class="planet-zoom-btn" id="planetZoomReset"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <div class="void-zoom-controls">
+          <button class="void-zoom-btn" id="voidZoomIn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+          <button class="void-zoom-btn" id="voidZoomOut"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+          <button class="void-zoom-btn" id="voidZoomReset"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
         </div>
       </div>
     </div>
@@ -595,7 +595,7 @@
     </script>
 
     <!-- Keyboard shortcuts overlay -->
-    <div class="shortcuts-overlay hidden" id="shortcutsOverlay">
+    <div class="shortcuts-overlay" id="shortcutsOverlay" style="display:none">
         <div class="shortcuts-modal">
             <div class="shortcuts-header">
                 <h2>Keyboard Shortcuts</h2>
@@ -628,7 +628,7 @@
     <script src="js/search.js"></script>
     <script src="js/icons.js"></script>
     <script src="js/extras.js"></script>
-    <script src="js/planet-view.js"></script>
+    <script src="js/void-view.js"></script>
     <script src="js/onboarding.js"></script>
     <script src="js/app.js"></script>
     <script>

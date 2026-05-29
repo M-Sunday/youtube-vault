@@ -1,6 +1,5 @@
-var CACHE = 'vault-2.0.0'
+var CACHE = 'vault-2.0.1'
 var URLS = [
-  'index.html',
   'css/base.css',
   'css/layout.css',
   'css/components.css',
@@ -21,7 +20,7 @@ var URLS = [
   'js/search.js',
   'js/icons.js',
   'js/extras.js',
-  'js/planet-view.js',
+  'js/void-view.js',
   'js/onboarding.js',
   'js/app.js',
   'assets/icons/app-icon-192.svg',
@@ -95,5 +94,9 @@ self.addEventListener('activate', function (e) {
   self.clients.claim()
 })
 self.addEventListener('fetch', function (e) {
-  e.respondWith(caches.match(e.request).then(function (r) { return r || fetch(e.request) }))
+  e.respondWith(
+    fetch(e.request).then(function (r) {
+      return caches.open(CACHE).then(function (c) { c.put(e.request, r.clone()); return r })
+    }).catch(function () { return caches.match(e.request) })
+  )
 })

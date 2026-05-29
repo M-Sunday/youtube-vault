@@ -96,7 +96,7 @@ document.getElementById('newBookmarkBtn').addEventListener('click', () => {
   bookmarkDialog.classList.add('open')
   setTimeout(() => bookmarkUrlInput.focus(), 100)
 })
-document.getElementById('bookmarkBtn').addEventListener('click', () => {
+document.getElementById('bookmarkBtn')?.addEventListener('click', () => {
   bookmarkUrlInput.value = ''; bookmarkTitleInput.value = ''
   bookmarkDialog.classList.add('open')
   setTimeout(() => bookmarkUrlInput.focus(), 100)

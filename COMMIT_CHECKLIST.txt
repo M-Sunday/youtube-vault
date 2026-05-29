@@ -4,7 +4,8 @@
 ╚══════════════════════════════════════════════════════════════╝
 
 ─── 1. SERVICE WORKER ─────────────────────────────────────────
-☐ sw.js — bump CACHE version string (e.g. 'yt-vault-X.Y.Z')
+☐ sw.js — bump CACHE version string (e.g. 'vault-X.Y.Z')
+☐ sw.js — DO NOT include 'index.html' in URLS array (prevents SW from serving stale HTML on launch)
 ☐ sw.js — add ANY new file paths to URLS array
     (new JS files, new SVG icons in assets/icons/ui/, etc.)
 ☐ sw.js — if adding a new JS module, add it to URLS
@@ -90,3 +91,15 @@ Common PWA pitfalls:
   git push origin main
 
 ───────────────────────────────────────────────────────────────
+
+─── 9. ANDROID DEPLOY — SW CACHE STALE CONTENT ────────────────
+The SW caches index.html + all CSS/JS. When deploying to Android,
+the OLD SW serves cached index.html which loads OLD CSS. Fixes:
+  1. sw.js: Network-first fetch for ALL requests (cache is offline fallback)
+  2. sw.js: DO NOT include 'index.html' in URLS array
+  3. index.html: Add ?v=X.Y.Z cache-busting to all CSS link hrefs
+
+After deployment:
+  ☐ Force-close and reopen TWICE (first: new SW activates, second: fresh load)
+  ☐ Verify changes are visible
+  ☐ If still wrong → Settings → Apps → Vault → Storage → Clear cache

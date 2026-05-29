@@ -1,7 +1,7 @@
 {
   "name": "Vault — Creative OS for Chaotic Minds",
   "short_name": "Vault",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A creative operating system for chaotic minds. Save ideas, build islands, track what matters.",
   "start_url": "../index.html",
   "scope": "../",

@@ -23,10 +23,11 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 - **Calendar view** — Browse videos by publish date
 - **Search** — Filter sidebar items by title
 - **Pin items** — Pin important videos to the top
+- **The Void** — Raw idea capture with no judgment or structure. Floating idea nodes with stage colors (Void, Signal, Star System, Island, Active Creation). Connection lines between related ideas. Zoom controls for navigation. Add ideas from the top-bar or dedicated input.
 - **Offline mode** — Detects connection status, greys search bar when offline, shows persistent online indicator (green/yellow/red badge in top-bar)
 - **Slow connection detection** — Shows yellow indicator when `effectiveType` is 2g/3g
 - **Patch notes** — In-app changelog shown on version updates and in Settings
-- **Service worker** — Caches static assets for offline use; Update notification with Update/Later buttons (3-min reminder)
+- **Service worker** — Network-first strategy with offline fallback; CSS cache-busting via versioned query strings; Update notification with Update/Later buttons (3-min reminder)
 - **Debug inspector** — Ctrl+D to toggle element inspector (colored overlay, title label, dims, style badges). Ctrl+Shift+H for hierarchy sidebar panel. Click to lock and copy CSS selector. Network simulation available via Debug menu.
 
 ## Usage
@@ -116,6 +117,7 @@ src/
 │   ├── search.js        # YouTube link fetch, Direct Access dialog
 │   ├── extras.js        # Patch notes, keyboard shortcuts, debug inspector, SW update, online indicator
 │   ├── icons.js         # Local SVG icon loader
+│   ├── void-view.js     # The Void — idea node visualization, connections, zoom controls
 │   ├── onboarding.js    # First-time user onboarding flow
 │   └── app.js           # Bootstrap init sequence
 ├── assets/
@@ -125,7 +127,7 @@ src/
 │   │   ├── app-icon-*.svg
 │   │   ├── app-icon-splash.svg
 │   │   └── ui/          # 36 Lucide-style SVG icons (including download.svg)
-├── sw.js                # Service worker (cache-first strategy)
+├── sw.js                # Service worker (network-first, offline fallback)
 ```
 
 ## Offline behavior

@@ -1,5 +1,26 @@
 [
   {
+    "version": "2.0.1",
+    "date": "2026-05-29",
+    "title": "The Void: Renamed from Planet View, SW Network-First, Rounded Corners Restored",
+    "changes": [
+      "Renamed Planet View to The Void — fresh branding across all UI, JS, and CSS",
+      "Void zoom controls replaced redundant zoom buttons with clean zoom-in/zoom-out/reset",
+      "New Add-to-Void button in top-bar for quick idea capture from any view",
+      "Service worker now network-first for ALL requests — CSS/layout changes appear instantly without force-close dance",
+      "index.html no longer cached by service worker — ensures fresh load every launch",
+      "CSS cache-busting via versioned query strings on all stylesheet links",
+      "Switched from hard-coded class=hidden to style=display:none for toggleable elements — fixes JS visibility toggling",
+      "Removed !important from .hidden utility class — no more override conflicts",
+      "Restored all border-radius and border properties across the entire UI (sidebar, cards, dialogs, buttons, etc.)",
+      "Media-view (player area) deliberately kept border-radius:0 — seamless with main area, no border, inherits background",
+      "Note-view header icons no longer clip off-screen — added proper 10px padding to note-view container",
+      "Android safe-area padding extended to void-view-header and void-view-footer for notch-safe layouts",
+      "Removed duplicate media-view theme overrides (themes.css) — media-view now inherits main-area background cleanly",
+      "Added comprehensive Android deploy section to commit checklist (SW stale cache prevention)"
+    ]
+  },
+  {
     "version": "2.0.0",
     "date": "2026-05-29",
     "title": "Vault — Creative Operating System for Chaotic Minds",

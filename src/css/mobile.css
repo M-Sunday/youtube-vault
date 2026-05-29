@@ -69,4 +69,10 @@
   .grid-items { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .online-indicator .online-indicator-text { display: none; }
   .sidebar-footer { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+
+  .note-view { padding: 0; }
+  .note-view-header { margin: 8px 8px 0; padding: 6px 10px; }
+  .note-view-content { padding: 12px 12px; }
+  .note-view-todos { padding: 0 12px 8px; }
+  .note-view-footer { padding: 4px 12px 8px; }
 }

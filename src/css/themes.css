@@ -52,7 +52,7 @@ body.theme-black .ctx-item:hover { background: #3a3a3c; }
 body.theme-black .ctx-icon { color: #98989e; }
 body.theme-black .ctx-divider { background: #3a3a3c; }
 body.theme-black .tree-folder.drop-zone { background: #3a3a3c; border-color: #f5f5f7; }
-body.theme-black .media-view { background: #2c2c2e; border-color: #3a3a3c; }
+
 body.theme-black .menu-btn { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .menu-btn:hover { background: #3a3a3c; }
 body.theme-black .menu-btn.active { background: #3a3a3c; border-color: #48484a; }
@@ -236,7 +236,7 @@ body.theme-obsidian .ctx-item:hover { background: #2a2a30; }
 body.theme-obsidian .ctx-icon { color: #98989e; }
 body.theme-obsidian .ctx-divider { background: #2a2a30; }
 body.theme-obsidian .tree-folder.drop-zone { background: #2a2a30; border-color: #e8e8ec; }
-body.theme-obsidian .media-view { background: #1e1e24; border-color: #2a2a30; }
+
 body.theme-obsidian .menu-btn { border-color: #2a2a30; color: #8e8e9a; }
 body.theme-obsidian .menu-btn:hover { background: #2a2a30; }
 body.theme-obsidian .menu-btn.active { background: #2a2a30; border-color: #3a3a44; }
@@ -492,6 +492,7 @@ body.theme-anthropic .reset-sub { color:#7a7a7a; }
 body.compact .top-bar { padding: 4px 8px; }
 body.compact .top-bar-input input { padding: 4px 0; font-size: 12px; }
 body.compact .content { padding: 20px 12px; }
+body.compact .grid-view { padding: 12px; }
 
 /* ─── BLACK THEME SPLASH TEXT ────────────────────────── */
 body.theme-black #splashText { color: #a1a1a6; }
