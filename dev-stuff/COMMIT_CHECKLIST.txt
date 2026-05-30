@@ -1,0 +1,148 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║              VAULT — COMMIT CHECKLIST                           ║
+║  Read this BEFORE every commit to avoid regressions             ║
+║  Covers: Web (PWA), npm, GitHub Pages, Android (Capacitor)     ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 1. VERSION BUMP — ALL FILES MUST MATCH                           │
+│ Do NOT rely on just the commit message — bump the actual code.    │
+│ Every "X.Y.Z" below must be the SAME value:                      │
+├───────────────────────────────────────────────────────────────────┤
+│ ☐ package.json                   — "version": "X.Y.Z"            │
+│ ☐ package-lock.json              — top "version": "X.Y.Z"        │
+│ ☐ src/js/data.js                 — const APP_VERSION = 'X.Y.Z'   │
+│ ☐ src/sw.js                      — CACHE = 'vault-X.Y.Z'         │
+│ ☐ src/index.html                 — appVersionLabel + settingsVer │
+│ ☐ src/index.html                 — CSS ?v=X.Y.Z cache-busters    │
+│ ☐ src/assets/manifest.json       — "version": "X.Y.Z"            │
+│ ☐ src/assets/changelog.json      — add new X.Y.Z entry           │
+│                                                                   │
+│ LOCAL ONLY (gitignored, but UPDATE before APK build):             │
+│ ☐ android/app/build.gradle       — versionName "X.Y.Z"           │
+│ ☐ android/app/build.gradle       — versionCode +1                │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 2. npm DEPENDENCIES CHECK                                        │
+├───────────────────────────────────────────────────────────────────┤
+│ ☐ npm ls @capacitor/cli           — confirm it's installed       │
+│ ☐ npm ls @capacitor/http          — UNINSTALL if present! It's   │
+│     deprecated (v0.0.2) and breaks Gradle 8+. Capacitor 8 has    │
+│     HTTP built-in. Remove with: npm uninstall @capacitor/http    │
+│ ☐ npm outdated                    — check for outdated deps      │
+│ ☐ npm audit                       — check for vulnerabilities    │
+│                                                                   │
+│ ALWAYS run after pulling on a new machine:                        │
+│ ☐ npm install                     — regenerate node_modules      │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 3. SERVICE WORKER                                                │
+├───────────────────────────────────────────────────────────────────┤
+│ ☐ sw.js — bump CACHE version (must match APP_VERSION)            │
+│ ☐ sw.js — DO NOT include 'index.html' in URLS (prevents stale)   │
+│ ☐ sw.js — add new file paths to URLS (new JS, SVG icons, etc.)   │
+│ ☐ No version guards in extras.js (can cause SW deadlock)         │
+│                                                                   │
+│ AFTER GITHUB PUSH — if PWA doesn't update in browser:             │
+│   1. Hard reload: Ctrl+Shift+R (Mac: Cmd+Shift+R)                 │
+│   2. DevTools → Application → Service Workers → Unregister        │
+│   3. Edge is stubbornest — try InPrivate window if cached         │
+│   4. Clear site data as last resort                               │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 4. GITHUB PAGES — DEPLOYMENT                                     │
+├───────────────────────────────────────────────────────────────────┤
+│ The site at m-sunday.github.io/youtube-vault/src/index.html       │
+│ serves DIRECTLY from the main branch (no build/deploy action).    │
+│                                                                   │
+│ ☐ Commit and push to main                                         │
+│ ☐ Wait ~1-2 minutes for GitHub to update                          │
+│ ☐ Visit the URL in an incognito/private window to verify          │
+│ ☐ If showing old version: hard refresh or clear SW cache (see 3) │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 5. ANDROID / CAPACITOR — FULL DEPLOY SEQUENCE                    │
+├───────────────────────────────────────────────────────────────────┤
+│ Run these ON YOUR MAC (android/ is gitignored, not on this PC):   │
+│                                                                   │
+│ Step 1 — Setup (first time on a machine or after fresh clone):    │
+│   ☐ npm install                     # install all deps            │
+│   ☐ npx cap add android             # ONLY if android/ missing    │
+│       (⚠ This is a ONE-TIME command — rerunning it overwrites     │
+│        your Android project. Skip if android/ already exists.)    │
+│                                                                   │
+│ Step 2 — Before each deploy:                                      │
+│   ☐ git pull                        # get latest code             │
+│   ☐ npm install                     # ensure deps up to date      │
+│   ☐ npx cap sync android            # copy web assets → android/  │
+│   ☐ Verify namespace in android/app/build.gradle:                 │
+│       → android { namespace "com.vault.app" } (required for AGP8+)|    │
+│   ☐ Bump versionCode +1 in android/app/build.gradle                │
+│   ☐ Set versionName "X.Y.Z" in android/app/build.gradle            │
+│                                                                   │
+│ Step 3 — Deploy:                                                  │
+│   ☐ Connect phone via USB (USB debugging enabled)                 │
+│   ☐ npx cap run android             # builds APK and deploys      │
+│                                                                   │
+│ Common Android build failures:                                    │
+│   - "Namespace not specified" → add namespace block (see above)   │
+│   - "@capacitor/http" error → npm uninstall @capacitor/http       │
+│   - "flatDir" warning → harmless, ignore it                       │
+│   - AGP/Gradle version mismatch → check versions in build.gradle  │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 6. CSS ANIMATION DEADLOCK                                        │
+├───────────────────────────────────────────────────────────────────┤
+│ If you add a CSS class with opacity:0 that controls visibility,   │
+│ make sure there is ALWAYS a path to add the .visible class.       │
+│                                                                   │
+│ ☐ app.js: startApp() calls startGridAnim() after renderGridView() │
+│ ☐ onboarding.js: calls __splashFade() (NOT raw DOM fade)          │
+│ ☐ Inline splash script defines __splashFade() on window           │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 7. FUNCTION OVERRIDE CHECK                                       │
+├───────────────────────────────────────────────────────────────────┤
+│ JS load order (index.html):                                       │
+│ data → views → calendar → settings → sidebar → context-menu       │
+│ → notes → dialogs → grid → card → download → search → icons       │
+│ → extras → onboarding → app                                        │
+│                                                                   │
+│ ☐ No naming collisions between files                              │
+│ ☐ Overridden functions accept params from all call sites          │
+│                                                                   │
+│ Known: saveUserName() in data.js + settings.js. settings.js wins. │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 8. SVG ICONS                                                     │
+├───────────────────────────────────────────────────────────────────┤
+│ ☐ New SVG → src/assets/icons/ui/{name}.svg                        │
+│ ☐ Referenced via data-lucide="{name}"                             │
+│ ☐ path added to sw.js URLS (for offline support)                  │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ 9. PRE-COMMIT REVIEW                                             │
+├───────────────────────────────────────────────────────────────────┤
+│ ☐ git status                      # review changed files          │
+│ ☐ git diff --stat                 # see file overview             │
+│ ☐ git diff                        # review actual changes         │
+│ ☐ git add -A && git commit -m "title" -m "body"                  │
+│ ☐ git push                        # pushes to main = live site    │
+│ ☐ Verify on github.io after push                                  │
+│ ☐ If Android: switch to Mac → pull → deploy (section 5)          │
+└───────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────┐
+│ REMINDER: gitignored files (do NOT try to commit these):           │
+│   android/          — generated per-machine by Capacitor           │
+│   node_modules/     — regenerated via npm install                  │
+│   dev.pictures/     — local dev screenshots                        │
+└───────────────────────────────────────────────────────────────────┘

@@ -43,6 +43,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
+  outline: none;
 }
 .wb-btn:hover {
   background: #e8e8ed;

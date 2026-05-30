@@ -18,30 +18,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-    body.native-android { padding-top: 0 !important; }
-      body.native-android .main-area { padding-top: max(30px, env(safe-area-inset-top, 0px)) !important; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important; background: #f5f5f7; }
-    body.native-android.theme-black .main-area { background: #1c1c1e; }
-    body.native-android .sidebar { padding-top: 40px !important; }
-
-
+        body.native-android { padding-top: 0 !important; }
+        body.native-android .main-area {
+            padding-top: max(30px, env(safe-area-inset-top, 0px)) !important;
+            padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
+            background: #f5f5f7;
+        }
+        body.native-android.theme-black .main-area { background: #1c1c1e; }
+        body.native-android .sidebar { padding-top: 40px !important; }
     </style>
 </head>
 <body>
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-header-left">
-            </div>
-            <div class="sidebar-header-right">
-                <button class="sidebar-icon-btn" id="settingsBtn">
-                    <i data-lucide="settings" class="sidebar-icon"></i>
-                </button>
-            </div>
-        </div>
         <div class="sidebar-search">
             <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search files..." spellcheck="false" />
+            <input type="text" id="searchInput" placeholder="Search files..." spellcheck="false">
         </div>
         <div class="sidebar-tree" id="sidebarTree"></div>
         <div class="sidebar-footer">
@@ -53,10 +46,18 @@
                 <i data-lucide="bookmark" class="footer-icon"></i>
                 Add bookmark
             </button>
-            <button class="sidebar-footer-btn" id="newNoteBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="footer-icon lucide-square-pen"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
-                New note
-            </button>
+            <div class="sidebar-footer-row">
+                <button class="sidebar-footer-btn" id="newNoteBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="footer-icon lucide-square-pen">
+                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                    </svg>
+                    New note
+                </button>
+                <button class="sidebar-icon-btn" id="settingsBtn">
+                    <i data-lucide="settings" class="sidebar-icon"></i>
+                </button>
+            </div>
         </div>
     </div>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -67,14 +68,11 @@
             <button class="menu-btn" id="menuBtn">
                 <i data-lucide="panel-left" class="menu-btn-icon"></i>
             </button>
-
-
             <button class="menu-btn mr-6" id="gridBtn">
                 <i data-lucide="layout-grid" class="icon-lg"></i>
             </button>
-            <div class="online-indicator badge" id="onlineIndicator"><span class="dot"></span><span class="online-indicator-text">Online</span></div>
             <div class="top-bar-input">
-                <input type="text" id="ytInput" placeholder="Paste a link" spellcheck="false" />
+                <input type="text" id="ytInput" placeholder="Paste a link" spellcheck="false">
                 <button id="ytBtn">
                     <i data-lucide="arrow-right"></i>
                 </button>
@@ -82,66 +80,83 @@
         </div>
 
         <div class="media-view">
-        <div class="content">
-            <div class="container">
-                <div class="card" id="videoCard">
-                    <div class="image-wrap" id="imageWrap">
-                        <div class="badge" id="durationBadge">–</div>
-                        <img id="thumbnail" src="" alt="Video thumbnail">
+            <div class="content">
+                <div class="container">
+                    <div class="card" id="videoCard">
+                        <div class="image-wrap" id="imageWrap">
+                            <div class="badge" id="durationBadge">–</div>
+                            <img id="thumbnail" src="" alt="Video thumbnail">
+                        </div>
+                        <div class="card-body">
+                            <h1 id="videoTitle">Paste a video link above</h1>
+                            <p class="subtitle" id="channelName"></p>
+                        </div>
+                        <div class="card-add-row" id="cardAddRow">
+                            <button class="card-add-btn" id="cardAddBtn">
+                                <i data-lucide="plus" class="card-add-icon"></i> Add video
+                            </button>
+                            <button class="card-add-btn" id="copyLinkBtn" style="display:none">
+                                <i data-lucide="link" class="card-add-icon"></i> Copy link
+                            </button>
+                        </div>
+                        <div class="calendar" id="calendar"></div>
                     </div>
-                    <div class="card-body">
-                        <h1 id="videoTitle">Paste a video link above</h1>
-                        <p class="subtitle" id="channelName"></p>
-                    </div>
-                    <div class="card-add-row" id="cardAddRow">
-                        <button class="card-add-btn" id="cardAddBtn"><i data-lucide="plus" class="card-add-icon"></i> Add video</button>
-                        <button class="card-add-btn" id="copyLinkBtn" style="display:none"><i data-lucide="link" class="card-add-icon"></i> Copy link</button>
-                    </div>
-                    <div class="calendar" id="calendar"></div>
                 </div>
             </div>
-        </div>
-        <div class="search-landing" id="searchLanding" style="display:none">
-            <div class="search-landing-content">
-                <h2 class="search-landing-title" id="searchLandingTitle">What do you want to search?</h2>
-                <div class="search-landing-divider"></div>
-                <div class="search-landing-history" id="searchLandingHistory"></div>
-            </div>
-        </div>
-        <div class="grid-view" id="gridView"></div>
-        <div class="batch-bar" id="batchBar" style="display:none">
-            <span class="batch-count" id="batchCount">0 selected</span>
-            <div class="batch-actions">
-                <button class="batch-btn" id="batchDelete"><i data-lucide="trash-2" class="icon-sm"></i> Delete</button>
-                <button class="batch-btn" id="batchMove"><i data-lucide="folder" class="icon-sm"></i> Move</button>
-                <button class="batch-btn" id="batchPin"><i data-lucide="pin" class="icon-sm"></i> Pin</button>
-                <button class="batch-btn" id="batchBlur"><i data-lucide="eye-off" class="icon-sm"></i> Blur</button>
-            </div>
-        </div>
-        <div class="batch-move-dropdown" id="batchMoveDropdown" style="display:none"></div>
-        <div class="note-view" id="noteView" style="display:none">
-            <div class="note-view-header">
-                <input class="note-view-title" id="noteViewTitle" placeholder="Note title" spellcheck="false" />
-                <div class="note-view-actions">
-                    <button class="note-view-btn" id="noteTodoBtn" title="Add todo"><i data-lucide="list-checks" class="icon-md"></i></button>
-                    <button class="note-view-btn" id="noteUndoBtn"><i data-lucide="undo-2" class="icon-md"></i></button>
-                    <button class="note-view-btn" id="noteRedoBtn"><i data-lucide="redo-2" class="icon-md"></i></button>
-                    <button class="note-view-btn" id="noteDeleteBtn"><i data-lucide="trash-2" class="icon-md" style="color:#ff453a"></i></button>
-                    <button class="note-view-btn" id="noteCloseBtn"><i data-lucide="x" class="icon-md"></i></button>
+            <div class="search-landing" id="searchLanding" style="display:none">
+                <div class="search-landing-content">
+                    <h2 class="search-landing-title" id="searchLandingTitle">What do you want to search?</h2>
+                    <div class="search-landing-divider"></div>
+                    <div class="search-landing-history" id="searchLandingHistory"></div>
                 </div>
             </div>
-            <div class="note-view-content" id="noteViewContent" contenteditable="true" spellcheck="false"></div>
-            <div class="note-view-todos" id="noteViewTodos"></div>
-            <div class="note-view-footer" id="noteViewFooter"></div>
-        </div>
+            <div class="grid-view" id="gridView"></div>
+            <div class="batch-bar" id="batchBar" style="display:none">
+                <span class="batch-count" id="batchCount">0 selected</span>
+                <div class="batch-actions">
+                    <button class="batch-btn" id="batchDelete"><i data-lucide="trash-2" class="icon-sm"></i> Delete</button>
+                    <button class="batch-btn" id="batchMove"><i data-lucide="folder" class="icon-sm"></i> Move</button>
+                    <button class="batch-btn" id="batchPin"><i data-lucide="pin" class="icon-sm"></i> Pin</button>
+                    <button class="batch-btn" id="batchBlur"><i data-lucide="eye-off" class="icon-sm"></i> Blur</button>
+                </div>
+            </div>
+            <div class="batch-move-dropdown" id="batchMoveDropdown" style="display:none"></div>
+            <div class="note-view" id="noteView" style="display:none">
+                <div class="note-view-header">
+                    <input class="note-view-title" id="noteViewTitle" placeholder="Note title" spellcheck="false">
+                    <div class="note-view-actions">
+                        <button class="note-view-btn" id="noteTodoBtn" title="Add todo">
+                            <i data-lucide="list-checks" class="icon-md"></i>
+                        </button>
+                        <button class="note-view-btn" id="noteUndoBtn">
+                            <i data-lucide="undo-2" class="icon-md"></i>
+                        </button>
+                        <button class="note-view-btn" id="noteRedoBtn">
+                            <i data-lucide="redo-2" class="icon-md"></i>
+                        </button>
+                        <button class="note-view-btn" id="noteDeleteBtn">
+                            <i data-lucide="trash-2" class="icon-md" style="color:#ff453a"></i>
+                        </button>
+                        <button class="note-view-btn" id="noteCloseBtn">
+                            <i data-lucide="x" class="icon-md"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="note-view-content" id="noteViewContent" contenteditable="true" spellcheck="false"></div>
+                <div class="note-view-todos" id="noteViewTodos"></div>
+                <div class="note-view-footer" id="noteViewFooter"></div>
+            </div>
         </div>
     </div>
 
     <!-- Folder dialog -->
     <div class="folder-dialog-overlay" id="folderDialog">
         <div class="folder-dialog">
-            <div class="folder-dialog-header"><h3>New Folder</h3><p class="folder-dialog-desc">Create a folder to organize your items.</p></div>
-            <input type="text" id="folderNameInput" placeholder="Folder name" spellcheck="false" />
+            <div class="folder-dialog-header">
+                <h3>New Folder</h3>
+                <p class="folder-dialog-desc">Create a folder to organize your items.</p>
+            </div>
+            <input type="text" id="folderNameInput" placeholder="Folder name" spellcheck="false">
             <div class="folder-colors">
                 <div class="folder-color active" data-color="#ff453a" style="background:#ff453a"></div>
                 <div class="folder-color" data-color="#ff9f0a" style="background:#ff9f0a"></div>
@@ -159,9 +174,12 @@
     <!-- Bookmark dialog -->
     <div class="folder-dialog-overlay" id="bookmarkDialog">
         <div class="folder-dialog">
-            <div class="folder-dialog-header"><h3>Add Bookmark</h3><p class="folder-dialog-desc">Save a link for quick access later.</p></div>
-            <input type="text" id="bookmarkUrlInput" placeholder="https://..." spellcheck="false" />
-            <input type="text" id="bookmarkTitleInput" placeholder="Title (optional)" spellcheck="false" />
+            <div class="folder-dialog-header">
+                <h3>Add Bookmark</h3>
+                <p class="folder-dialog-desc">Save a link for quick access later.</p>
+            </div>
+            <input type="text" id="bookmarkUrlInput" placeholder="https://..." spellcheck="false">
+            <input type="text" id="bookmarkTitleInput" placeholder="Title (optional)" spellcheck="false">
             <div class="folder-dialog-actions">
                 <button class="dialog-btn cancel" id="bookmarkDialogCancel">Cancel</button>
                 <button class="dialog-btn confirm" id="bookmarkDialogConfirm">Add Bookmark</button>
@@ -172,9 +190,12 @@
     <!-- Direct Access dialog -->
     <div class="folder-dialog-overlay" id="daDialog">
         <div class="folder-dialog">
-            <div class="folder-dialog-header"><h3>Add Direct Access</h3><p class="folder-dialog-desc">Create a quick-launch shortcut.</p></div>
+            <div class="folder-dialog-header">
+                <h3>Add Direct Access</h3>
+                <p class="folder-dialog-desc">Create a quick-launch shortcut.</p>
+            </div>
             <p class="da-url-display" id="daUrlDisplay"></p>
-            <input type="text" id="daTitleInput" placeholder="Title (optional)" spellcheck="false" />
+            <input type="text" id="daTitleInput" placeholder="Title (optional)" spellcheck="false">
             <div class="folder-dialog-actions">
                 <button class="dialog-btn cancel" id="daDialogCancel">Cancel</button>
                 <button class="dialog-btn confirm" id="daDialogConfirm">Add Shortcut</button>
@@ -185,8 +206,11 @@
     <!-- Note dialog -->
     <div class="folder-dialog-overlay" id="noteDialog">
         <div class="folder-dialog note-dialog">
-            <div class="folder-dialog-header"><h3>New Note</h3><p class="folder-dialog-desc">Capture a quick thought.</p></div>
-            <input type="text" id="noteTitleInput" placeholder="Title" spellcheck="false" />
+            <div class="folder-dialog-header">
+                <h3>New Note</h3>
+                <p class="folder-dialog-desc">Capture a quick thought.</p>
+            </div>
+            <input type="text" id="noteTitleInput" placeholder="Title" spellcheck="false">
             <textarea id="noteContentInput" placeholder="Write something..." spellcheck="false"></textarea>
             <div class="folder-dialog-actions">
                 <button class="dialog-btn cancel" id="noteDialogCancel">Cancel</button>
@@ -214,7 +238,13 @@
     </div>
 
     <!-- Update toast -->
-    <div class="update-toast" id="updateToast"><span id="updateToastText">Updating app…</span><span class="update-toast-actions"><button id="updateToastBtn">Update</button><button id="updateLaterBtn">Later</button></span></div>
+    <div class="update-toast" id="updateToast">
+        <span id="updateToastText">Updating app…</span>
+        <span class="update-toast-actions">
+            <button id="updateToastBtn">Update</button>
+            <button id="updateLaterBtn">Later</button>
+        </span>
+    </div>
 
     <!-- Settings -->
     <div class="settings-overlay" id="settingsOverlay">
@@ -222,7 +252,13 @@
             <div class="settings-sidebar">
                 <div class="settings-sidebar-header">Settings</div>
                 <div class="settings-categories">
-                    <div class="settings-cat active" data-cat="user"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> About User</div>
+                    <div class="settings-cat active" data-cat="user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        About User
+                    </div>
                     <div class="settings-cat" data-cat="theme"><i data-lucide="eye" class="icon-md flex-shrink-0"></i> Theme</div>
                     <div class="settings-cat" data-cat="basic"><i data-lucide="file-text" class="icon-md flex-shrink-0"></i> Basic info</div>
                     <div class="settings-cat" data-cat="toolbar"><i data-lucide="edit-3" class="icon-md flex-shrink-0"></i> Toolbar</div>
@@ -237,13 +273,18 @@
             </div>
             <div class="settings-content" id="settingsContent">
                 <div class="settings-pane" id="pane-user">
-                    <div class="settings-pane-header"><h2>About User</h2><p class="settings-pane-desc">Your account information.</p></div>
+                    <div class="settings-pane-header">
+                        <h2>About User</h2>
+                        <p class="settings-pane-desc">Your account information.</p>
+                    </div>
                     <div class="settings-field-row mt-16">
                         <label class="settings-field-label">Name</label>
                         <div class="settings-user-edit-wrap">
                             <p class="settings-user-value" id="settingsUserNameDisplay">—</p>
-                            <button class="settings-user-edit-btn" id="settingsUserNameEditBtn"><i data-lucide="edit-3" class="icon-sm"></i></button>
-                            <input type="text" class="settings-user-edit-input" id="settingsUserNameEditInput" style="display:none" placeholder="Enter your name" maxlength="30" />
+                            <button class="settings-user-edit-btn" id="settingsUserNameEditBtn">
+                                <i data-lucide="edit-3" class="icon-sm"></i>
+                            </button>
+                            <input type="text" class="settings-user-edit-input" id="settingsUserNameEditInput" style="display:none" placeholder="Enter your name" maxlength="30">
                         </div>
                     </div>
                     <div class="settings-field-row mt-12">
@@ -260,136 +301,197 @@
                     </div>
                 </div>
                 <div class="settings-pane" id="pane-theme" style="display:none">
-                    <div class="settings-pane-header"><h2>Theme</h2><p class="settings-pane-desc">Choose your preferred appearance.</p></div>
-                    <div class="theme-options">
-                        <div class="theme-option" data-theme="white"><div class="theme-preview theme-white"></div><span>White</span></div>
-                        <div class="theme-option" data-theme="black"><div class="theme-preview theme-black"></div><span>Black</span></div>
+                    <div class="settings-pane-header">
+                        <h2>Theme</h2>
+                        <p class="settings-pane-desc">Choose your preferred appearance.</p>
                     </div>
-                    <label class="settings-checkbox"><input type="checkbox" id="systemTheme" /><span class="settings-checkbox-mark"></span><span>Have system theme</span></label>
+                    <div class="theme-options">
+                        <div class="theme-option" data-theme="white">
+                            <div class="theme-preview theme-white"></div>
+                            <span>White</span>
+                        </div>
+                        <div class="theme-option" data-theme="black">
+                            <div class="theme-preview theme-black"></div>
+                            <span>Black</span>
+                        </div>
+                    </div>
+                    <label class="settings-checkbox">
+                        <input type="checkbox" id="systemTheme">
+                        <span class="settings-checkbox-mark"></span>
+                        <span>Have system theme</span>
+                    </label>
                 </div>
                 <div class="settings-pane" id="pane-basic" style="display:none">
-                    <div class="settings-pane-header"><h2>Basic info</h2><p class="settings-pane-desc">About this app.</p></div>
+                    <div class="settings-pane-header">
+                        <h2>Basic info</h2>
+                        <p class="settings-pane-desc">About this app.</p>
+                    </div>
                     <div class="settings-field-row mt-16">
                         <label class="settings-field-label">Your name</label>
-                        <input type="text" id="settingsUserName" class="settings-text-input" placeholder="Enter your name" maxlength="30" />
+                        <input type="text" id="settingsUserName" class="settings-text-input" placeholder="Enter your name" maxlength="30">
                     </div>
                     <div class="settings-footer-row flex flex-col gap-6 mt-20">
-                        <span id="settingsBasicVersion">Version 3.0.1</span><span>Language: English</span><span>Account: Not logged in</span><span>Commercial licence</span>
+                        <span id="settingsBasicVersion">Version 3.0.1</span>
+                        <span>Language: English</span>
+                        <span>Account: Not logged in</span>
+                        <span>Commercial licence</span>
                     </div>
                 </div>
                 <div class="settings-pane" id="pane-toolbar" style="display:none">
-                    <div class="settings-pane-header"><h2>Toolbar</h2><p class="settings-pane-desc">Customize your toolbar.</p></div>
+                    <div class="settings-pane-header">
+                        <h2>Toolbar</h2>
+                        <p class="settings-pane-desc">Customize your toolbar.</p>
+                    </div>
                     <div class="settings-plugin-list mt-20">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Show sidebar button</span><div class="settings-toggle on"></div></div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Show YouTube input</span><div class="settings-toggle on"></div></div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Compact mode</span><div class="settings-toggle"></div></div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Show sidebar button</span>
+                            <div class="settings-toggle on"></div>
+                        </div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Show YouTube input</span>
+                            <div class="settings-toggle on"></div>
+                        </div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Compact mode</span>
+                            <div class="settings-toggle"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="settings-pane" id="pane-files" style="display:none">
-                    <div class="settings-pane-header"><h2>Files and links</h2><p class="settings-pane-desc">How files and links are handled.</p></div>
+                    <div class="settings-pane-header">
+                        <h2>Files and links</h2>
+                        <p class="settings-pane-desc">How files and links are handled.</p>
+                    </div>
                     <div class="settings-plugin-list mt-20">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Automatically update links</span><div class="settings-toggle on"></div></div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Confirm file deletion</span><div class="settings-toggle on"></div></div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Detect all file extensions</span><div class="settings-toggle"></div></div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Automatically update links</span>
+                            <div class="settings-toggle on"></div>
+                        </div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Confirm file deletion</span>
+                            <div class="settings-toggle on"></div>
+                        </div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Detect all file extensions</span>
+                            <div class="settings-toggle"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="settings-pane" id="pane-history" style="display:none">
-                    <div class="settings-pane-header"><h2>Link history</h2><p class="settings-pane-desc">Recently opened YouTube links.</p></div>
-                    <div class="settings-plugin-list mt-20">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Save link history</span><div class="settings-toggle on"></div></div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Clear on exit</span><div class="settings-toggle"></div></div>
+                    <div class="settings-pane-header">
+                        <h2>Link history</h2>
+                        <p class="settings-pane-desc">Recently opened YouTube links.</p>
                     </div>
-                    <div class="settings-footer-info"><button class="settings-clear-btn" id="settingsClearHistoryBtn">Clear history</button></div>
+                    <div class="settings-plugin-list mt-20">
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Save link history</span>
+                            <div class="settings-toggle on"></div>
+                        </div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Clear on exit</span>
+                            <div class="settings-toggle"></div>
+                        </div>
+                    </div>
+                    <div class="settings-footer-info">
+                        <button class="settings-clear-btn" id="settingsClearHistoryBtn">Clear history</button>
+                    </div>
                     <div class="settings-history-list" id="settingsHistoryList"></div>
                 </div>
                 <div class="settings-pane" id="pane-nsfw" style="display:none">
-                    <div class="settings-pane-header"><h2>NSFW</h2><p class="settings-pane-desc">Mark sites as NSFW to blur their thumbnails.</p></div>
+                    <div class="settings-pane-header">
+                        <h2>NSFW</h2>
+                        <p class="settings-pane-desc">Mark sites as NSFW to blur their thumbnails.</p>
+                    </div>
                     <div class="settings-plugin-list mt-20">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Blur all NSFW</span><div class="settings-toggle" id="blurAllNSFWToggle"></div></div>
+                        <div class="settings-plugin">
+                            <span class="settings-plugin-name">Blur all NSFW</span>
+                            <div class="settings-toggle" id="blurAllNSFWToggle"></div>
+                        </div>
                     </div>
                     <div class="nsfw-section mt-16">
                         <p class="nsfw-label">Keywords to blur (title or URL contains any of these):</p>
                         <div class="nsfw-chips-wrap" id="nsfwChips"></div>
                         <div class="nsfw-add-row">
-                            <input id="nsfwAddInput" type="text" placeholder="Add keyword..." class="nsfw-input" />
+                            <input id="nsfwAddInput" type="text" placeholder="Add keyword..." class="nsfw-input">
                             <button id="nsfwAddBtn" class="nsfw-add-btn">Add</button>
                         </div>
                     </div>
                 </div>
-                    <div class="settings-pane" id="pane-patchnotes" style="display:none">
-                    <div class="settings-pane-header"><h2>Patch notes</h2><p class="settings-pane-desc">Changelog history for this app.</p></div>
+                <div class="settings-pane" id="pane-patchnotes" style="display:none">
+                    <div class="settings-pane-header">
+                        <h2>Patch notes</h2>
+                        <p class="settings-pane-desc">Changelog history for this app.</p>
+                    </div>
                     <div id="patchNotesList" class="mt-20"></div>
-                </div>
                 </div>
             </div>
         </div>
     </div>
 
-
     <!-- Challenge dialog -->
     <div class="folder-dialog-overlay" id="challengeDialog">
-      <div class="folder-dialog dialog-scroll">
-        <h3>New Challenge</h3>
-        <input type="text" id="challengeNameInput" placeholder="Challenge name" spellcheck="false" />
-        <textarea id="challengeDescInput" placeholder="Description..." class="dialog-textarea" spellcheck="false"></textarea>
-        <div class="milestone-header">GOALS / MILESTONES</div>
-        <div id="challengeTodoList"></div>
-        <button id="challengeAddTodoBtn" class="add-goal-btn">+ Add goal</button>
-        <div class="folder-dialog-actions compact">
-          <button class="dialog-btn cancel" id="challengeDialogCancel">Cancel</button>
-          <button class="dialog-btn confirm" id="challengeDialogConfirm">Start Challenge</button>
+        <div class="folder-dialog dialog-scroll">
+            <h3>New Challenge</h3>
+            <input type="text" id="challengeNameInput" placeholder="Challenge name" spellcheck="false">
+            <textarea id="challengeDescInput" placeholder="Description..." class="dialog-textarea" spellcheck="false"></textarea>
+            <div class="milestone-header">GOALS / MILESTONES</div>
+            <div id="challengeTodoList"></div>
+            <button id="challengeAddTodoBtn" class="add-goal-btn">+ Add goal</button>
+            <div class="folder-dialog-actions compact">
+                <button class="dialog-btn cancel" id="challengeDialogCancel">Cancel</button>
+                <button class="dialog-btn confirm" id="challengeDialogConfirm">Start Challenge</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Challenge Edit dialog -->
     <div class="folder-dialog-overlay" id="challengeEditDialog">
-      <div class="folder-dialog dialog-scroll">
-        <h3 id="challengeEditTitle">Edit Challenge</h3>
-        <input type="text" id="challengeEditNameInput" placeholder="Challenge name" spellcheck="false" />
-        <textarea id="challengeEditDescInput" placeholder="Description..." class="dialog-textarea" spellcheck="false"></textarea>
-        <div class="milestone-header">GOALS / MILESTONES</div>
-        <div id="challengeEditTodoList"></div>
-        <button id="challengeEditAddTodoBtn" class="add-goal-btn">+ Add goal</button>
-        <div class="dialog-action-row">
-          <div class="dialog-action-group">
-            <button class="dialog-btn danger" id="challengeEditDeleteBtn">Delete</button>
-          </div>
-          <div class="dialog-action-group">
-            <button class="dialog-btn cancel" id="challengeEditCancel">Cancel</button>
-            <button class="dialog-btn confirm" id="challengeEditSaveBtn">Save</button>
-          </div>
+        <div class="folder-dialog dialog-scroll">
+            <h3 id="challengeEditTitle">Edit Challenge</h3>
+            <input type="text" id="challengeEditNameInput" placeholder="Challenge name" spellcheck="false">
+            <textarea id="challengeEditDescInput" placeholder="Description..." class="dialog-textarea" spellcheck="false"></textarea>
+            <div class="milestone-header">GOALS / MILESTONES</div>
+            <div id="challengeEditTodoList"></div>
+            <button id="challengeEditAddTodoBtn" class="add-goal-btn">+ Add goal</button>
+            <div class="dialog-action-row">
+                <div class="dialog-action-group">
+                    <button class="dialog-btn danger" id="challengeEditDeleteBtn">Delete</button>
+                </div>
+                <div class="dialog-action-group">
+                    <button class="dialog-btn cancel" id="challengeEditCancel">Cancel</button>
+                    <button class="dialog-btn confirm" id="challengeEditSaveBtn">Save</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Achievements dialog -->
     <div class="folder-dialog-overlay" id="achievementDialog">
-      <div class="folder-dialog dialog-scroll-sm">
-        <h3>Achievements</h3>
-        <div id="achievementList" class="mt-12"></div>
-        <div class="folder-dialog-actions mt-12">
-          <button class="dialog-btn cancel" id="achievementDialogClose">Close</button>
+        <div class="folder-dialog dialog-scroll-sm">
+            <h3>Achievements</h3>
+            <div id="achievementList" class="mt-12"></div>
+            <div class="folder-dialog-actions mt-12">
+                <button class="dialog-btn cancel" id="achievementDialogClose">Close</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Goal dialog -->
     <div class="folder-dialog-overlay" id="goalDialog">
-      <div class="folder-dialog">
-        <h3>New Goal</h3>
-        <input type="text" id="goalNameInput" placeholder="What do you want to achieve?" spellcheck="false" />
-        <textarea id="goalDescInput" placeholder="Why does this matter to you?" class="dialog-textarea-lg" spellcheck="false"></textarea>
-        <div class="flex gap-6 mt-12 items-center">
-          <label class="goal-label">Target:</label>
-          <input type="number" id="goalTargetInput" value="5" min="1" class="goal-input" />
-          <label class="goal-label">per week</label>
+        <div class="folder-dialog">
+            <h3>New Goal</h3>
+            <input type="text" id="goalNameInput" placeholder="What do you want to achieve?" spellcheck="false">
+            <textarea id="goalDescInput" placeholder="Why does this matter to you?" class="dialog-textarea-lg" spellcheck="false"></textarea>
+            <div class="flex gap-6 mt-12 items-center">
+                <label class="goal-label">Target:</label>
+                <input type="number" id="goalTargetInput" value="5" min="1" class="goal-input">
+                <label class="goal-label">per week</label>
+            </div>
+            <div class="folder-dialog-actions mt-12">
+                <button class="dialog-btn cancel" id="goalDialogCancel">Cancel</button>
+                <button class="dialog-btn confirm" id="goalDialogConfirm">Set Goal</button>
+            </div>
         </div>
-        <div class="folder-dialog-actions mt-12">
-          <button class="dialog-btn cancel" id="goalDialogCancel">Cancel</button>
-          <button class="dialog-btn confirm" id="goalDialogConfirm">Set Goal</button>
-        </div>
-      </div>
     </div>
 
     <!-- Update dialog -->
@@ -397,7 +499,9 @@
         <div class="update-modal">
             <div class="update-modal-header">
                 <h2>What's New</h2>
-                <button class="update-close-btn" id="updateCloseBtn"><i data-lucide="x" class="icon-lg"></i></button>
+                <button class="update-close-btn" id="updateCloseBtn">
+                    <i data-lucide="x" class="icon-lg"></i>
+                </button>
             </div>
             <div class="update-modal-body" id="updateBody"></div>
         </div>
@@ -410,7 +514,9 @@
                 <h2>Reset Account</h2>
             </div>
             <div class="update-modal-body">
-                <p class="reset-warning">This will permanently delete <strong>all your data</strong> including videos, bookmarks, notes, settings, and user name. Your browser cookies (YouTube login, etc.) will also be cleared within this app.</p>
+                <p class="reset-warning">
+                    This will permanently delete <strong>all your data</strong> including videos, bookmarks, notes, settings, and user name. Your browser cookies (YouTube login, etc.) will also be cleared within this app.
+                </p>
                 <p class="reset-sub">This action cannot be undone.</p>
                 <div class="reset-actions">
                     <button class="dialog-btn cancel" id="resetCancel">Cancel</button>
@@ -423,7 +529,7 @@
     <!-- Splash screen -->
     <div id="splash">
         <div class="splash-content">
-            <img id="splashIcon" src="assets/icons/app-icon-splash.svg" width="94" height="94" alt="Vault" />
+            <img id="splashIcon" src="assets/icons/app-icon-splash.svg" width="94" height="94" alt="Vault">
             <p id="splashText">Checking for updates...</p>
 
             <!-- Step 0 (first-time user) inside splash -->
@@ -440,7 +546,7 @@
         <div class="splash-content">
             <div id="onbStep1" class="onb-step onb-hidden">
                 <p class="onb-label">What is your name?</p>
-                <input type="text" id="onbNameInput" class="onb-input" placeholder="Your name" maxlength="30" />
+                <input type="text" id="onbNameInput" class="onb-input" placeholder="Your name" maxlength="30">
                 <button class="onb-btn onb-hidden" id="onbNext1">Next →</button>
             </div>
             <div id="onbStep2" class="onb-step onb-hidden">
@@ -455,52 +561,67 @@
     </div>
 
     <script>
-    ;(function(){
-      var splash = document.getElementById('splash')
-      var splashText = document.getElementById('splashText')
-      if (!splash) return
-      var faded = false
-      var icon = splash.querySelector('.splash-content svg, .splash-content img')
-      if (icon) {
-        if (!navigator.onLine) { icon.style.filter = 'grayscale(1)'; icon.style.opacity = '0.5' }
-        icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
-        function randomSpin() {
-          if (faded) return
-          icon.style.transform = 'rotate(' + (360 * (Math.floor(Math.random() * 3) + 1)) + 'deg)'
-          setTimeout(function(){ icon.style.transition = 'none'; icon.style.transform = 'rotate(0deg)'; setTimeout(function(){ icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'; randomSpin() }, 50) }, 800)
-        }
-        setTimeout(randomSpin, 2000)
-      }
-      var isFirstTime = !localStorage.getItem('ytUserName')
-      if (!navigator.onLine) { splash.classList.add('offline'); splashText.textContent = "You're offline" }
-      if (isFirstTime) {
-        splash.classList.add('onboarding')
-        splashText.style.display = 'none'
-        document.getElementById('onbStep0').classList.remove('onb-hidden')
-      } else {
-        if (navigator.onLine) {
-          setTimeout(function(){ splashText.textContent = 'Up to date' }, 2000)
-          setTimeout(function(){ splashText.textContent = 'Welcome, ' + localStorage.getItem('ytUserName') }, 3400)
-        }
-        function fadeOut() {
-          if (faded) return; faded = true
-          splash.classList.add('fade')
-          setTimeout(function(){
-            splash.style.display = 'none'
-            if (window.startGridAnim) window.startGridAnim()
-          }, 500)
-        }
-        setTimeout(fadeOut, navigator.onLine ? 4600 : 2000)
-      }
-      window.__splashFade = function() {
-        if (faded) return; faded = true
-        splash.classList.add('fade')
-        setTimeout(function(){
-          splash.style.display = 'none'
-          if (window.startGridAnim) window.startGridAnim()
-        }, 500)
-      }
-    })()
+        (function () {
+            var splash = document.getElementById('splash');
+            var splashText = document.getElementById('splashText');
+            if (!splash) return;
+            var faded = false;
+            var icon = splash.querySelector('.splash-content svg, .splash-content img');
+            if (icon) {
+                if (!navigator.onLine) {
+                    icon.style.filter = 'grayscale(1)';
+                    icon.style.opacity = '0.5';
+                }
+                icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                function randomSpin() {
+                    if (faded) return;
+                    icon.style.transform = 'rotate(' + (360 * (Math.floor(Math.random() * 3) + 1)) + 'deg)';
+                    setTimeout(function () {
+                        icon.style.transition = 'none';
+                        icon.style.transform = 'rotate(0deg)';
+                        setTimeout(function () {
+                            icon.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                            randomSpin();
+                        }, 50);
+                    }, 800);
+                }
+                setTimeout(randomSpin, 2000);
+            }
+            var isFirstTime = !localStorage.getItem('ytUserName');
+            if (!navigator.onLine) {
+                splash.classList.add('offline');
+                splashText.textContent = "You're offline";
+            }
+            if (isFirstTime) {
+                splash.classList.add('onboarding');
+                splashText.style.display = 'none';
+                document.getElementById('onbStep0').classList.remove('onb-hidden');
+            } else {
+                if (navigator.onLine) {
+                    setTimeout(function () { splashText.textContent = 'Up to date'; }, 2000);
+                    setTimeout(function () { splashText.textContent = 'Welcome, ' + localStorage.getItem('ytUserName'); }, 3400);
+                }
+                function fadeOut() {
+                    if (faded) return;
+                    faded = true;
+                    splash.classList.add('fade');
+                    setTimeout(function () {
+                        splash.style.display = 'none';
+                        if (window.startGridAnim) window.startGridAnim();
+                    }, 500);
+                }
+                setTimeout(fadeOut, navigator.onLine ? 4600 : 2000);
+            }
+            window.__splashFade = function () {
+                if (faded) return;
+                faded = true;
+                splash.classList.add('fade');
+                setTimeout(function () {
+                    splash.style.display = 'none';
+                    if (window.startGridAnim) window.startGridAnim();
+                }, 500);
+            };
+        })();
     </script>
 
     <!-- Keyboard shortcuts overlay -->
@@ -508,17 +629,43 @@
         <div class="shortcuts-modal">
             <div class="shortcuts-header">
                 <h2>Keyboard Shortcuts</h2>
-                <button class="shortcuts-close" id="shortcutsClose"><i data-lucide="x" class="icon-lg"></i></button>
+                <button class="shortcuts-close" id="shortcutsClose">
+                    <i data-lucide="x" class="icon-lg"></i>
+                </button>
             </div>
             <div class="shortcuts-body">
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></span><span class="shortcut-desc">Focus YouTube search bar</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>F</kbd></span><span class="shortcut-desc">Focus sidebar search</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>/</kbd></span><span class="shortcut-desc">Quick search sidebar</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>?</kbd></span><span class="shortcut-desc">Toggle this menu</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Escape</kbd></span><span class="shortcut-desc">Close modals / blur input</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Z</kbd></span><span class="shortcut-desc">Undo note edit</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></span><span class="shortcut-desc">Redo note edit</span></div>
-                <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd>+click</span><span class="shortcut-desc">Select multiple grid items</span></div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></span>
+                    <span class="shortcut-desc">Focus YouTube search bar</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>F</kbd></span>
+                    <span class="shortcut-desc">Focus sidebar search</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>/</kbd></span>
+                    <span class="shortcut-desc">Quick search sidebar</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>?</kbd></span>
+                    <span class="shortcut-desc">Toggle this menu</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Escape</kbd></span>
+                    <span class="shortcut-desc">Close modals / blur input</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Z</kbd></span>
+                    <span class="shortcut-desc">Undo note edit</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></span>
+                    <span class="shortcut-desc">Redo note edit</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-keys"><kbd>Ctrl</kbd>+click</span>
+                    <span class="shortcut-desc">Select multiple grid items</span>
+                </div>
             </div>
         </div>
     </div>
@@ -538,46 +685,52 @@
     <script src="js/extras.js"></script>
     <script src="js/onboarding.js"></script>
     <script src="js/app.js"></script>
-    <script>
-    ;(function(){
-      // Kill text selection on non-editable elements
-      document.addEventListener('selectionchange', function() {
-        var active = document.activeElement
-        if (!active || !active.closest('input, textarea, [contenteditable], .note-view-content')) {
-          var s = window.getSelection()
-          if (s && s.rangeCount) s.removeAllRanges()
-        }
-      })
-      // Block Android long-press context menu on non-editable elements
-      document.addEventListener('contextmenu', function(e) {
-        if (!e.target.closest('input, textarea, [contenteditable], .note-view-content')) e.preventDefault()
-      })
-      // Block selectstart everywhere except editable
-      document.addEventListener('selectstart', function(e) {
-        if (!e.target.closest('input, textarea, [contenteditable], .note-view-content')) e.preventDefault()
-      })
 
-      if (window.Capacitor && window.Capacitor.isNativePlatform()) document.body.classList.add('native-android')
-      window.applyStatusBarTheme = function() {
-        try {
-          if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return
-          var sb = window.Capacitor.Plugins.StatusBar
-          if (!sb) return
-          var cls = document.body.className
-          if (cls.indexOf('theme-black') > -1) {
-            sb.setStyle({ style: 'LIGHT' })
-            sb.setBackgroundColor({ color: '#2c2c2e' })
-          } else {
-            sb.setStyle({ style: 'DARK' })
-            sb.setBackgroundColor({ color: '#ffffff' })
-          }
-          sb.setOverlaysWebView({ overlay: false })
-        } catch(e) {}
-      }
-      window.applyStatusBarTheme()
-      var observer = new MutationObserver(function() { window.applyStatusBarTheme() })
-      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
-    })()
+    <script>
+        (function () {
+            // Kill text selection on non-editable elements
+            document.addEventListener('selectionchange', function () {
+                var active = document.activeElement;
+                if (!active || !active.closest('input, textarea, [contenteditable], .note-view-content')) {
+                    var s = window.getSelection();
+                    if (s && s.rangeCount) s.removeAllRanges();
+                }
+            });
+
+            // Block Android long-press context menu on non-editable elements
+            document.addEventListener('contextmenu', function (e) {
+                if (!e.target.closest('input, textarea, [contenteditable], .note-view-content')) e.preventDefault();
+            });
+
+            // Block selectstart everywhere except editable
+            document.addEventListener('selectstart', function (e) {
+                if (!e.target.closest('input, textarea, [contenteditable], .note-view-content')) e.preventDefault();
+            });
+
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) document.body.classList.add('native-android');
+
+            window.applyStatusBarTheme = function () {
+                try {
+                    if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
+                    var sb = window.Capacitor.Plugins.StatusBar;
+                    if (!sb) return;
+                    var cls = document.body.className;
+                    if (cls.indexOf('theme-black') > -1) {
+                        sb.setStyle({ style: 'LIGHT' });
+                        sb.setBackgroundColor({ color: '#2c2c2e' });
+                    } else {
+                        sb.setStyle({ style: 'DARK' });
+                        sb.setBackgroundColor({ color: '#ffffff' });
+                    }
+                    sb.setOverlaysWebView({ overlay: false });
+                } catch (e) {}
+            };
+
+            window.applyStatusBarTheme();
+            var observer = new MutationObserver(function () { window.applyStatusBarTheme(); });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        })();
     </script>
+
 </body>
 </html>

@@ -53,7 +53,7 @@
   .settings-content { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; max-height: calc(90vh - 60px); }
 
   .top-bar { padding: 6px 10px; gap: 6px; }
-  .top-bar.search-expanded .menu-btn, .top-bar.search-expanded .online-indicator { display: none; }
+  .top-bar.search-expanded .menu-btn { display: none; }
   .top-bar.search-expanded .top-bar-input { flex: 1; min-width: 0; }
   .top-bar-input { min-width: 0; flex: 1; }
   .top-bar-input input { flex: 1; min-width: 0; font-size: 13px; }
@@ -65,7 +65,7 @@
   .card-add-row { padding: 6px 16px 0; }
   .grid-view { padding: 12px; }
   .grid-items { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .online-indicator .online-indicator-text { display: none; }
+
   .sidebar-footer { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
 
   .note-view { padding: 0; }

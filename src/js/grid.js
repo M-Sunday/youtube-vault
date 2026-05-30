@@ -3,12 +3,9 @@ function updateGridClock() {
   var c = document.querySelector('.grid-clock')
   if (!c) return
   var d = new Date()
-  var h = d.getHours(), m = d.getMinutes()
-  var ampm = h >= 12 ? 'PM' : 'AM'
-  if (h > 12) h -= 12
-  if (h === 0) h = 12
-  var mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]
-  c.textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm + ' — ' + mon + ' ' + d.getDate() + ', ' + d.getFullYear()
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  c.textContent = days[d.getDay()].toUpperCase() + ' • ' + months[d.getMonth()].toUpperCase() + ' ' + d.getDate() + ' • ' + d.getFullYear()
 }
 function renderGridView() {
   const el = document.getElementById('gridView')

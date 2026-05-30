@@ -446,34 +446,37 @@ document.getElementById('updateCloseBtn').addEventListener('click', () => {
   setInterval(updateDebugInfo, 2000)
 })()
 
-// ─── Online status indicator ──────────────────────────
+// ─── Online status ────────────────────────────────────
 ;(function(){
-  const ind = document.getElementById('onlineIndicator')
-  if (!ind) return
-  const text = ind.querySelector('.online-indicator-text')
   const title = document.getElementById('searchLandingTitle')
   const searchInput = document.getElementById('ytInput')
   const searchBtn = document.getElementById('ytBtn')
+  const PLACEHOLDER_TEXTS = ['Search online', 'Look up a video', 'Find a link']
+  let placeholderIdx = 0
   function update() {
     const on = navigator.onLine
-    const conn = navigator.connection
-    let cls = 'offline', label = 'Offline'
-    if (on) {
-      const et = conn?.effectiveType
-      if (et === '2g' || et === 'slow-2g') { cls = 'slow'; label = 'Slow' }
-      else { cls = ''; label = 'Online' }
-    }
-    ind.className = 'online-indicator badge' + (cls ? ' ' + cls : '')
-    if (text) text.textContent = label
     if (title) {
       if (!on) { title.textContent = "You're offline"; title.classList.add('offline') }
       else { title.textContent = 'What do you want to search?'; title.classList.remove('offline') }
     }
-    if (searchInput) { searchInput.disabled = !on; searchInput.placeholder = on ? 'Paste YouTube link' : 'Search unavailable offline' }
+    if (searchInput) {
+      searchInput.disabled = !on
+      if (on) {
+        searchInput.placeholder = PLACEHOLDER_TEXTS[placeholderIdx % PLACEHOLDER_TEXTS.length]
+      } else {
+        searchInput.placeholder = 'Search unavailable offline'
+      }
+    }
     if (searchBtn) searchBtn.disabled = !on
   }
   window.addEventListener('online', update)
   window.addEventListener('offline', update)
   if (navigator.connection) navigator.connection.addEventListener('change', update)
   update()
+  setInterval(function() {
+    placeholderIdx++
+    if (navigator.onLine && searchInput) {
+      searchInput.placeholder = PLACEHOLDER_TEXTS[placeholderIdx % PLACEHOLDER_TEXTS.length]
+    }
+  }, 180000)
 })()
