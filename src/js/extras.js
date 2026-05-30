@@ -13,7 +13,7 @@ function loadPatchNotes() {
 
 // ─── Keyboard shortcuts ────────────────────────────────
 document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'L') { e.preventDefault(); document.getElementById('ytInput').focus() }
+  if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'L') { e.preventDefault(); document.getElementById('kiroInput').focus() }
   if ((e.metaKey || e.ctrlKey) && e.key === '=') { e.preventDefault(); document.getElementById('cardAddBtn').click() }
   if ((e.metaKey || e.ctrlKey) && e.key === ',') { e.preventDefault(); settingsOverlay.classList.add('open') }
   if ((e.metaKey || e.ctrlKey) && e.key === 'f') { e.preventDefault(); document.getElementById('searchInput')?.focus() }
@@ -315,7 +315,7 @@ if ('serviceWorker' in navigator) {
     })
   })
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    localStorage.setItem('ytSwVersion', APP_VERSION)
+    localStorage.setItem('kiroSwVersion', APP_VERSION)
     window.location.reload()
   })
 }
@@ -332,7 +332,7 @@ if (history.length) {
 }
 
 // ─── Update check ──────────────────────────────────────
-const lastSeen = localStorage.getItem('ytLastVersion')
+const lastSeen = localStorage.getItem('kiroLastVersion')
 if (lastSeen !== APP_VERSION) {
   fetch('assets/changelog.json').then(r => r.json()).then(log => {
     const updates = log.filter(e => {
@@ -350,7 +350,7 @@ if (lastSeen !== APP_VERSION) {
     `).join('')
     document.getElementById('updateOverlay').classList.add('open')
   }).catch(() => {})
-  safeSetItem('ytLastVersion', APP_VERSION)
+  safeSetItem('kiroLastVersion', APP_VERSION)
 }
 document.getElementById('updateCloseBtn').addEventListener('click', () => {
   document.getElementById('updateOverlay').classList.remove('open')
@@ -449,8 +449,8 @@ document.getElementById('updateCloseBtn').addEventListener('click', () => {
 // ─── Online status ────────────────────────────────────
 ;(function(){
   const title = document.getElementById('searchLandingTitle')
-  const searchInput = document.getElementById('ytInput')
-  const searchBtn = document.getElementById('ytBtn')
+  const searchInput = document.getElementById('kiroInput')
+  const searchBtn = document.getElementById('kiroBtn')
   const PLACEHOLDER_TEXTS = ['Search online', 'Look up a video', 'Find a link']
   let placeholderIdx = 0
   function update() {

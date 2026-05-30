@@ -1,6 +1,6 @@
 {
-  "appId": "com.vault.app",
-  "appName": "Vault",
+  "appId": "com.kiro.app",
+  "appName": "Kiro",
   "webDir": "src",
   "server": {
     "androidScheme": "https"

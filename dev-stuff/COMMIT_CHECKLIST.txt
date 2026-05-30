@@ -1,5 +1,5 @@
 ╔═══════════════════════════════════════════════════════════════════╗
-║              VAULT — COMMIT CHECKLIST                           ║
+║              KIRO — COMMIT CHECKLIST                           ║
 ║  Read this BEFORE every commit to avoid regressions             ║
 ║  Covers: Web (PWA), npm, GitHub Pages, Android (Capacitor)     ║
 ╚═══════════════════════════════════════════════════════════════════╝
@@ -12,7 +12,7 @@
 │ ☐ package.json                   — "version": "X.Y.Z"            │
 │ ☐ package-lock.json              — top "version": "X.Y.Z"        │
 │ ☐ src/js/data.js                 — const APP_VERSION = 'X.Y.Z'   │
-│ ☐ src/sw.js                      — CACHE = 'vault-X.Y.Z'         │
+│ ☐ src/sw.js                      — CACHE = 'kiro-X.Y.Z'         │
 │ ☐ src/index.html                 — appVersionLabel + settingsVer │
 │ ☐ src/index.html                 — CSS ?v=X.Y.Z cache-busters    │
 │ ☐ src/assets/manifest.json       — "version": "X.Y.Z"            │
@@ -55,7 +55,7 @@
 ┌───────────────────────────────────────────────────────────────────┐
 │ 4. GITHUB PAGES — DEPLOYMENT                                     │
 ├───────────────────────────────────────────────────────────────────┤
-│ The site at m-sunday.github.io/youtube-vault/src/index.html       │
+│ The site at m-sunday.github.io/kiro/src/index.html                │
 │ serves DIRECTLY from the main branch (no build/deploy action).    │
 │                                                                   │
 │ ☐ Commit and push to main                                         │
@@ -80,7 +80,7 @@
 │   ☐ npm install                     # ensure deps up to date      │
 │   ☐ npx cap sync android            # copy web assets → android/  │
 │   ☐ Verify namespace in android/app/build.gradle:                 │
-│       → android { namespace "com.vault.app" } (required for AGP8+)|    │
+│       → android { namespace "com.kiro.app" } (required for AGP8+)|    │
 │   ☐ Bump versionCode +1 in android/app/build.gradle                │
 │   ☐ Set versionName "X.Y.Z" in android/app/build.gradle            │
 │                                                                   │

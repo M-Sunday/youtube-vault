@@ -69,8 +69,8 @@ function renderGridView() {
   }
 
   // ─── Challenges section ───────────────────────────────
-  const vaultChallenges = getVaultChallenges()
-  const activeChallenges = vaultChallenges.filter(function(c) { return c.progress < c.target })
+  const kiroChallenges = getKiroChallenges()
+  const activeChallenges = kiroChallenges.filter(function(c) { return c.progress < c.target })
   if (activeChallenges.length) {
     html += '<div class="grid-section"><div class="grid-section-header"><i data-lucide="sparkles" style="width:16px;height:16px;flex-shrink:0"></i> Active Challenges</div><div class="grid-items">'
     for (var ci = 0; ci < activeChallenges.length; ci++) {
@@ -91,8 +91,8 @@ function renderGridView() {
   }
 
   // ─── Goals section ────────────────────────────────────
-  const vaultGoals = getVaultGoals()
-  const activeGoals = vaultGoals.filter(function(g) { return g.progress < g.target })
+  const kiroGoals = getKiroGoals()
+  const activeGoals = kiroGoals.filter(function(g) { return g.progress < g.target })
   if (activeGoals.length) {
     html += '<div class="grid-section"><div class="grid-section-header"><i data-lucide="rocket" style="width:16px;height:16px;flex-shrink:0"></i> Goals</div><div class="grid-items">'
     for (var gi = 0; gi < activeGoals.length; gi++) {
@@ -363,13 +363,13 @@ function renderGridView() {
       var cid = this.dataset.challengeId
       var idx = parseInt(this.dataset.todoIdx)
       if (!cid || isNaN(idx)) return
-      var challenges = getVaultChallenges()
+      var challenges = getKiroChallenges()
       var c = challenges.find(function(x) { return x.id === cid })
       if (!c || !c.todos || !c.todos[idx]) return
       c.todos[idx].done = !c.todos[idx].done
       c.progress = c.todos.filter(function(t) { return t.done }).length
       if (c.progress >= c.target) c.progress = c.target
-      saveVaultChallenges(challenges)
+      saveKiroChallenges(challenges)
       var rect = this.getBoundingClientRect()
       var fakeEvent = { clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 }
       todoBurst(fakeEvent)
@@ -429,7 +429,7 @@ document.getElementById('gridBtn').addEventListener('click', function () {
   }
   this.classList.add('active')
   setView('grid')
-  document.getElementById('ytInput').value = ''
+  document.getElementById('kiroInput').value = ''
   renderGridView()
 })
 
@@ -592,7 +592,7 @@ document.getElementById('challengeDialogConfirm')?.addEventListener('click', fun
   var name = document.getElementById('challengeNameInput').value.trim()
   if (!name) return
   var todos = (window._challengeTodoCtx ? window._challengeTodoCtx.items : []).filter(function(t) { return t.text.trim() })
-  var challenges = getVaultChallenges()
+  var challenges = getKiroChallenges()
   challenges.push({
     id: '_ch_' + Date.now(),
     name: name,
@@ -603,7 +603,7 @@ document.getElementById('challengeDialogConfirm')?.addEventListener('click', fun
     created: Date.now(),
     todos: todos
   })
-  saveVaultChallenges(challenges)
+  saveKiroChallenges(challenges)
   document.getElementById('challengeDialog').classList.remove('open')
   checkAchievements()
   var rect = (document.querySelector('.wb-btn[data-action="challenge"]') || document.body).getBoundingClientRect()
@@ -634,7 +634,7 @@ document.getElementById('goalDialogCancel')?.addEventListener('click', function(
 document.getElementById('goalDialogConfirm')?.addEventListener('click', function() {
   var name = document.getElementById('goalNameInput').value.trim()
   if (!name) return
-  var goals = getVaultGoals()
+  var goals = getKiroGoals()
   goals.push({
     id: '_gl_' + Date.now(),
     name: name,
@@ -643,7 +643,7 @@ document.getElementById('goalDialogConfirm')?.addEventListener('click', function
     progress: 0,
     created: Date.now()
   })
-  saveVaultGoals(goals)
+  saveKiroGoals(goals)
   document.getElementById('goalDialog').classList.remove('open')
   checkAchievements()
   renderGridView()
@@ -674,7 +674,7 @@ document.getElementById('achievementDialog')?.addEventListener('mousedown', func
 function renderAchievements() {
   var el = document.getElementById('achievementList')
   if (!el) return
-  var achievements = getVaultAchievements()
+  var achievements = getKiroAchievements()
 
   // default achievements
   var defaultAchievements = [
@@ -698,14 +698,14 @@ function renderAchievements() {
 
 // ─── Auto-check achievements ──────────────────────────
 function checkAchievements() {
-  var achievements = getVaultAchievements()
-  var challenges = getVaultChallenges()
-  var goals = getVaultGoals()
+  var achievements = getKiroAchievements()
+  var challenges = getKiroChallenges()
+  var goals = getKiroGoals()
 
   function unlock(id) {
     if (!achievements.some(function(a) { return a.id === id })) {
       achievements.push({ id: id, unlocked: Date.now() })
-      saveVaultAchievements(achievements)
+      saveKiroAchievements(achievements)
       return true
     }
     return false
@@ -720,14 +720,14 @@ function checkAchievements() {
 function renderProgressBar(current, target, label) {
   var pct = Math.min(100, (current / Math.max(target, 1)) * 100)
   var displayLabel = label || (current + '/' + target)
-  return '<div class="vault-progress"><div class="vault-progress-track segmented"><div class="vault-progress-fill' + (pct >= 100 ? ' glow' : '') + '" style="width:' + pct + '%"></div></div><span class="vault-progress-text">' + displayLabel + '</span></div>'
+  return '<div class="kiro-progress"><div class="kiro-progress-track segmented"><div class="kiro-progress-fill' + (pct >= 100 ? ' glow' : '') + '" style="width:' + pct + '%"></div></div><span class="kiro-progress-text">' + displayLabel + '</span></div>'
 }
 
 // ─── Challenge Edit Dialog ──────────────────────────
 var _challengeEditTodoCtx = null
 
 function openChallengeEditDialog(challengeId) {
-  var challenges = getVaultChallenges()
+  var challenges = getKiroChallenges()
   var c = challenges.find(function(x) { return x.id === challengeId })
   if (!c) return
 
@@ -754,7 +754,7 @@ document.getElementById('challengeEditSaveBtn')?.addEventListener('click', funct
   var dialog = document.getElementById('challengeEditDialog')
   var cid = dialog.dataset.challengeId
   if (!cid) return
-  var challenges = getVaultChallenges()
+  var challenges = getKiroChallenges()
   var c = challenges.find(function(x) { return x.id === cid })
   if (!c) return
   var name = document.getElementById('challengeEditNameInput').value.trim()
@@ -767,7 +767,7 @@ document.getElementById('challengeEditSaveBtn')?.addEventListener('click', funct
   c.unit = 'goals'
   c.progress = todos.filter(function(t) { return t.done }).length
   if (c.progress > c.target) c.progress = c.target
-  saveVaultChallenges(challenges)
+  saveKiroChallenges(challenges)
   dialog.classList.remove('open')
   checkAchievements()
   renderGridView()
@@ -778,8 +778,8 @@ document.getElementById('challengeEditDeleteBtn')?.addEventListener('click', fun
   var dialog = document.getElementById('challengeEditDialog')
   var cid = dialog.dataset.challengeId
   if (!cid || !confirm('Delete this challenge?')) return
-  var challenges = getVaultChallenges()
-  saveVaultChallenges(challenges.filter(function(x) { return x.id !== cid }))
+  var challenges = getKiroChallenges()
+  saveKiroChallenges(challenges.filter(function(x) { return x.id !== cid }))
   dialog.classList.remove('open')
   renderGridView()
 })
@@ -792,7 +792,7 @@ function todoBurst(e) {
   var colors = ['#ffd60a', '#ff9f0a', '#30d158', '#007aff', '#ff375f']
   for (var i = 0; i < 12; i++) {
     var dot = document.createElement('div')
-    dot.className = 'vault-particle'
+    dot.className = 'kiro-particle'
     var color = colors[i % colors.length]
     var size = 4 + Math.random() * 6
     dot.style.width = size + 'px'

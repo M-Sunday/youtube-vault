@@ -1,4 +1,4 @@
-/* ─── Vault: Workbench Buttons ──────────────────────── */
+/* ─── Kiro: Workbench Buttons ──────────────────────── */
 .grid-workbench {
   padding: 20px 24px;
   display: flex;
@@ -67,13 +67,13 @@
 .theme-black .wb-btn-planet:hover { background: #d1d1d6; }
 
 /* ─── Progress Bars ────────────────── */
-.vault-progress {
+.kiro-progress {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 4px 0;
 }
-.vault-progress-track {
+.kiro-progress-track {
   flex: 1;
   height: 12px;
   background: rgba(128,128,128,0.12);
@@ -81,14 +81,14 @@
   overflow: hidden;
   position: relative;
 }
-.vault-progress-fill {
+.kiro-progress-fill {
   height: 100%;
   border-radius: 6px;
   background: linear-gradient(90deg, #ff453a, #ff9f0a, #30d158);
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   min-width: 4px;
 }
-.vault-progress-text {
+.kiro-progress-text {
   font-size: 11px;
   font-weight: 600;
   color: #86868b;
@@ -127,7 +127,7 @@
   align-items: center;
   gap: 8px;
 }
-.challenge-item .vault-progress-track {
+.challenge-item .kiro-progress-track {
   height: 8px;
 }
 .challenge-progress-btn {
@@ -170,7 +170,7 @@
 }
 
 /* ─── Particle burst (reuses todo style) ───────────── */
-.vault-particle {
+.kiro-particle {
   position: fixed;
   pointer-events: none;
   z-index: 99999;

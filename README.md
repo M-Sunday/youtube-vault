@@ -1,6 +1,6 @@
-# Vault
+# Kiro
 
-A creative operating system for chaotic minds. A local-first desktop + PWA app for capturing ideas, organizing thoughts, tracking goals, and exploring connections. Save YouTube videos, bookmarks, notes, and direct-access links alongside your creative universe. All data stays in your browser — no servers, no login.
+A local-first desktop + PWA app for capturing ideas, organizing thoughts, tracking goals, and exploring connections. Save videos, bookmarks, notes, and direct-access links. All data stays in your browser — no servers, no login.
 
 Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android, and iOS.
 
@@ -12,7 +12,7 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 - **Notes** — Rich-text notes with image paste, assignable to folders. Built-in todo lists with editable checkboxes, custom SVG circle-check/circle-x toggle icons, particle burst animations on completion
 - **Direct Access** — Quick-launch links with thumbnail previews
 - **Grid view** — Browse all content in a visual grid with sections per type. Cascade animation on load (sections stagger in 220ms apart, items within at 60ms). Workbench header always visible at top.
-- **Search landing** — Centered search prompt with recent history miniatures (click to reload). Shows when focusing the YouTube URL input or the sidebar search.
+- **Search landing** — Centered search prompt with recent history miniatures (click to reload). Shows when focusing the search input or the sidebar search.
 - **Bulk select** — Ctrl+click grid items for batch delete, move, pin, or blur
 - **Drag to reorder** — Reorder grid items within sections (videos, bookmarks, notes, DAs) with blue drop-line indicators. Touch drag via long-press on mobile.
 - **Drag to folder** — Drag video grid items onto sidebar folders to move them. Also drag sidebar items between folders. Grid section headers also accept drops (videos and notes).
@@ -31,7 +31,7 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 
 ## Usage
 
-1. **Add a video** — Paste a YouTube link in the top bar, press Enter or click the arrow
+1. **Add a video** — Paste a link in the top bar, press Enter or click the arrow
 2. **Save** — Click "Add video" to save it to a folder (or create a new folder)
 3. **Browse** — Use the sidebar tree to navigate folders, videos, bookmarks, notes, and direct access links
 4. **Grid view** — Click the grid icon (or press `?` for more shortcuts) to see all content as cards
@@ -40,7 +40,7 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 7. **Reorder** — Drag grid items within a section to reorder them; drag sidebar items to move between folders
 8. **Download** — Open a saved video, click the Download button below the player (desktop Electron only — uses yt-dlp)
 9. **Settings** — Click the gear icon in the sidebar header
-10. **Search landing** — Click the YouTube URL input or the sidebar search to open the search landing with recent history
+10. **Search landing** — Click the search input or the sidebar search to open the search landing with recent history
 11. **Debug** — Press Ctrl+D to inspect elements; Ctrl+Shift+H for hierarchy sidebar
 
 ## Keyboard shortcuts
@@ -49,7 +49,7 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 |----------|--------|
 | `?` | Toggle keyboard shortcuts overlay |
 | `Ctrl+F` / `/` | Focus sidebar search |
-| `Ctrl+Shift+L` | Focus YouTube URL input |
+| `Ctrl+Shift+L` | Focus search input |
 | `Ctrl+=` | Add current video |
 | `Ctrl+,` | Open Settings |
 | `Ctrl+Z` | Undo in note editor |
@@ -64,23 +64,23 @@ Built with vanilla JS/CSS and Electron. Works on Windows, macOS, Linux, Android,
 All data is stored locally in `localStorage`. Nothing is sent to any server.
 
 Storage keys:
-- `ytVideos` — video metadata
-- `ytFolders` — folder structure and ordering
-- `ytBookmarks` — bookmark entries
-- `ytDirectAccess` — direct access entries
-- `ytNotes` — rich-text notes
-- `ytSettings` — user preferences
-- `ytPins` — pinned video IDs
-- `ytNSFW` — NSFW domain list
+- `kiroVideos` — video metadata
+- `kiroFolders` — folder structure and ordering
+- `kiroBookmarks` — bookmark entries
+- `kiroDirectAccess` — direct access entries
+- `kiroNotes` — rich-text notes
+- `kiroSettings` — user preferences
+- `kiroPins` — pinned video IDs
+- `kiroNSFW` — NSFW domain list
 - `linkHistory` — recently opened links
-- `ytLastVersion` — last seen app version (for changelog)
-- `ytSwVersion` — applied service worker version (tracks updates)
+- `kiroLastVersion` — last seen app version (for changelog)
+- `kiroSwVersion` — applied service worker version (tracks updates)
 - `dlType`, `dlVideoQuality`, `dlAudioFormat`, `dlAudioBitrate`, `dlVideoCodec` — download preferences
 
 ## Download feature
 
 - **Desktop only** — download button is hidden on mobile/PWA
-- **yt-dlp** is auto-downloaded from GitHub on first use (stored in `~/.youtube-vault/bin/`)
+- **yt-dlp** is auto-downloaded from GitHub on first use (stored in `~/.kiro/bin/`)
 - **ffmpeg** is auto-downloaded from gyan.dev when 1080p+ or Max quality is requested
 - With ffmpeg: uses `bestvideo[height<=?Q]+bestaudio` merged to MP4
 - Without ffmpeg: falls back to single-file `best[height<=?Q]` (720p max)
@@ -113,7 +113,7 @@ src/
 │   ├── grid.js          # Grid view, batch actions, drag/touch reorder
 │   ├── card.js          # Video card view, add/unlink, pin badge
 │   ├── download.js      # yt-dlp/ffmpeg auto-download, progress bar
-│   ├── search.js        # YouTube link fetch, Direct Access dialog
+│   ├── search.js        # Video link fetch, Direct Access dialog
 │   ├── extras.js        # Patch notes, keyboard shortcuts, debug inspector, SW update, online indicator
 │   ├── icons.js         # Local SVG icon loader
 │   ├── onboarding.js    # First-time user onboarding flow

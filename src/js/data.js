@@ -1,21 +1,53 @@
 // ─── Data ──────────────────────────────────────────────
-function getVideos() { try { return JSON.parse(localStorage.getItem('ytVideos') || '{}') } catch { return {} } }
-function saveVideos(v) { safeSetItem('ytVideos', JSON.stringify(v)) }
-function getFolders() { try { return JSON.parse(localStorage.getItem('ytFolders') || '{"Videos":[],"Archived":[]}') } catch { return { Videos: [], Archived: [] } } }
-function saveFolders(f) { safeSetItem('ytFolders', JSON.stringify(f)) }
-function getFolderMeta() { try { return JSON.parse(localStorage.getItem('ytFolderMeta') || '{}') } catch { return {} } }
-function saveFolderMeta(m) { safeSetItem('ytFolderMeta', JSON.stringify(m)) }
-function getPins() { try { return JSON.parse(localStorage.getItem('ytPins') || '[]') } catch { return [] } }
-function savePins(p) { safeSetItem('ytPins', JSON.stringify(p)) }
-function getBookmarks() { try { return JSON.parse(localStorage.getItem('ytBookmarks') || '[]') } catch { return [] } }
-function saveBookmarks(b) { safeSetItem('ytBookmarks', JSON.stringify(b)) }
-function getDirectAccess() { try { return JSON.parse(localStorage.getItem('ytDirectAccess') || '[]') } catch { return [] } }
-function saveDirectAccess(d) { safeSetItem('ytDirectAccess', JSON.stringify(d)) }
+function migrateStorage() {
+  if (localStorage.getItem('kiro_migrated')) return
+  var map = [
+    ['ytVideos', 'kiroVideos'],
+    ['ytFolders', 'kiroFolders'],
+    ['ytFolderMeta', 'kiroFolderMeta'],
+    ['ytPins', 'kiroPins'],
+    ['ytBookmarks', 'kiroBookmarks'],
+    ['ytDirectAccess', 'kiroDirectAccess'],
+    ['ytNSFW', 'kiroNSFW'],
+    ['ytBlurAllNSFW', 'kiroBlurAllNSFW'],
+    ['ytNotes', 'kiroNotes'],
+    ['ytCollapsed', 'kiroCollapsed'],
+    ['ytUserName', 'kiroUserName'],
+    ['ytSettings', 'kiroSettings'],
+    ['ytSwVersion', 'kiroSwVersion'],
+    ['ytLastVersion', 'kiroLastVersion'],
+    ['vault_challenges', 'kiro_challenges'],
+    ['vault_achievements', 'kiro_achievements'],
+    ['vault_goals', 'kiro_goals']
+  ]
+  for (var i = 0; i < map.length; i++) {
+    var old = localStorage.getItem(map[i][0])
+    if (old !== null) {
+      localStorage.setItem(map[i][1], old)
+      localStorage.removeItem(map[i][0])
+    }
+  }
+  localStorage.setItem('kiro_migrated', 'true')
+}
+migrateStorage()
+
+function getVideos() { try { return JSON.parse(localStorage.getItem('kiroVideos') || '{}') } catch { return {} } }
+function saveVideos(v) { safeSetItem('kiroVideos', JSON.stringify(v)) }
+function getFolders() { try { return JSON.parse(localStorage.getItem('kiroFolders') || '{"Videos":[],"Archived":[]}') } catch { return { Videos: [], Archived: [] } } }
+function saveFolders(f) { safeSetItem('kiroFolders', JSON.stringify(f)) }
+function getFolderMeta() { try { return JSON.parse(localStorage.getItem('kiroFolderMeta') || '{}') } catch { return {} } }
+function saveFolderMeta(m) { safeSetItem('kiroFolderMeta', JSON.stringify(m)) }
+function getPins() { try { return JSON.parse(localStorage.getItem('kiroPins') || '[]') } catch { return [] } }
+function savePins(p) { safeSetItem('kiroPins', JSON.stringify(p)) }
+function getBookmarks() { try { return JSON.parse(localStorage.getItem('kiroBookmarks') || '[]') } catch { return [] } }
+function saveBookmarks(b) { safeSetItem('kiroBookmarks', JSON.stringify(b)) }
+function getDirectAccess() { try { return JSON.parse(localStorage.getItem('kiroDirectAccess') || '[]') } catch { return [] } }
+function saveDirectAccess(d) { safeSetItem('kiroDirectAccess', JSON.stringify(d)) }
 var NSFW_DEFAULTS = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'redtube.com', 'youporn.com', 'xhamster.com', 'stripchat.com', 'chaturbate.com', 'onlyfans.com']
-function getNSFW() { try { var v = localStorage.getItem('ytNSFW'); if (v === null) { safeSetItem('ytNSFW', JSON.stringify(NSFW_DEFAULTS)); return NSFW_DEFAULTS.slice() }; return JSON.parse(v) } catch { return [] } }
-function saveNSFW(n) { safeSetItem('ytNSFW', JSON.stringify(n)) }
-function getBlurAllNSFW() { return localStorage.getItem('ytBlurAllNSFW') === 'true' }
-function saveBlurAllNSFW(v) { safeSetItem('ytBlurAllNSFW', v ? 'true' : 'false') }
+function getNSFW() { try { var v = localStorage.getItem('kiroNSFW'); if (v === null) { safeSetItem('kiroNSFW', JSON.stringify(NSFW_DEFAULTS)); return NSFW_DEFAULTS.slice() }; return JSON.parse(v) } catch { return [] } }
+function saveNSFW(n) { safeSetItem('kiroNSFW', JSON.stringify(n)) }
+function getBlurAllNSFW() { return localStorage.getItem('kiroBlurAllNSFW') === 'true' }
+function saveBlurAllNSFW(v) { safeSetItem('kiroBlurAllNSFW', v ? 'true' : 'false') }
 function isNSFW(item) {
   try {
     if (!getBlurAllNSFW()) return false
@@ -72,11 +104,11 @@ function updateBatchBar() {
   if (len) { bar.style.display = 'flex'; count.textContent = len + ' selected' }
   else { bar.style.display = 'none' }
 }
-function getNotes() { try { return JSON.parse(localStorage.getItem('ytNotes') || '[]') } catch { return [] } }
-function saveNotes(n) { safeSetItem('ytNotes', JSON.stringify(n)) }
+function getNotes() { try { return JSON.parse(localStorage.getItem('kiroNotes') || '[]') } catch { return [] } }
+function saveNotes(n) { safeSetItem('kiroNotes', JSON.stringify(n)) }
 function stripHtml(str) { return str.replace(/<[^>]*>/g, '') }
-function getCollapsed() { try { return JSON.parse(localStorage.getItem('ytCollapsed') || '{}') } catch { return {} } }
-function saveCollapsed(c) { safeSetItem('ytCollapsed', JSON.stringify(c)) }
+function getCollapsed() { try { return JSON.parse(localStorage.getItem('kiroCollapsed') || '{}') } catch { return {} } }
+function saveCollapsed(c) { safeSetItem('kiroCollapsed', JSON.stringify(c)) }
 function safeSetItem(key, val) { try { localStorage.setItem(key, val) } catch (e) { if (e.name === 'QuotaExceededError') { const t = document.getElementById('updateToast'); t.textContent = 'Storage full — clear some data'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000) } } }
 function sanitizeHtml(str) {
   const allowed = /^(b|i|u|em|strong|a|br|p|ul|ol|li|span|div|h[1-6]|pre|code|blockquote|img|input)$/i
@@ -96,20 +128,20 @@ function sanitizeHtml(str) {
   return str
 }
 
-function getUserName() { return localStorage.getItem('ytUserName') || '' }
-function saveUserName(name) { localStorage.setItem('ytUserName', name) }
+function getUserName() { return localStorage.getItem('kiroUserName') || '' }
+function saveUserName(name) { localStorage.setItem('kiroUserName', name) }
 
 let currentVideo = null
 let dragVideoId = null
 let currentNoteId = null
 
-function getVaultChallenges() { try { return JSON.parse(localStorage.getItem('vault_challenges') || '[]') } catch { return [] } }
-function saveVaultChallenges(c) { safeSetItem('vault_challenges', JSON.stringify(c)) }
+function getKiroChallenges() { try { return JSON.parse(localStorage.getItem('kiro_challenges') || '[]') } catch { return [] } }
+function saveKiroChallenges(c) { safeSetItem('kiro_challenges', JSON.stringify(c)) }
 
-function getVaultAchievements() { try { return JSON.parse(localStorage.getItem('vault_achievements') || '[]') } catch { return [] } }
-function saveVaultAchievements(a) { safeSetItem('vault_achievements', JSON.stringify(a)) }
+function getKiroAchievements() { try { return JSON.parse(localStorage.getItem('kiro_achievements') || '[]') } catch { return [] } }
+function saveKiroAchievements(a) { safeSetItem('kiro_achievements', JSON.stringify(a)) }
 
-function getVaultGoals() { try { return JSON.parse(localStorage.getItem('vault_goals') || '[]') } catch { return [] } }
-function saveVaultGoals(g) { safeSetItem('vault_goals', JSON.stringify(g)) }
+function getKiroGoals() { try { return JSON.parse(localStorage.getItem('kiro_goals') || '[]') } catch { return [] } }
+function saveKiroGoals(g) { safeSetItem('kiro_goals', JSON.stringify(g)) }
 
 const APP_VERSION = '3.0.1'

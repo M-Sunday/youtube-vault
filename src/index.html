@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1d1d1f">
-    <title>Vault</title>
+    <title>Kiro</title>
     <link rel="manifest" href="assets/manifest.json">
     <link rel="icon" href="assets/icons/app-icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/icons/app-icon-192.svg">
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="css/components.css?v=3.0.1">
     <link rel="stylesheet" href="css/themes.css?v=3.0.1">
     <link rel="stylesheet" href="css/mobile.css?v=3.0.1">
-    <link rel="stylesheet" href="css/vault.css?v=3.0.1">
+    <link rel="stylesheet" href="css/kiro.css?v=3.0.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -72,8 +72,8 @@
                 <i data-lucide="layout-grid" class="icon-lg"></i>
             </button>
             <div class="top-bar-input">
-                <input type="text" id="ytInput" placeholder="Paste a link" spellcheck="false">
-                <button id="ytBtn">
+                <input type="text" id="kiroInput" placeholder="Paste a link" spellcheck="false">
+                <button id="kiroBtn">
                     <i data-lucide="arrow-right"></i>
                 </button>
             </div>
@@ -348,7 +348,7 @@
                             <div class="settings-toggle on"></div>
                         </div>
                         <div class="settings-plugin">
-                            <span class="settings-plugin-name">Show YouTube input</span>
+                            <span class="settings-plugin-name">Show search input</span>
                             <div class="settings-toggle on"></div>
                         </div>
                         <div class="settings-plugin">
@@ -380,7 +380,7 @@
                 <div class="settings-pane" id="pane-history" style="display:none">
                     <div class="settings-pane-header">
                         <h2>Link history</h2>
-                        <p class="settings-pane-desc">Recently opened YouTube links.</p>
+                        <p class="settings-pane-desc">Recently opened video links.</p>
                     </div>
                     <div class="settings-plugin-list mt-20">
                         <div class="settings-plugin">
@@ -515,7 +515,7 @@
             </div>
             <div class="update-modal-body">
                 <p class="reset-warning">
-                    This will permanently delete <strong>all your data</strong> including videos, bookmarks, notes, settings, and user name. Your browser cookies (YouTube login, etc.) will also be cleared within this app.
+                    This will permanently delete <strong>all your data</strong> including videos, bookmarks, notes, settings, and user name. Your browser cookies (login, etc.) will also be cleared within this app.
                 </p>
                 <p class="reset-sub">This action cannot be undone.</p>
                 <div class="reset-actions">
@@ -529,12 +529,12 @@
     <!-- Splash screen -->
     <div id="splash">
         <div class="splash-content">
-            <img id="splashIcon" src="assets/icons/app-icon-splash.svg" width="94" height="94" alt="Vault">
+            <img id="splashIcon" src="assets/icons/app-icon-splash.svg" width="94" height="94" alt="Kiro">
             <p id="splashText">Checking for updates...</p>
 
             <!-- Step 0 (first-time user) inside splash -->
             <div id="onbStep0" class="onb-step onb-hidden">
-                <p class="onb-welcome" id="onbWelcome">Hello and welcome to Vault</p>
+                <p class="onb-welcome" id="onbWelcome">Hello and welcome to Kiro</p>
                 <p class="onb-subtitle">A creative operating system for chaotic minds</p>
                 <button class="onb-btn" id="onbNext0">Next →</button>
             </div>
@@ -587,7 +587,7 @@
                 }
                 setTimeout(randomSpin, 2000);
             }
-            var isFirstTime = !localStorage.getItem('ytUserName');
+            var isFirstTime = !localStorage.getItem('kiroUserName');
             if (!navigator.onLine) {
                 splash.classList.add('offline');
                 splashText.textContent = "You're offline";
@@ -599,7 +599,7 @@
             } else {
                 if (navigator.onLine) {
                     setTimeout(function () { splashText.textContent = 'Up to date'; }, 2000);
-                    setTimeout(function () { splashText.textContent = 'Welcome, ' + localStorage.getItem('ytUserName'); }, 3400);
+                    setTimeout(function () { splashText.textContent = 'Welcome, ' + localStorage.getItem('kiroUserName'); }, 3400);
                 }
                 function fadeOut() {
                     if (faded) return;
@@ -636,7 +636,7 @@
             <div class="shortcuts-body">
                 <div class="shortcut-row">
                     <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></span>
-                    <span class="shortcut-desc">Focus YouTube search bar</span>
+                    <span class="shortcut-desc">Focus search bar</span>
                 </div>
                 <div class="shortcut-row">
                     <span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>F</kbd></span>

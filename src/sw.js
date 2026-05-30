@@ -1,11 +1,11 @@
-var CACHE = 'vault-3.0.1'
+var CACHE = 'kiro-3.0.1'
 var URLS = [
   'css/base.css',
   'css/layout.css',
   'css/components.css',
   'css/themes.css',
   'css/mobile.css',
-  'css/vault.css',
+  'css/kiro.css',
   'js/data.js',
   'js/views.js',
   'js/calendar.js',

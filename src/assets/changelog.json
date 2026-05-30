@@ -2,12 +2,16 @@
   {
     "version": "3.0.1",
     "date": "2026-05-30",
-    "title": "Version sync: All platforms bumped to 3.0.1",
+    "title": "Kiro — Full rebrand from Vault",
     "changes": [
-      "Synced Android/Capacitor version with npm/PWA version across all files",
-      "All version references bumped to 3.0.1"
+      "Rebranded from Vault to Kiro across all UI, config, and code",
+      "Migrated all localStorage keys (yt* → kiro*, vault_* → kiro_*) — existing data preserved",
+      "Renamed vault.css → kiro.css, vault-* CSS classes → kiro-*",
+      "Updated service worker cache, manifest, capacitor config, and npm package name",
+      "Renamed element IDs (ytInput → kiroInput, ytBtn → kiroBtn) plus all JS references"
     ]
   },
+  {
   {
     "version": "2.0.1",
     "date": "2026-05-29",

@@ -17,8 +17,8 @@ document.querySelectorAll('.settings-cat').forEach(cat => {
     if (this.dataset.cat === 'history') renderSettingsHistory()
   })
 })
-function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); s[key] = on; safeSetItem('ytSettings', JSON.stringify(s)) }
-function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('ytSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
+function saveSetting(key, on) { const s = JSON.parse(localStorage.getItem('kiroSettings') || '{}'); s[key] = on; safeSetItem('kiroSettings', JSON.stringify(s)) }
+function loadSetting(key, def) { const s = JSON.parse(localStorage.getItem('kiroSettings') || '{}'); return s[key] !== undefined ? s[key] : def }
 function renderSettingsHistory() {
   const el = document.getElementById('settingsHistoryList')
   if (!el) return
@@ -85,13 +85,13 @@ if (savedTheme === 'system') {
 }
 
 const SETTINGS_KEYS = {
-  toolbar: ['showSidebarBtn', 'showYtInput', 'compactMode'],
+  toolbar: ['showSidebarBtn', 'showKiroInput', 'compactMode'],
   files: ['autoUpdateLinks', 'confirmDeletion', 'detectAllExt'],
   history: ['saveLinkHistory', 'clearOnExit']
 }
 function applyToolbarSettings() {
   document.getElementById('menuBtn').style.display = loadSetting('showSidebarBtn', true) ? '' : 'none'
-  document.querySelector('.top-bar-input').style.display = loadSetting('showYtInput', true) ? '' : 'none'
+  document.querySelector('.top-bar-input').style.display = loadSetting('showKiroInput', true) ? '' : 'none'
   document.body.classList.toggle('compact', loadSetting('compactMode', false))
 }
 document.querySelectorAll('#pane-toolbar .settings-toggle').forEach((t, i) => {
@@ -156,7 +156,7 @@ if (blurAllToggle) {
   })
 }
 document.querySelector('#pane-basic .settings-clear-btn')?.addEventListener('click', () => {
-  if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
+  if (confirm('Clear all saved data?')) { localStorage.removeItem('kiroVideos'); localStorage.removeItem('kiroFolders'); localStorage.removeItem('kiroFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('kiroBookmarks'); localStorage.removeItem('kiroNotes'); renderSidebar(); clearCard() }
 })
 var settingsNameInput = document.getElementById('settingsUserName')
 if (settingsNameInput) {
@@ -201,7 +201,7 @@ if (editBtn && editInput && userDisplay) {
   function saveUserName(name) {
     var val = name !== undefined ? name.trim() : editInput.value.trim()
     if (!val) return
-    safeSetItem('ytUserName', val)
+    safeSetItem('kiroUserName', val)
     userDisplay.textContent = val
     userDisplay.style.display = ''
     editBtn.style.display = ''

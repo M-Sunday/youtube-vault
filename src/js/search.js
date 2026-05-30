@@ -49,8 +49,8 @@ async function loadVideo(videoId) {
 
 let pendingDaUrl = ''
 
-document.getElementById('ytBtn').addEventListener('click', () => {
-  const input = document.getElementById('ytInput').value.trim()
+document.getElementById('kiroBtn').addEventListener('click', () => {
+  const input = document.getElementById('kiroInput').value.trim()
   const id = getVideoId(input)
   if (id) { loadVideo(id); return }
   if (/^https?:\/\//i.test(input) || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(input)) {
@@ -60,7 +60,7 @@ document.getElementById('ytBtn').addEventListener('click', () => {
     document.getElementById('daDialog').classList.add('open')
     setTimeout(() => document.getElementById('daTitleInput').focus(), 100)
   } else {
-    document.getElementById('videoTitle').textContent = 'Invalid YouTube link'
+    document.getElementById('videoTitle').textContent = 'Invalid video link'
   }
 })
 
@@ -75,7 +75,7 @@ document.getElementById('daDialogConfirm').addEventListener('click', async () =>
   const da = { id: '_da_' + Date.now(), url: pendingDaUrl, title, added: Date.now(), image: `https://www.google.com/s2/favicons?domain=${domain}&sz=128` }
   das.push(da)
   saveDirectAccess(das)
-  document.getElementById('ytInput').value = ''
+  document.getElementById('kiroInput').value = ''
   document.getElementById('daDialog').classList.remove('open')
   pendingDaUrl = ''
   renderSidebar(); renderGridView(); closeSidebarMobile()
@@ -85,18 +85,18 @@ document.getElementById('daTitleInput').addEventListener('keydown', (e) => { if 
 
 document.getElementById('daDialog').addEventListener('mousedown', (e) => { if (e.target === document.getElementById('daDialog')) document.getElementById('daDialogCancel').click() })
 
-document.getElementById('ytInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { document.getElementById('ytBtn').click() };
-  if (e.key === 'Escape') document.getElementById('ytInput').blur()
+document.getElementById('kiroInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { document.getElementById('kiroBtn').click() };
+  if (e.key === 'Escape') document.getElementById('kiroInput').blur()
 })
-document.getElementById('ytInput').addEventListener('focus', () => {
+document.getElementById('kiroInput').addEventListener('focus', () => {
   document.querySelector('.top-bar').classList.add('search-expanded')
   setView('landing')
   renderSearchLanding()
 })
-document.getElementById('ytInput').addEventListener('blur', (e) => {
+document.getElementById('kiroInput').addEventListener('blur', (e) => {
   document.querySelector('.top-bar').classList.remove('search-expanded')
   const related = e.relatedTarget
-  if (related && (related.closest('#searchLanding') || related.id === 'ytBtn' || related.closest('.top-bar-input'))) return
+  if (related && (related.closest('#searchLanding') || related.id === 'kiroBtn' || related.closest('.top-bar-input'))) return
   if (!document.getElementById('gridView').classList.contains('open')) setView('grid')
 })
