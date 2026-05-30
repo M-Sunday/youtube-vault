@@ -424,17 +424,16 @@ function renderNoteTodoPreview(n) {
 
 // ─── Grid toggle ──────────────────────────────────────
 document.getElementById('gridBtn').addEventListener('click', function () {
-  const open = this.classList.toggle('active')
-  if (open) {
-    if (currentNoteId) closeNoteView()
-    setView('grid')
-    document.getElementById('ytInput').value = ''
-    renderGridView()
-  } else {
-    selectedGridItems.clear(); updateBatchBar()
-    if (!currentVideo) clearCard()
-    else setView('card')
+  const gv = document.getElementById('gridView')
+  if (gv.classList.contains('open')) return
+  if (currentNoteId) {
+    currentNoteId = null
+    document.getElementById('noteView').style.display = 'none'
   }
+  this.classList.add('active')
+  setView('grid')
+  document.getElementById('ytInput').value = ''
+  renderGridView()
 })
 
 // ─── Batch actions ─────────────────────────────────────

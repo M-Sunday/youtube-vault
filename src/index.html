@@ -22,7 +22,7 @@
       body.native-android .main-area { padding-top: max(30px, env(safe-area-inset-top, 0px)) !important; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important; background: #f5f5f7; }
     body.native-android.theme-black .main-area { background: #1c1c1e; }
     body.native-android .sidebar { padding-top: 40px !important; }
-    body.native-android .settings-cat[data-cat="download"] { display: none; }
+
 
     </style>
 </head>
@@ -74,7 +74,7 @@
             </button>
             <div class="online-indicator badge" id="onlineIndicator"><span class="dot"></span><span class="online-indicator-text">Online</span></div>
             <div class="top-bar-input">
-                <input type="text" id="ytInput" placeholder="Paste YouTube link" spellcheck="false" />
+                <input type="text" id="ytInput" placeholder="Paste a link" spellcheck="false" />
                 <button id="ytBtn">
                     <i data-lucide="arrow-right"></i>
                 </button>
@@ -95,12 +95,7 @@
                     </div>
                     <div class="card-add-row" id="cardAddRow">
                         <button class="card-add-btn" id="cardAddBtn"><i data-lucide="plus" class="card-add-icon"></i> Add video</button>
-                        <button class="card-add-btn" id="dlBtn" style="display:none"><i data-lucide="download" class="card-add-icon"></i> Download</button>
                         <button class="card-add-btn" id="copyLinkBtn" style="display:none"><i data-lucide="link" class="card-add-icon"></i> Copy link</button>
-                    </div>
-                    <div class="dl-progress" id="dlProgress" style="display:none">
-                        <div class="dl-progress-track"><div class="dl-progress-fill" id="dlProgressFill"></div></div>
-                        <span class="dl-progress-text" id="dlProgressText">0%</span>
                     </div>
                     <div class="calendar" id="calendar"></div>
                 </div>
@@ -129,7 +124,6 @@
                 <input class="note-view-title" id="noteViewTitle" placeholder="Note title" spellcheck="false" />
                 <div class="note-view-actions">
                     <button class="note-view-btn" id="noteTodoBtn" title="Add todo"><i data-lucide="list-checks" class="icon-md"></i></button>
-                    <button class="note-view-btn" id="notePasteImgBtn" title="Paste image from clipboard"><i data-lucide="clipboard-plus" class="icon-md"></i></button>
                     <button class="note-view-btn" id="noteUndoBtn"><i data-lucide="undo-2" class="icon-md"></i></button>
                     <button class="note-view-btn" id="noteRedoBtn"><i data-lucide="redo-2" class="icon-md"></i></button>
                     <button class="note-view-btn" id="noteDeleteBtn"><i data-lucide="trash-2" class="icon-md" style="color:#ff453a"></i></button>
@@ -201,26 +195,6 @@
         </div>
     </div>
 
-    <!-- Download dialog -->
-    <div class="folder-dialog-overlay" id="downloadDialog">
-        <div class="folder-dialog">
-            <div class="folder-dialog-header"><h3>Download Video</h3><p class="folder-dialog-desc" id="downloadDialogDesc">Choose where to save this video.</p></div>
-            <div class="download-quality-row">
-                <label class="download-quality-option active" data-quality="720"><span class="download-quality-label">720p</span><span class="download-quality-sublabel">HD ready</span></label>
-                <label class="download-quality-option" data-quality="480"><span class="download-quality-label">480p</span><span class="download-quality-sublabel">Standard</span></label>
-                <label class="download-quality-option" data-quality="360"><span class="download-quality-label">360p</span><span class="download-quality-sublabel">Fast</span></label>
-            </div>
-            <div class="dl-progress" id="dlDialogProgress" style="display:none">
-                <div class="dl-progress-track"><div class="dl-progress-fill" id="dlDialogProgressFill"></div></div>
-                <span class="dl-progress-text" id="dlDialogProgressText">0%</span>
-            </div>
-            <div class="folder-dialog-actions">
-                <button class="dialog-btn cancel" id="downloadDialogCancel">Cancel</button>
-                <button class="dialog-btn confirm" id="downloadDialogConfirm">Download</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Context menu -->
     <div class="ctx-menu" id="ctxMenu">
         <div class="ctx-item" data-action="rename-folder"><i data-lucide="edit-3" class="ctx-icon"></i> Rename folder</div>
@@ -255,7 +229,6 @@
                     <div class="settings-cat" data-cat="files"><i data-lucide="folder" class="icon-md flex-shrink-0"></i> Files and links</div>
                     <div class="settings-cat" data-cat="history"><i data-lucide="history" class="icon-md flex-shrink-0"></i> Link history</div>
                     <div class="settings-cat" data-cat="nsfw"><i data-lucide="eye-off" class="icon-md flex-shrink-0"></i> NSFW</div>
-                    <div class="settings-cat" data-cat="download"><i data-lucide="download" class="icon-md flex-shrink-0"></i> Download</div>
                     <div class="settings-cat" data-cat="patchnotes"><i data-lucide="file-text-fill" class="icon-md flex-shrink-0"></i> Patch notes</div>
                 </div>
                 <div class="settings-sidebar-footer" id="settingsClose">
@@ -347,58 +320,6 @@
                     <div class="settings-pane-header"><h2>Patch notes</h2><p class="settings-pane-desc">Changelog history for this app.</p></div>
                     <div id="patchNotesList" class="mt-20"></div>
                 </div>
-                <div class="settings-pane" id="pane-download" style="display:none">
-                    <div class="settings-pane-header"><h2>Download</h2><p class="settings-pane-desc">Media download preferences.</p></div>
-                    <div class="settings-plugin-list mt-20">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Type</span>
-                            <select class="settings-select" id="dlType">
-                                <option value="video">Video</option>
-                                <option value="audio">Audio</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="settings-plugin-list dl-video-settings">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Video quality</span>
-                            <select class="settings-select" id="dlVideoQuality">
-                                <option value="360">360p</option>
-                                <option value="480">480p</option>
-                                <option value="720" selected>720p</option>
-                                <option value="1080">1080p</option>
-                                <option value="1440">1440p</option>
-                                <option value="2160">2160p</option>
-                                <option value="max">Max</option>
-                            </select>
-                        </div>
-                        <div class="settings-plugin"><span class="settings-plugin-name">Video codec</span>
-                            <select class="settings-select" id="dlVideoCodec">
-                                <option value="h264" selected>H.264</option>
-                                <option value="av1">AV1</option>
-                                <option value="vp9">VP9</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="settings-plugin-list dl-audio-settings" style="display:none">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Audio format</span>
-                            <select class="settings-select" id="dlAudioFormat">
-                                <option value="mp3" selected>MP3</option>
-                                <option value="wav">WAV</option>
-                                <option value="opus">Opus</option>
-                                <option value="ogg">OGG</option>
-                                <option value="best">Best</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="settings-plugin-list" style="margin-top:4px">
-                        <div class="settings-plugin"><span class="settings-plugin-name">Audio bitrate</span>
-                            <select class="settings-select" id="dlAudioBitrate">
-                                <option value="auto" selected>Auto</option>
-                                <option value="320">320 kbps</option>
-                                <option value="256">256 kbps</option>
-                                <option value="128">128 kbps</option>
-                                <option value="96">96 kbps</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -555,7 +476,7 @@
       if (isFirstTime) {
         splash.classList.add('onboarding')
         splashText.style.display = 'none'
-        document.getElementById('onbStep0').style.display = ''
+        document.getElementById('onbStep0').classList.remove('onb-hidden')
       } else {
         if (navigator.onLine) {
           setTimeout(function(){ splashText.textContent = 'Up to date' }, 2000)
@@ -612,7 +533,6 @@
     <script src="js/dialogs.js"></script>
     <script src="js/grid.js"></script>
     <script src="js/card.js"></script>
-    <script src="js/download.js"></script>
     <script src="js/search.js"></script>
     <script src="js/icons.js"></script>
     <script src="js/extras.js"></script>

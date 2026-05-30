@@ -189,15 +189,6 @@ document.getElementById('noteViewContent').addEventListener('paste', async funct
   } catch {}
 })
 
-document.getElementById('notePasteImgBtn').addEventListener('click', async function () {
-  const el = document.getElementById('noteViewContent')
-  if (!el) return
-  const handled = await noteReadClipboardImage(el)
-  if (!handled) {
-    el.focus()
-  }
-})
-
 document.getElementById('noteDeleteBtn').addEventListener('click', () => {
   if (!currentNoteId) return
   let notes = getNotes().filter(x => x.id !== currentNoteId)

@@ -34,7 +34,9 @@
     setTimeout(function() {
       splash.style.display = 'none'
       onboarding.style.display = 'flex'
+      onboarding.classList.remove('onb-hidden')
       step1.style.display = 'block'
+      step1.classList.remove('onb-hidden')
       requestAnimationFrame(function() {
         step1.querySelector('.onb-label').classList.add('onb-visible')
         nameInput.style.opacity = '1'
@@ -64,6 +66,7 @@
     nameDisplay.textContent = name
     step1.style.display = 'none'
     step2.style.display = 'block'
+    step2.classList.remove('onb-hidden')
     requestAnimationFrame(function() {
       nameDisplay.classList.add('onb-visible')
       setTimeout(function() {

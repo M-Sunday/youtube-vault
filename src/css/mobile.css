@@ -32,10 +32,9 @@
   }
 
   .settings-modal {
-    width: calc(100% - 24px); height: 90vh; max-height: 90vh;
+    width: calc(100% - 32px); max-width: 440px; height: 380px;
     border-radius: 14px;
     flex-direction: column;
-    overflow: hidden;
   }
   .settings-sidebar {
     width: 100%; min-width: 0;
@@ -64,7 +63,6 @@
   .card-body h1 { font-size: 16px; }
   .calendar { padding: 10px 16px 16px; }
   .card-add-row { padding: 6px 16px 0; }
-  .dl-progress { padding: 4px 16px 0; }
   .grid-view { padding: 12px; }
   .grid-items { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .online-indicator .online-indicator-text { display: none; }

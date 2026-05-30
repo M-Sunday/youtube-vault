@@ -12,7 +12,7 @@ document.querySelectorAll('.settings-cat').forEach(cat => {
     document.querySelectorAll('.settings-cat').forEach(c => c.classList.remove('active'))
     this.classList.add('active')
     document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none')
-    document.getElementById({ user: 'pane-user', theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', nsfw: 'pane-nsfw', download: 'pane-download', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
+    document.getElementById({ user: 'pane-user', theme: 'pane-theme', basic: 'pane-basic', toolbar: 'pane-toolbar', files: 'pane-files', history: 'pane-history', nsfw: 'pane-nsfw', patchnotes: 'pane-patchnotes' }[this.dataset.cat]).style.display = 'block'
     if (this.dataset.cat === 'patchnotes') loadPatchNotes()
     if (this.dataset.cat === 'history') renderSettingsHistory()
   })
@@ -54,19 +54,35 @@ document.querySelectorAll('.theme-option').forEach(opt => {
   opt.addEventListener('click', function () {
     document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
     this.classList.add('active')
-    const t = this.dataset.theme; document.body.className = t === 'white' ? '' : 'theme-' + t
+    const t = this.dataset.theme
+    document.body.classList.remove('theme-black')
+    if (t === 'black') document.body.classList.add('theme-black')
     safeSetItem('theme', t); document.getElementById('systemTheme').checked = false
   })
 })
 document.getElementById('systemTheme').addEventListener('change', function () {
   document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
-  if (this.checked) { document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-black' : ''; safeSetItem('theme', 'system') }
-  else { const s = localStorage.getItem('theme') || 'white'; document.body.className = s === 'white' ? '' : 'theme-' + s; document.querySelector(`.theme-option[data-theme="${s}"]`)?.classList.add('active') }
+  if (this.checked) {
+    document.body.classList.remove('theme-black')
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('theme-black')
+    safeSetItem('theme', 'system')
+  } else {
+    const s = localStorage.getItem('theme') || 'white'
+    document.body.classList.remove('theme-black')
+    if (s !== 'white') document.body.classList.add('theme-' + s)
+    document.querySelector(`.theme-option[data-theme="${s}"]`)?.classList.add('active')
+  }
 })
 const savedTheme = localStorage.getItem('theme') || 'white'
 document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'))
-if (savedTheme === 'system') { document.getElementById('systemTheme').checked = true; document.body.className = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-black' : '' }
-else { document.body.className = savedTheme === 'white' ? '' : 'theme-' + savedTheme; document.querySelector(`.theme-option[data-theme="` + savedTheme + `"]`)?.classList.add('active') }
+document.body.classList.remove('theme-black')
+if (savedTheme === 'system') {
+  document.getElementById('systemTheme').checked = true
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('theme-black')
+} else {
+  if (savedTheme !== 'white') document.body.classList.add('theme-' + savedTheme)
+  document.querySelector(`.theme-option[data-theme="` + savedTheme + `"]`)?.classList.add('active')
+}
 
 const SETTINGS_KEYS = {
   toolbar: ['showSidebarBtn', 'showYtInput', 'compactMode'],
@@ -139,30 +155,6 @@ if (blurAllToggle) {
     setTimeout(function(){ location.reload() }, 400)
   })
 }
-const dlTypeEl = document.getElementById('dlType')
-const dlVideoSettings = document.querySelector('.dl-video-settings')
-const dlAudioSettings = document.querySelector('.dl-audio-settings')
-function toggleDlSettings(type) {
-  if (!dlVideoSettings || !dlAudioSettings) return
-  dlVideoSettings.style.display = type === 'video' ? '' : 'none'
-  dlAudioSettings.style.display = type === 'audio' ? '' : 'none'
-}
-if (dlTypeEl) {
-  const saved = localStorage.getItem('dlType') || 'video'
-  dlTypeEl.value = saved
-  toggleDlSettings(saved)
-  dlTypeEl.addEventListener('change', () => {
-    localStorage.setItem('dlType', dlTypeEl.value)
-    toggleDlSettings(dlTypeEl.value)
-  })
-}
-['dlVideoQuality','dlAudioFormat','dlAudioBitrate','dlVideoCodec'].forEach(id => {
-  const el = document.getElementById(id)
-  if (!el) return
-  const saved = localStorage.getItem(id)
-  if (saved) el.value = saved
-  el.addEventListener('change', () => localStorage.setItem(id, el.value))
-})
 document.querySelector('#pane-basic .settings-clear-btn')?.addEventListener('click', () => {
   if (confirm('Clear all saved data?')) { localStorage.removeItem('ytVideos'); localStorage.removeItem('ytFolders'); localStorage.removeItem('ytFolderMeta'); localStorage.removeItem('linkHistory'); localStorage.removeItem('ytBookmarks'); localStorage.removeItem('ytNotes'); renderSidebar(); clearCard() }
 })

@@ -29,7 +29,6 @@ function updateCardAddBtn() {
   const row = document.getElementById('cardAddRow')
   const btn = document.getElementById('cardAddBtn')
   const copyBtn = document.getElementById('copyLinkBtn')
-  const dlBtn = document.getElementById('dlBtn')
   if (!currentVideo) { row.style.display = 'none'; return }
   const vs = getVideos()
   if (vs[currentVideo.id]) {
@@ -46,7 +45,6 @@ function updateCardAddBtn() {
     }
     btn.onclick = (e) => { e.stopPropagation(); if (currentVideo) unlinkCurrentVideo() }
     copyBtn.style.display = 'inline-flex'
-    if (dlBtn) dlBtn.style.display = 'inline-flex'
     loadIcons()
   } else {
     row.style.display = 'flex'
@@ -54,7 +52,6 @@ function updateCardAddBtn() {
     btn.innerHTML = '<i data-lucide="plus" class="card-add-icon"></i> Add video'
     btn.onmouseover = btn.onmouseout = btn.onclick = null
     copyBtn.style.display = 'none'
-    if (dlBtn) dlBtn.style.display = 'none'
     loadIcons()
   }
 }

@@ -28,9 +28,7 @@ body.theme-black .card-add-btn { border-color: #3a3a3c; color: #a1a1a6; }
 body.theme-black .card-add-btn:hover { background: #3a3a3c; color: #f5f5f7; border-color: #8e8e93; }
 body.theme-black .card-add-btn.saved { border-color: #30d158; color: #30d158; }
 body.theme-black .card-add-btn.saved:hover { border-color: #ff453a; color: #ff453a; }
-body.theme-black .dl-progress-track { background: #3a3a3c; }
-body.theme-black .dl-progress-fill { background: #0a84ff; }
-body.theme-black .dl-progress-text { color: #a1a1a6; }
+
 body.theme-black .update-toast { background: #f5f5f7; color: #1c1c1e; }
 body.theme-black #updateToastBtn { background: #0a84ff; color: #fff; }
 body.theme-black #updateLaterBtn { border-color: #8e8e93; color: #8e8e93; }
